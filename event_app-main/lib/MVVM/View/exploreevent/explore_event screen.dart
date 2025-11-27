@@ -132,6 +132,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
 
   void _applyFilters() {
     setState(() {
+      final now = DateTime.now();
       _filteredEvents = controller.events.where((event) {
         // Search by title
         bool matchesSearch = _searchController.text.isEmpty ||
@@ -143,6 +144,21 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
         // Filter by category
         bool matchesCategory = _selectedCategory == 'All' ||
             (event.category?.toLowerCase() == _selectedCategory.toLowerCase());
+
+        // Filter out past events - only show events that haven't passed
+        bool isNotPast = true;
+        if (event.startDate != null && event.startDate!.isNotEmpty) {
+          try {
+            final eventDate = DateTime.parse(event.startDate!);
+            // Check if event date/time has passed (compare with current date/time)
+            if (eventDate.isBefore(now)) {
+              isNotPast = false;
+            }
+          } catch (_) {
+            // If date parsing fails, include the event (don't filter it out)
+            isNotPast = true;
+          }
+        }
 
         // Distance filter (if enabled)
         bool matchesDistance = true;
@@ -181,6 +197,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
 
         return matchesSearch &&
             matchesCategory &&
+            isNotPast &&
             matchesDistance &&
             matchesDate;
       }).toList();
