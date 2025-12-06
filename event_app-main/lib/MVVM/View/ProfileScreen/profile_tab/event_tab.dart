@@ -26,6 +26,7 @@ class EventTab extends StatelessWidget {
       }
 
       return ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
         itemCount: controller.myEvents.length,
         itemBuilder: (context, index) {

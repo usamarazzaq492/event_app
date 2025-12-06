@@ -58,76 +58,79 @@ class _AboutTabState extends State<AboutTab> {
           .map((e) => e.trim())
           .toList();
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// 🔹 About Me header
-          buildSectionHeader('About Me', Icons.person),
+      return SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// 🔹 About Me header
+            buildSectionHeader('About Me', Icons.person),
 
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(2.w),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.signinoptioncolor,
-                  AppColors.backgroundColor
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              bio,
-              style: TextStyles.regularwhite.copyWith(
-                height: 1.4,
-              ),
-              maxLines: 5,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-
-          SizedBox(height: 3.h),
-
-          /// 🔹 Interests header
-          buildSectionHeader('Interests', Icons.star),
-
-          splitInterests.isEmpty
-              ? Text('No interests added',
-                  style: TextStyles.regularwhite.copyWith(color: Colors.grey))
-              : Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: List.generate(splitInterests.length, (index) {
-                    final interest = splitInterests[index];
-                    final icon = knownInterestIcons.entries
-                        .firstWhere(
-                          (entry) => interest
-                              .toLowerCase()
-                              .contains(entry.key.toLowerCase()),
-                          orElse: () => MapEntry('default', defaultIcon),
-                        )
-                        .value;
-
-                    final color = gradientColors[index % gradientColors.length];
-
-                    return Chip(
-                      avatar: Icon(icon, color: Colors.white, size: 12.sp),
-                      label: Text(
-                        interest,
-                        style: TextStyles.regularwhite,
-                      ),
-                      backgroundColor: color,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 3.w, vertical: 0.5.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    );
-                  }),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(2.w),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.signinoptioncolor,
+                    AppColors.backgroundColor
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-        ],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                bio,
+                style: TextStyles.regularwhite.copyWith(
+                  height: 1.4,
+                ),
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+
+            SizedBox(height: 3.h),
+
+            /// 🔹 Interests header
+            buildSectionHeader('Interests', Icons.star),
+
+            splitInterests.isEmpty
+                ? Text('No interests added',
+                    style: TextStyles.regularwhite.copyWith(color: Colors.grey))
+                : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: List.generate(splitInterests.length, (index) {
+                      final interest = splitInterests[index];
+                      final icon = knownInterestIcons.entries
+                          .firstWhere(
+                            (entry) => interest
+                                .toLowerCase()
+                                .contains(entry.key.toLowerCase()),
+                            orElse: () => MapEntry('default', defaultIcon),
+                          )
+                          .value;
+
+                      final color = gradientColors[index % gradientColors.length];
+
+                      return Chip(
+                        avatar: Icon(icon, color: Colors.white, size: 12.sp),
+                        label: Text(
+                          interest,
+                          style: TextStyles.regularwhite,
+                        ),
+                        backgroundColor: color,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 3.w, vertical: 0.5.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      );
+                    }),
+                  ),
+          ],
+        ),
       );
     });
   }

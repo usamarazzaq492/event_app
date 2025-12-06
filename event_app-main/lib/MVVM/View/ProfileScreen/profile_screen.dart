@@ -88,7 +88,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             onRefresh: _refreshProfile,
             color: AppColors.blueColor,
             backgroundColor: AppColors.signinoptioncolor,
-            child: Padding(
+            child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -105,7 +105,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                   SizedBox(height: 3.h),
                   _buildTabBar(),
                   SizedBox(height: 2.h),
-                  Expanded(child: _buildTabBarView()),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    child: _buildTabBarView(),
+                  ),
                 ],
               ),
             ),
@@ -519,6 +522,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildTabBarView() {
     return TabBarView(
       controller: _tabController,
+      physics: const NeverScrollableScrollPhysics(), // Disable swipe, use tabs only
       children: [
         AboutTab(),
         EventTab(),

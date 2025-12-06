@@ -9,6 +9,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/foundation.dart';
 import '../../view_model/public_profile_controller.dart';
 import '../ProfileScreen/public_profile_screen.dart';
 import '../UsersData/invite_user_list.dart';
@@ -18,6 +20,209 @@ import '../../../utils/haptic_utils.dart';
 import '../bottombar/bottom_navigation_bar.dart';
 import '../../../Widget/live_stream_widget.dart';
 import '../Promotion/promote_event_screen.dart';
+
+/// Safe Google Map Widget with error handling
+class _SafeMapStatefulWidget extends StatefulWidget {
+  final LatLng location;
+  final EventDetailModel event;
+
+  const _SafeMapStatefulWidget({
+    required this.location,
+    required this.event,
+  });
+
+  @override
+  State<_SafeMapStatefulWidget> createState() => _SafeMapStatefulWidgetState();
+}
+
+class _SafeMapStatefulWidgetState extends State<_SafeMapStatefulWidget> {
+  bool _mapInitialized = false;
+  bool _hasError = false;
+
+  @override
+  Widget build(BuildContext context) {
+    // Temporarily show fallback until API key is configured
+    // Uncomment the GoogleMap widget below once API key is added to Info.plist
+    return _buildMapFallback(widget.location, widget.event);
+    
+    // Uncomment this once Google Maps API key is configured in Info.plist
+    /*
+    if (_hasError) {
+      return _buildMapFallback(widget.location, widget.event);
+    }
+
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: widget.location,
+        zoom: 15.0,
+      ),
+      markers: {
+        Marker(
+          markerId: MarkerId('event_location'),
+          position: widget.location,
+          infoWindow: InfoWindow(
+            title: widget.event.eventTitle ?? 'Event Location',
+            snippet: '${widget.event.address ?? ''}, ${widget.event.city ?? ''}',
+          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueBlue,
+          ),
+        ),
+      },
+      mapType: MapType.normal,
+      zoomControlsEnabled: false,
+      myLocationButtonEnabled: false,
+      compassEnabled: false,
+      mapToolbarEnabled: false,
+      onMapCreated: (GoogleMapController controller) {
+        if (mounted) {
+          setState(() {
+            _mapInitialized = true;
+          });
+        }
+      },
+    );
+    */
+  }
+
+  Widget _buildMapFallback(LatLng location, EventDetailModel event) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.grey.shade900,
+            Colors.grey.shade800,
+          ],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Background pattern
+          Center(
+            child: Opacity(
+              opacity: 0.3,
+              child: Icon(
+                Icons.map,
+                size: 50.sp,
+                color: Colors.grey.shade700,
+              ),
+            ),
+          ),
+          // Content - made scrollable to prevent overflow
+          SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 1.h),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(1.5.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.blueColor.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.location_on,
+                      size: 24.sp,
+                      color: AppColors.blueColor,
+                    ),
+                  ),
+                  SizedBox(height: 1.h),
+                  Text(
+                    'Event Location',
+                    style: TextStyles.regularwhite.copyWith(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 0.8.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+                    margin: EdgeInsets.symmetric(horizontal: 3.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.signinoptioncolor,
+                      borderRadius: BorderRadius.circular(1.h),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.navigation,
+                              size: 10.sp,
+                              color: AppColors.blueColor,
+                            ),
+                            SizedBox(width: 1.w),
+                            Flexible(
+                              child: Text(
+                                'Lat: ${location.latitude.toStringAsFixed(6)}',
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 9.sp,
+                                  color: Colors.white70,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 0.3.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.navigation,
+                              size: 10.sp,
+                              color: AppColors.blueColor,
+                            ),
+                            SizedBox(width: 1.w),
+                            Flexible(
+                              child: Text(
+                                'Lng: ${location.longitude.toStringAsFixed(6)}',
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 9.sp,
+                                  color: Colors.white70,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 0.8.h),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 3.w),
+                    child: Text(
+                      'Configure Google Maps API key\nto view interactive map',
+                      textAlign: TextAlign.center,
+                      style: TextStyles.regularwhite.copyWith(
+                        fontSize: 8.sp,
+                        color: Colors.white60,
+                      ),
+                      maxLines: 2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class EventDetailScreen extends StatefulWidget {
   final String eventId;
@@ -753,7 +958,24 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
   }
 
+  /// Safe Google Map widget with error handling
+  Widget _SafeGoogleMapWidget({
+    required LatLng location,
+    required EventDetailModel event,
+  }) {
+    return _SafeMapStatefulWidget(location: location, event: event);
+  }
+
   Widget _buildLocationSection(EventDetailModel event) {
+    final lat = double.tryParse(event.latitude ?? '');
+    final lng = double.tryParse(event.longitude ?? '');
+
+    if (lat == null || lng == null) {
+      return const SizedBox.shrink();
+    }
+
+    final eventLocation = LatLng(lat, lng);
+
     return Container(
       padding: EdgeInsets.all(3.w),
       decoration: BoxDecoration(
@@ -788,42 +1010,106 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           Container(
             height: 20.h,
             decoration: BoxDecoration(
-              color: Colors.grey.shade800,
               borderRadius: BorderRadius.circular(1.h),
               border: Border.all(
-                color: Colors.grey.shade600,
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(1.h),
+              child: _SafeGoogleMapWidget(
+                location: eventLocation,
+                event: event,
+              ),
+            ),
+          ),
+          SizedBox(height: 1.h),
+          if (event.address != null || event.city != null)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 1.w),
+              child: Row(
                 children: [
                   Icon(
-                    Icons.map,
-                    size: 24.sp,
+                    Icons.location_on,
+                    size: 12.sp,
                     color: AppColors.blueColor,
                   ),
-                  SizedBox(height: 1.h),
-                  Text(
-                    'Interactive Map',
-                    style: TextStyles.regularwhite.copyWith(
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    'Tap to view full map',
-                    style: TextStyles.regularwhite.copyWith(
-                      fontSize: 9.sp,
-                      color: Colors.white60,
+                  SizedBox(width: 1.w),
+                  Expanded(
+                    child: Text(
+                      '${event.address ?? ''}${event.address != null && event.city != null ? ', ' : ''}${event.city ?? ''}',
+                      style: TextStyles.regularwhite.copyWith(
+                        fontSize: 10.sp,
+                        color: Colors.white70,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
         ],
+      ),
+    );
+  }
+
+  /// Fallback UI when Google Maps fails to load
+  Widget _buildMapFallback(LatLng location, EventDetailModel event) {
+    return Container(
+      color: Colors.grey.shade900,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.map_outlined,
+              size: 24.sp,
+              color: AppColors.blueColor,
+            ),
+            SizedBox(height: 1.h),
+            Text(
+              'Map unavailable',
+              style: TextStyles.regularwhite.copyWith(
+                fontSize: 11.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 0.5.h),
+            Text(
+              'Coordinates: ${location.latitude.toStringAsFixed(6)}, ${location.longitude.toStringAsFixed(6)}',
+              style: TextStyles.regularwhite.copyWith(
+                fontSize: 9.sp,
+                color: Colors.white60,
+              ),
+            ),
+            SizedBox(height: 1.h),
+            GestureDetector(
+              onTap: () {
+                // Open in external maps app
+                final url = 'https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}';
+                // You can use url_launcher here if available
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+                decoration: BoxDecoration(
+                  color: AppColors.blueColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(1.h),
+                  border: Border.all(
+                    color: AppColors.blueColor,
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  'Open in Maps',
+                  style: TextStyles.regularwhite.copyWith(
+                    fontSize: 9.sp,
+                    color: AppColors.blueColor,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

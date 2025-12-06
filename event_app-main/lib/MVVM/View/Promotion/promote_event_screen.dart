@@ -43,19 +43,39 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
       });
 
       final response = await _promotionService.getPackages();
-      if (response['success'] == true) {
-        setState(() {
-          _packages = response['data'];
-          _isLoadingPackages = false;
-        });
+      
+      // Check if response is valid
+      if (response == null) {
+        throw Exception('No response from server');
+      }
+      
+      // Handle different response formats
+      if (response['success'] == true || response['success'] == 'true') {
+        final data = response['data'];
+        if (data != null && data is Map) {
+          setState(() {
+            _packages = Map<String, dynamic>.from(data);
+            _isLoadingPackages = false;
+          });
+        } else {
+          throw Exception('Invalid package data format');
+        }
       } else {
-        throw Exception('Failed to load packages');
+        final errorMsg = response['message'] ?? response['error'] ?? 'Failed to load packages';
+        throw Exception(errorMsg);
       }
     } catch (e) {
+      print('Error loading packages: $e');
       setState(() {
-        _error = e.toString();
+        _error = e.toString().replaceAll('Exception: ', '');
         _isLoadingPackages = false;
       });
+      Get.snackbar(
+        'Error',
+        'Failed to load promotion packages: ${e.toString().replaceAll('Exception: ', '')}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -203,20 +223,37 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                       ),
                       SizedBox(height: 2.h),
 
-                      if (_packages != null) ...[
+                      if (_packages != null && _packages!.isNotEmpty) ...[
                         // Basic Package
+                        if (_packages!['basic'] != null)
+                          _buildPackageCard(
+                            'Basic',
+                            _packages!['basic'],
+                            'basic',
+                            Colors.blue,
+                          ),
+                        if (_packages!['basic'] != null) SizedBox(height: 2.h),
+
+                        // Premium Package
+                        if (_packages!['premium'] != null)
+                          _buildPackageCard(
+                            'Premium',
+                            _packages!['premium'],
+                            'premium',
+                            Colors.orange,
+                          ),
+                      ] else ...[
+                        // Fallback packages if API fails
                         _buildPackageCard(
                           'Basic',
-                          _packages!['basic'],
+                          {'price': 35.00, 'durationDays': 10},
                           'basic',
                           Colors.blue,
                         ),
                         SizedBox(height: 2.h),
-
-                        // Premium Package
                         _buildPackageCard(
                           'Premium',
-                          _packages!['premium'],
+                          {'price': 75.00, 'durationDays': 30},
                           'premium',
                           Colors.orange,
                         ),

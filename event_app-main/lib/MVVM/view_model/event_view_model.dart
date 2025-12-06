@@ -239,12 +239,22 @@ class EventController extends GetxController {
       final data = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        Get.snackbar("Success", data["message"] ?? "Event updated.");
+        Get.snackbar("Success", data["message"] ?? "Event updated.",
+            backgroundColor: Colors.green, colorText: Colors.white);
+        // Refresh the event list after successful update
+        await fetchAllEvents();
       } else {
-        Get.snackbar("Error", data["error"] ?? "Update failed.");
+        final errorMessage = data["error"] ?? 
+                           data["message"] ?? 
+                           "Update failed. Status: ${response.statusCode}";
+        Get.snackbar("Error", errorMessage,
+            backgroundColor: Colors.red, colorText: Colors.white);
+        print("Update Event Error: ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      Get.snackbar("Error", "Failed to update event: ${e.toString()}",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      print("Update Event Exception: $e");
     } finally {
       isLoading.value = false;
     }

@@ -19,21 +19,35 @@ class PromotionService {
     };
   }
 
-  /// Get available promotion packages
+  /// Get available promotion packages (Public endpoint - no auth required)
   Future<Map<String, dynamic>> getPackages() async {
     try {
+      // Public endpoint - only send basic headers, no auth token needed
       final response = await http.get(
         Uri.parse('$baseUrl/promotion/packages'),
-        headers: await _getHeaders(),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
       );
 
+      print('Promotion packages response: ${response.statusCode} - ${response.body}');
+
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final decoded = json.decode(response.body);
+        return decoded;
       } else {
-        throw Exception('Failed to load packages: ${response.body}');
+        final errorBody = response.body.isNotEmpty 
+            ? json.decode(response.body) 
+            : {'message': 'Server error ${response.statusCode}'};
+        throw Exception(errorBody['message'] ?? 'Failed to load packages: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Error loading packages: $e');
+      print('Promotion service error: $e');
+      if (e is FormatException) {
+        throw Exception('Invalid response format from server');
+      }
+      rethrow;
     }
   }
 

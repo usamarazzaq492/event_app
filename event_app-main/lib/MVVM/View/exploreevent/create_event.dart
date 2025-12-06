@@ -478,6 +478,8 @@ class _CreateEventState extends State<CreateEvent> {
     return TextFormField(
       controller: controller,
       readOnly: true,
+      enableInteractiveSelection: false,
+      contextMenuBuilder: (context, editableTextState) => const SizedBox.shrink(),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         hintText: hint,

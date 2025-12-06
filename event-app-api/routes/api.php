@@ -21,6 +21,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/verify-password-otp', [AuthController::class, 'verifyPasswordOtp']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
+    // 💰 Promotion Packages (Public - accessible without authentication)
+    Route::get('/promotion/packages', [PromotionController::class, 'getPackages']);
+
     // 🔒 Authenticated User Actions
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -53,9 +56,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/promote', [PromotionController::class, 'purchasePromotion']);
             Route::get('/{id}/promotion-status', [PromotionController::class, 'getPromotionStatus']);
         });
-
-        // 💰 Promotion Packages (Public)
-        Route::get('/promotion/packages', [PromotionController::class, 'getPackages']);
 
         // Invites
         Route::prefix('invite')->group(function () {

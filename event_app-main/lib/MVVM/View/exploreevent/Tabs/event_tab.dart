@@ -105,6 +105,8 @@ class _CreatEventTabState extends State<CreatEventTab> {
           child: TextFormField(
             controller: dateController,
             readOnly: true,
+            enableInteractiveSelection: false,
+            contextMenuBuilder: (context, editableTextState) => const SizedBox.shrink(),
             decoration: InputDecoration(
               fillColor: Colors.transparent,
               filled: true,

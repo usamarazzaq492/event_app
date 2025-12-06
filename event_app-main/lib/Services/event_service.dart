@@ -350,16 +350,28 @@ class EventService {
       request.fields['live_stream_url'] = liveStreamUrl;
     }
 
-    // Image file
-    if (eventImage != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'eventImage',
-        eventImage.path,
-        filename: basename(eventImage.path),
-      ));
+    // Image file - only add if file exists and is valid
+    if (eventImage != null && await eventImage.exists()) {
+      try {
+        request.files.add(await http.MultipartFile.fromPath(
+          'eventImage',
+          eventImage.path,
+          filename: basename(eventImage.path),
+        ));
+      } catch (e) {
+        print("Error adding image file: $e");
+        throw Exception("Failed to process image file: $e");
+      }
     }
 
-    final streamedResponse = await request.send();
-    return await http.Response.fromStream(streamedResponse);
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      print("Update Event Response: ${response.statusCode} - ${response.body}");
+      return response;
+    } catch (e) {
+      print("Error sending update request: $e");
+      rethrow;
+    }
   }
 }
