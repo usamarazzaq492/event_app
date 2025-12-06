@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart'; // Commented out - map functionality disabled
 import 'package:flutter/foundation.dart';
 import '../../view_model/public_profile_controller.dart';
 import '../ProfileScreen/public_profile_screen.dart';
@@ -21,7 +21,8 @@ import '../bottombar/bottom_navigation_bar.dart';
 import '../../../Widget/live_stream_widget.dart';
 import '../Promotion/promote_event_screen.dart';
 
-/// Safe Google Map Widget with error handling
+/// Safe Google Map Widget with error handling - COMMENTED OUT
+/*
 class _SafeMapStatefulWidget extends StatefulWidget {
   final LatLng location;
   final EventDetailModel event;
@@ -34,7 +35,9 @@ class _SafeMapStatefulWidget extends StatefulWidget {
   @override
   State<_SafeMapStatefulWidget> createState() => _SafeMapStatefulWidgetState();
 }
+*/
 
+/*
 class _SafeMapStatefulWidgetState extends State<_SafeMapStatefulWidget> {
   bool _mapInitialized = false;
   bool _hasError = false;
@@ -84,7 +87,10 @@ class _SafeMapStatefulWidgetState extends State<_SafeMapStatefulWidget> {
     );
     */
   }
+*/
 
+  // COMMENTED OUT - Map functionality disabled
+  /*
   Widget _buildMapFallback(LatLng location, EventDetailModel event) {
     return Container(
       decoration: BoxDecoration(
@@ -222,6 +228,7 @@ class _SafeMapStatefulWidgetState extends State<_SafeMapStatefulWidget> {
       ),
     );
   }
+  */
 }
 
 class EventDetailScreen extends StatefulWidget {
@@ -314,11 +321,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       _buildLiveStreamSection(event),
                     if (event.liveStreamUrl != null) SizedBox(height: 3.h),
 
-                    // Location Map (if coordinates available)
-                    if (event.latitude != null && event.longitude != null)
-                      _buildLocationSection(event),
-                    if (event.latitude != null && event.longitude != null)
-                      SizedBox(height: 3.h),
+                    // Location Map (if coordinates available) - COMMENTED OUT
+                    // if (event.latitude != null && event.longitude != null)
+                    //   _buildLocationSection(event),
+                    // if (event.latitude != null && event.longitude != null)
+                    //   SizedBox(height: 3.h),
 
                     // Event Status and Actions
                     _buildEventStatusSection(event, isCreator, isBooked,
@@ -958,14 +965,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
   }
 
-  /// Safe Google Map widget with error handling
+  /// Safe Google Map widget with error handling - COMMENTED OUT
+  /*
   Widget _SafeGoogleMapWidget({
     required LatLng location,
     required EventDetailModel event,
   }) {
     return _SafeMapStatefulWidget(location: location, event: event);
   }
+  */
 
+  // COMMENTED OUT - Map functionality disabled
+  /*
   Widget _buildLocationSection(EventDetailModel event) {
     final lat = double.tryParse(event.latitude ?? '');
     final lng = double.tryParse(event.longitude ?? '');
@@ -1052,8 +1063,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       ),
     );
   }
+  */
 
-  /// Fallback UI when Google Maps fails to load
+  /// Fallback UI when Google Maps fails to load - COMMENTED OUT
+  /*
   Widget _buildMapFallback(LatLng location, EventDetailModel event) {
     return Container(
       color: Colors.grey.shade900,
