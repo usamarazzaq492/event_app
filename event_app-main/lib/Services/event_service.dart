@@ -145,6 +145,25 @@ class EventService {
         }
       }
 
+      // Sort: Promoted events FIRST, then by date
+      filteredEvents.sort((a, b) {
+        // First priority: Promoted events come first
+        final aIsPromoted = a.isPromotionActive;
+        final bIsPromoted = b.isPromotionActive;
+
+        if (aIsPromoted && !bIsPromoted) return -1; // a comes first
+        if (!aIsPromoted && bIsPromoted) return 1; // b comes first
+
+        // If both promoted or both not promoted, sort by date
+        try {
+          final aDate = DateTime.parse(a.startDate ?? '');
+          final bDate = DateTime.parse(b.startDate ?? '');
+          return aDate.compareTo(bDate);
+        } catch (_) {
+          return 0;
+        }
+      });
+
       return filteredEvents;
     } catch (e) {
       throw Exception('Failed to search events: $e');

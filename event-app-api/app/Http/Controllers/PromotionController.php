@@ -50,7 +50,7 @@ class PromotionController extends Controller
 
         return DB::transaction(function () use ($request, $eventId) {
             $user = $request->user();
-            
+
             // Verify event exists and belongs to user
             $event = DB::table('events')
                 ->where('eventId', $eventId)
@@ -63,6 +63,22 @@ class PromotionController extends Controller
                     'success' => false,
                     'message' => 'Event not found or you do not have permission'
                 ], 404);
+            }
+
+            // Check if promotion is already active - prevent promoting again
+            $isPromoted = $event->isPromoted == 1;
+            $isActive = false;
+
+            if ($isPromoted && $event->promotionEndDate) {
+                $endDate = \Carbon\Carbon::parse($event->promotionEndDate);
+                $isActive = $endDate->isFuture();
+            }
+
+            if ($isActive) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your event is already promoted. You can promote again after the current promotion expires.'
+                ], 400);
             }
 
             // Determine package details
@@ -149,9 +165,9 @@ class PromotionController extends Controller
         if ($isPromoted && $event->promotionEndDate) {
             $endDate = \Carbon\Carbon::parse($event->promotionEndDate);
             $isActive = $endDate->isFuture();
-            
+
             if ($isActive) {
-                $daysRemaining = now()->diffInDays($endDate, false);
+                $daysRemaining = max(0, (int)ceil(now()->diffInDays($endDate, false)));
             }
         }
 
@@ -163,7 +179,7 @@ class PromotionController extends Controller
                 'package' => $event->promotionPackage,
                 'startDate' => $event->promotionStartDate,
                 'endDate' => $event->promotionEndDate,
-                'daysRemaining' => $daysRemaining > 0 ? $daysRemaining : 0,
+                'daysRemaining' => $daysRemaining,
             ]
         ]);
     }
@@ -196,33 +212,74 @@ class PromotionController extends Controller
     private function processSquarePayment($paymentNonce, $amount, $note, $userId)
     {
         try {
+            // Validate amount
+            if (!is_numeric($amount) || $amount <= 0) {
+                throw new \InvalidArgumentException('Invalid payment amount: must be a positive number');
+            }
+
+            // Convert to cents and ensure it's an integer
+            $amountCents = (int)round($amount * 100);
+
+            // Create Money object using SDK 42.0+ syntax
             $amountMoney = new Money();
-            $amountMoney->setAmount((int)($amount * 100)); // Convert to cents
+            $amountMoney->setAmount($amountCents);
             $amountMoney->setCurrency('USD');
 
+            // Verify location ID
+            $locationId = env('SQUARE_LOCATION_ID');
+            if (empty($locationId)) {
+                throw new \RuntimeException('Square location ID is not configured');
+            }
+
+            // Create payment request with newer SDK syntax
             $paymentRequest = new CreatePaymentRequest([
                 'idempotencyKey' => Str::uuid()->toString(),
                 'sourceId' => $paymentNonce,
                 'amountMoney' => $amountMoney,
-                'note' => $note,
             ]);
 
-            $response = $this->squareClient->payments->createPayment($paymentRequest);
+            // Set additional parameters
+            $paymentRequest->setNote(substr($note, 0, 500));
+            $paymentRequest->setCustomerId((string)$userId);
+            $paymentRequest->setAutocomplete(true);
+            $paymentRequest->setLocationId($locationId);
 
-            if ($response->isError()) {
-                Log::error('Square payment error', [
-                    'errors' => $response->getErrors(),
-                    'user_id' => $userId,
-                ]);
-                throw new \Exception('Payment processing failed: ' . json_encode($response->getErrors()));
+            // Debug the final request payload
+            Log::debug('Square Payment Request', [
+                'amount_money' => [
+                    'amount' => $amountMoney->getAmount(),
+                    'currency' => $amountMoney->getCurrency()
+                ],
+                'sourceId' => $paymentNonce,
+                'customer_id' => $userId,
+                'location_id' => $locationId
+            ]);
+
+            // Process payment using the Payments API - use create() not createPayment()
+            $paymentsApi = $this->squareClient->payments;
+            $response = $paymentsApi->create($paymentRequest);
+
+            // Check for errors in response
+            if ($response->getErrors()) {
+                $errors = $response->getErrors();
+                Log::error('Square payment error', ['errors' => $errors]);
+                throw new \RuntimeException('Square payment failed: ' . json_encode($errors));
             }
 
             return $response;
 
+        } catch (\Square\Exceptions\SquareApiException $e) {
+            Log::error('Square API Exception', [
+                'message' => $e->getMessage(),
+                'errors' => $e->getErrors(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new \RuntimeException('Payment processing failed: ' . $e->getMessage());
         } catch (\Exception $e) {
             Log::error('Square payment exception', [
                 'message' => $e->getMessage(),
                 'user_id' => $userId,
+                'trace' => $e->getTraceAsString()
             ]);
             throw $e;
         }

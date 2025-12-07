@@ -254,12 +254,23 @@
         @forelse($events as $event)
         <div class="event-card" data-aos="fade-up" data-aos-delay="{{ $loop->index * 50 }}">
             <div class="event-info">
-                <div class="event-logo">
+                <div class="event-logo position-relative">
                     @if($event->eventImage)
                         <img src="{{ asset($event->eventImage) }}" alt="{{ $event->eventTitle }}"
                             onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=80&q=80';">
                     @else
                         <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=80&q=80" alt="{{ $event->eventTitle }}">
+                    @endif
+                    @if($event->isPromoted == 1 && $event->promotionEndDate)
+                        @php
+                            $endDate = \Carbon\Carbon::parse($event->promotionEndDate);
+                            $isActive = $endDate->isFuture();
+                        @endphp
+                        @if($isActive)
+                            <span class="badge bg-warning text-dark position-absolute top-0 end-0" style="font-size: 0.7rem; padding: 4px 8px; z-index: 10;">
+                                <i class="bi bi-star-fill"></i> PROMOTED
+                            </span>
+                        @endif
                     @endif
                 </div>
                 <div class="event-text">

@@ -27,7 +27,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final EventController controller = Get.put(EventController());
   final authViewModel = Get.put(AuthViewModel());
-  final BottomNavController navController = Get.find<BottomNavController>(tag: 'BottomNavController');
+  final BottomNavController navController =
+      Get.find<BottomNavController>(tag: 'BottomNavController');
 
   late AnimationController _bannerAnimationController;
   late AnimationController _listAnimationController;
@@ -414,6 +415,248 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 SizedBox(height: 3.h),
 
+                /// Featured Promoted Events Section
+                Obx(() {
+                  final promotedEvents = controller.events.where((event) {
+                    if (event.startDate == null) return false;
+                    final eventDate = DateTime.tryParse(event.startDate!);
+                    if (eventDate == null) return false;
+                    return eventDate.isAfter(DateTime.now()) &&
+                        event.isPromotionActive;
+                  }).toList();
+
+                  // Sort promoted events by date
+                  promotedEvents.sort((a, b) {
+                    try {
+                      return DateTime.parse(a.startDate ?? '')
+                          .compareTo(DateTime.parse(b.startDate ?? ''));
+                    } catch (_) {
+                      return 0;
+                    }
+                  });
+
+                  if (promotedEvents.isNotEmpty) {
+                    return AnimatedBuilder(
+                      animation: _listAnimation,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 20 * (1 - _listAnimation.value)),
+                          child: Opacity(
+                            opacity: _listAnimation.value,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.star,
+                                          color: Colors.orange,
+                                          size: 20.sp,
+                                        ),
+                                        SizedBox(width: 2.w),
+                                        Text(
+                                          "Featured Events",
+                                          style: TextStyles.homeheadingtext
+                                              .copyWith(
+                                            fontSize: 18.sp,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 2.h),
+                                SizedBox(
+                                  height: 25.h,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: promotedEvents.length > 4
+                                        ? 4
+                                        : promotedEvents.length,
+                                    itemBuilder: (context, index) {
+                                      final event = promotedEvents[index];
+                                      return Container(
+                                        width: 70.w,
+                                        margin: EdgeInsets.only(right: 3.w),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.signinoptioncolor,
+                                          borderRadius:
+                                              BorderRadius.circular(2.5.h),
+                                          border: Border.all(
+                                            color: Colors.orange
+                                                .withValues(alpha: 0.5),
+                                            width: 2,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.orange
+                                                  .withValues(alpha: 0.2),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child:
+                                            AccessibilityUtils.accessibleCard(
+                                          label:
+                                              'Featured Event: ${event.eventTitle}',
+                                          hint: 'Tap to view event details',
+                                          onTap: () {
+                                            HapticUtils.selection();
+                                            NavigationUtils.push(
+                                              context,
+                                              EventDetailScreen(
+                                                  eventId: '${event.eventId}'),
+                                              routeName: '/event-detail',
+                                            );
+                                          },
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Event Image with Promoted Badge
+                                              Stack(
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      topLeft: Radius.circular(
+                                                          2.5.h),
+                                                      topRight: Radius.circular(
+                                                          2.5.h),
+                                                    ),
+                                                    child: CachedNetworkImage(
+                                                      imageUrl:
+                                                          event.eventImage ??
+                                                              '',
+                                                      width: double.infinity,
+                                                      height: 12.h,
+                                                      fit: BoxFit.cover,
+                                                      placeholder:
+                                                          (context, url) =>
+                                                              Container(
+                                                        color: AppColors
+                                                            .blueColor
+                                                            .withValues(
+                                                                alpha: 0.1),
+                                                        child: Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            color: AppColors
+                                                                .blueColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          Container(
+                                                        color: AppColors
+                                                            .blueColor
+                                                            .withValues(
+                                                                alpha: 0.1),
+                                                        child: Icon(
+                                                          Icons.event,
+                                                          size: 30.sp,
+                                                          color: AppColors
+                                                              .blueColor,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  // Promoted Badge
+                                                  Positioned(
+                                                    top: 1.h,
+                                                    right: 1.w,
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                        horizontal: 2.w,
+                                                        vertical: 0.5.h,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.orange,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(1.h),
+                                                      ),
+                                                      child: Text(
+                                                        'PROMOTED',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 7.sp,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              // Event Details
+                                              Padding(
+                                                padding: EdgeInsets.all(2.h),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      event.eventTitle ?? '',
+                                                      style: TextStyles
+                                                          .homeheadingtext
+                                                          .copyWith(
+                                                        fontSize: 12.sp,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                    SizedBox(height: 1.h),
+                                                    Text(
+                                                      formatDate(event
+                                                              .startDate) ??
+                                                          '',
+                                                      style: TextStyles
+                                                          .homedatetext,
+                                                    ),
+                                                    SizedBox(height: 0.5.h),
+                                                    Text(
+                                                      event.city ??
+                                                          'Location TBA',
+                                                      style: TextStyles
+                                                          .homedatetext,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  return SizedBox.shrink();
+                }),
+
                 /// Upcoming Events Title with enhanced styling
                 AnimatedBuilder(
                   animation: _listAnimation,
@@ -492,13 +735,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       onRetry: () => controller.fetchAllEvents(),
                     );
                   } else {
-                    // Filter upcoming events only
+                    // Filter upcoming events only, then sort: promoted first, then by date
                     final upcomingEvents = controller.events.where((event) {
                       if (event.startDate == null) return false;
                       final eventDate = DateTime.tryParse(event.startDate!);
                       if (eventDate == null) return false;
                       return eventDate.isAfter(DateTime.now());
                     }).toList();
+
+                    // Sort: Promoted events FIRST, then by date
+                    upcomingEvents.sort((a, b) {
+                      final aIsPromoted = a.isPromotionActive;
+                      final bIsPromoted = b.isPromotionActive;
+
+                      if (aIsPromoted && !bIsPromoted)
+                        return -1; // a comes first
+                      if (!aIsPromoted && bIsPromoted)
+                        return 1; // b comes first
+
+                      // If both promoted or both not promoted, sort by date
+                      try {
+                        final aDate = DateTime.parse(a.startDate ?? '');
+                        final bDate = DateTime.parse(b.startDate ?? '');
+                        return aDate.compareTo(bDate);
+                      } catch (_) {
+                        return 0;
+                      }
+                    });
 
                     if (upcomingEvents.isEmpty) {
                       return AppEmptyStateWidget(

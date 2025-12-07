@@ -16,8 +16,10 @@ class EventWebController extends Controller
     public function index(Request $request)
     {
         // Get 4 upcoming events for top section
+        // Sort promoted events first, then by date
         $query = Event::query()
             ->where('startDate', '>=', now())
+            ->orderByRaw('CASE WHEN isPromoted = 1 AND promotionEndDate > NOW() THEN 0 ELSE 1 END')
             ->orderBy('startDate', 'asc');
 
         // Apply search filter if provided
@@ -43,7 +45,42 @@ class EventWebController extends Controller
     {
         $event = Event::with('user')->findOrFail((int)$id);
 
-        return view('events.show', compact('event'));
+        // Check if user is authenticated and owns the event
+        $isOwner = false;
+        $promotionStatus = null;
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            // Ensure we're comparing the same types (integers)
+            $isOwner = (int)$event->userId === (int)$user->userId;
+
+            // Get promotion status if user owns the event
+            if ($isOwner) {
+                $isPromoted = $event->isPromoted == 1;
+                $isActive = false;
+                $daysRemaining = 0;
+
+                if ($isPromoted && $event->promotionEndDate) {
+                    $endDate = \Carbon\Carbon::parse($event->promotionEndDate);
+                    $isActive = $endDate->isFuture();
+
+                    if ($isActive) {
+                        $daysRemaining = max(0, (int)ceil(now()->diffInDays($endDate, false)));
+                    }
+                }
+
+                $promotionStatus = [
+                    'isPromoted' => $isPromoted,
+                    'isActive' => $isActive,
+                    'package' => $event->promotionPackage,
+                    'startDate' => $event->promotionStartDate,
+                    'endDate' => $event->promotionEndDate,
+                    'daysRemaining' => $daysRemaining,
+                ];
+            }
+        }
+
+        return view('events.show', compact('event', 'isOwner', 'promotionStatus'));
     }
 
     /**
@@ -145,6 +182,12 @@ class EventWebController extends Controller
         // Check if user is authenticated
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Please login to book this event.');
+        }
+
+        // Prevent event owners from booking their own events
+        if (Auth::check() && (int)$event->userId === (int)Auth::user()->userId) {
+            return redirect()->route('events.show', $id)
+                ->with('error', 'You cannot book your own event.');
         }
 
         // Redirect to Square payment page

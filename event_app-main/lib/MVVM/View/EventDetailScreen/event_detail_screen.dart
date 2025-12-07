@@ -1,4 +1,3 @@
-import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart';
 import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/MVVM/view_model/event_view_model.dart';
 import 'package:event_app/MVVM/body_model/event_detail_model.dart';
@@ -10,7 +9,6 @@ import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart'; // Commented out - map functionality disabled
-import 'package:flutter/foundation.dart';
 import '../../view_model/public_profile_controller.dart';
 import '../ProfileScreen/public_profile_screen.dart';
 import '../UsersData/invite_user_list.dart';
@@ -20,6 +18,7 @@ import '../../../utils/haptic_utils.dart';
 import '../bottombar/bottom_navigation_bar.dart';
 import '../../../Widget/live_stream_widget.dart';
 import '../Promotion/promote_event_screen.dart';
+import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart';
 
 /// Safe Google Map Widget with error handling - COMMENTED OUT
 /*
@@ -89,8 +88,8 @@ class _SafeMapStatefulWidgetState extends State<_SafeMapStatefulWidget> {
   }
 */
 
-  // COMMENTED OUT - Map functionality disabled
-  /*
+// COMMENTED OUT - Map functionality disabled
+/*
   Widget _buildMapFallback(LatLng location, EventDetailModel event) {
     return Container(
       decoration: BoxDecoration(
@@ -229,7 +228,6 @@ class _SafeMapStatefulWidgetState extends State<_SafeMapStatefulWidget> {
     );
   }
   */
-}
 
 class EventDetailScreen extends StatefulWidget {
   final String eventId;
@@ -1126,6 +1124,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       ),
     );
   }
+  */
 
   Widget _buildEventStatusSection(EventDetailModel event, bool isCreator,
       bool isBooked, bool hasEventStarted, bool hasEventEnded) {
@@ -1434,90 +1433,156 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   ),
                 ),
 
-                // Promote Event Button (for organizers)
+                // Promotion Status or Promote Button (for organizers)
                 if (isCreator && !hasEventEnded) ...[
                   SizedBox(height: 2.h),
-                  Container(
-                    width: double.infinity,
-                    height: 5.h,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.orange.shade600,
-                          Colors.orange.shade700,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(2.h),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.orange.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          HapticUtils.buttonPress();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PromoteEventScreen(
-                                eventId: event.eventId!,
-                                eventTitle: event.eventTitle ?? 'Event',
-                              ),
-                            ),
-                          ).then((_) {
-                            // Refresh event details after promotion
-                            controller.fetchEventDetailById(widget.eventId);
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(2.h),
-                        child: Container(
+                  // Check if promotion is active
+                  Builder(
+                    builder: (context) {
+                      bool isPromotionActive = false;
+                      if (event.isPromoted == true &&
+                          event.promotionEndDate != null) {
+                        try {
+                          final endDate =
+                              DateTime.parse(event.promotionEndDate!);
+                          isPromotionActive = DateTime.now().isBefore(endDate);
+                        } catch (e) {
+                          isPromotionActive = false;
+                        }
+                      }
+
+                      if (isPromotionActive) {
+                        // Show promotion active message
+                        return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(3.w),
                           decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(2.h),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: Colors.green.withValues(alpha: 0.5),
                               width: 1,
                             ),
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                padding: EdgeInsets.all(1.w),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(1.h),
-                                ),
-                                child: Icon(
-                                  event.isPromoted == true
-                                      ? Icons.verified
-                                      : Icons.trending_up,
-                                  size: 14.sp,
-                                  color: Colors.white,
-                                ),
+                              Icon(
+                                Icons.verified,
+                                color: Colors.green,
+                                size: 20.sp,
                               ),
                               SizedBox(width: 3.w),
-                              Text(
-                                event.isPromoted == true
-                                    ? 'Promotion Active'
-                                    : 'Promote Event',
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 0.5,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Event is Currently Promoted',
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(height: 0.5.h),
+                                    Text(
+                                      'You can promote again after this promotion expires.',
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                    ),
+                        );
+                      } else {
+                        // Show promote button
+                        return Container(
+                          width: double.infinity,
+                          height: 5.h,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.orange.shade600,
+                                Colors.orange.shade700,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(2.h),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.orange.withValues(alpha: 0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                HapticUtils.buttonPress();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => PromoteEventScreen(
+                                      eventId: event.eventId!,
+                                      eventTitle: event.eventTitle ?? 'Event',
+                                    ),
+                                  ),
+                                ).then((_) {
+                                  // Refresh event details after promotion
+                                  controller
+                                      .fetchEventDetailById(widget.eventId);
+                                });
+                              },
+                              borderRadius: BorderRadius.circular(2.h),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(2.h),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(1.w),
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Colors.white.withValues(alpha: 0.2),
+                                        borderRadius:
+                                            BorderRadius.circular(1.h),
+                                      ),
+                                      child: Icon(
+                                        Icons.trending_up,
+                                        size: 14.sp,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(width: 3.w),
+                                    Text(
+                                      'Promote Event',
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
                 ],
               ],

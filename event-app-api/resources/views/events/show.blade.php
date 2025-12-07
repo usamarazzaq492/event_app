@@ -92,6 +92,11 @@
             <div class="banner-title">
                 <h3>{{ $event->eventTitle }}</h3>
                 <p>{{ $event->category ?? 'Event' }} {{ \Carbon\Carbon::parse($event->startDate)->format('Y') }}</p>
+                @if(isset($promotionStatus) && $promotionStatus['isActive'])
+                    <span class="badge bg-warning text-dark ms-2">
+                        <i class="bi bi-star-fill"></i> PROMOTED
+                    </span>
+                @endif
             </div>
         </div>
 
@@ -119,7 +124,7 @@
                             <p class="mb-1"><i class="bi bi-mortarboard-fill"></i> {{ $event->category }}</p>
                         @endif
                         @if($event->bookings && $event->bookings->count() > 0)
-                            <p class="mb-1"><i class="bi bi-people-fill"></i> {{ $event->bookings->count() }} Expected Delegates</p>
+                            <p class="mb-1"><i class="bi bi-people-fill"></i> {{ $event->bookings->count() }} Bookings</p>
                         @endif
                         <div class="d-flex gap-2 mt-2">
                             <a href="https://instagram.com" target="_blank"
@@ -134,48 +139,82 @@
             <!-- Right Apply -->
             <div class="col-lg-4">
                 <div class="feature-card text-center">
-                    <h5>Apply Now!</h5>
-                    @if($event->eventPrice > 0)
-                        <p class="small">Price: ${{ number_format($event->eventPrice, 2) }}</p>
-                    @else
-                        <p class="small">Free Event</p>
-                    @endif
                     @auth
-                        <form action="{{ route('events.book', $event->eventId) }}" method="POST">
-                            @csrf
-
-                            @if($event->eventPrice > 0)
-                                <div class="mb-3">
-                                    <label class="form-label small">Ticket Type</label>
-                                    <select name="ticket_type" class="form-select form-select-sm" required>
-                                        <option value="general">General - ${{ number_format($event->eventPrice, 2) }}</option>
-                                        <option value="silver">Silver - ${{ number_format($event->eventPrice * 1.2, 2) }}</option>
-                                        <option value="gold">Gold - ${{ number_format($event->eventPrice * 1.5, 2) }}</option>
-                                    </select>
+                        @if(isset($isOwner) && $isOwner)
+                            <!-- Owner View - Only show promotion, never show booking -->
+                            <h5>Your Event</h5>
+                            @if(isset($promotionStatus) && $promotionStatus['isActive'])
+                                <div class="alert alert-success mb-3">
+                                    <i class="bi bi-star-fill"></i> <strong>Promoted!</strong>
+                                    <p class="mb-0 small">
+                                        {{ ucfirst($promotionStatus['package']) }} Package
+                                        <br>
+                                        @if($promotionStatus['daysRemaining'] > 0)
+                                            {{ $promotionStatus['daysRemaining'] }} days remaining
+                                        @else
+                                            Active
+                                        @endif
+                                    </p>
                                 </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label small">Quantity</label>
-                                    <select name="quantity" class="form-select form-select-sm" required>
-                                        @for($i = 1; $i <= 10; $i++)
-                                            <option value="{{ $i }}">{{ $i }} {{ $i == 1 ? 'ticket' : 'tickets' }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
+                                <p class="small text-muted mb-0">Your event is currently promoted. You can promote again after this promotion expires.</p>
                             @else
-                                <input type="hidden" name="ticket_type" value="general">
-                                <input type="hidden" name="quantity" value="1">
+                                <a href="{{ route('promotion.show', $event->eventId) }}" class="btn btn-warning btn-sm w-100 mb-2">
+                                    <i class="bi bi-megaphone-fill"></i>
+                                    Promote Event
+                                </a>
+                                <p class="small text-muted mb-0">Promote your event to reach more people!</p>
                             @endif
+                        @else
+                            <!-- Non-Owner Authenticated View - Only show booking if NOT owner -->
+                            <h5>Apply Now!</h5>
+                            @if($event->eventPrice > 0)
+                                <p class="small">Price: ${{ number_format($event->eventPrice, 2) }}</p>
+                            @else
+                                <p class="small">Free Event</p>
+                            @endif
+                            <form action="{{ route('events.book', $event->eventId) }}" method="POST">
+                                @csrf
 
-                            <button type="submit" class="btn btn-primary btn-sm w-100">
                                 @if($event->eventPrice > 0)
-                                    Book Now! <i class="bi bi-arrow-right"></i>
+                                    <div class="mb-3">
+                                        <label class="form-label small">Ticket Type</label>
+                                        <select name="ticket_type" class="form-select form-select-sm" required>
+                                            <option value="general">General - ${{ number_format($event->eventPrice, 2) }}</option>
+                                            <option value="silver">Silver - ${{ number_format($event->eventPrice * 1.2, 2) }}</option>
+                                            <option value="gold">Gold - ${{ number_format($event->eventPrice * 1.5, 2) }}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small">Quantity</label>
+                                        <select name="quantity" class="form-select form-select-sm" required>
+                                            @for($i = 1; $i <= 10; $i++)
+                                                <option value="{{ $i }}">{{ $i }} {{ $i == 1 ? 'ticket' : 'tickets' }}</option>
+                                            @endfor
+                                        </select>
+                                    </div>
                                 @else
-                                    Register Now! <i class="bi bi-arrow-right"></i>
+                                    <input type="hidden" name="ticket_type" value="general">
+                                    <input type="hidden" name="quantity" value="1">
                                 @endif
-                            </button>
-                        </form>
+
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    @if($event->eventPrice > 0)
+                                        Book Now! <i class="bi bi-arrow-right"></i>
+                                    @else
+                                        Register Now! <i class="bi bi-arrow-right"></i>
+                                    @endif
+                                </button>
+                            </form>
+                        @endif
                     @else
+                        <!-- Guest View -->
+                        <h5>Apply Now!</h5>
+                        @if($event->eventPrice > 0)
+                            <p class="small">Price: ${{ number_format($event->eventPrice, 2) }}</p>
+                        @else
+                            <p class="small">Free Event</p>
+                        @endif
                         <a href="{{ route('login') }}" class="btn btn-primary btn-sm w-100">
                             Login to Book <i class="bi bi-arrow-right"></i>
                         </a>

@@ -43,12 +43,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
       });
 
       final response = await _promotionService.getPackages();
-      
-      // Check if response is valid
-      if (response == null) {
-        throw Exception('No response from server');
-      }
-      
+
       // Handle different response formats
       if (response['success'] == true || response['success'] == 'true') {
         final data = response['data'];
@@ -61,7 +56,9 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
           throw Exception('Invalid package data format');
         }
       } else {
-        final errorMsg = response['message'] ?? response['error'] ?? 'Failed to load packages';
+        final errorMsg = response['message'] ??
+            response['error'] ??
+            'Failed to load packages';
         throw Exception(errorMsg);
       }
     } catch (e) {
@@ -152,8 +149,8 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                     children: [
                       Text(
                         'Error loading packages',
-                        style: TextStyles.regularwhite.copyWith(
-                            color: Colors.red),
+                        style:
+                            TextStyles.regularwhite.copyWith(color: Colors.red),
                       ),
                       SizedBox(height: 2.h),
                       ButtonWidget(
@@ -263,9 +260,8 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
 
                       // Purchase Button
                       ButtonWidget(
-                        text: _isLoading
-                            ? 'Processing...'
-                            : 'Purchase Promotion',
+                        text:
+                            _isLoading ? 'Processing...' : 'Purchase Promotion',
                         onPressed: _isLoading ? null : _purchasePromotion,
                         backgroundColor: _selectedPackage != null
                             ? AppColors.blueColor
@@ -284,8 +280,8 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                           ),
                           child: Text(
                             _error!,
-                            style: TextStyles.regularwhite.copyWith(
-                                color: Colors.red),
+                            style: TextStyles.regularwhite
+                                .copyWith(color: Colors.red),
                           ),
                         ),
                       ],
@@ -409,7 +405,3 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
     );
   }
 }
-
-
-
-

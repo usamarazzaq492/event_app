@@ -296,7 +296,8 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
       controller: controller,
       readOnly: true,
       enableInteractiveSelection: false,
-      contextMenuBuilder: (context, editableTextState) => const SizedBox.shrink(),
+      contextMenuBuilder: (context, editableTextState) =>
+          const SizedBox.shrink(),
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
@@ -449,9 +450,10 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                         (_endTime == 'End Time') ? 'Select end time' : null;
 
                     // For updates, image is optional if existing image exists
-                    final existingImageUrl =
-                        eventController.eventDetail.value?.eventImage;
-                    _imageError = null; // Image is optional when updating (can keep existing)
+                    // final existingImageUrl =
+                    //     eventController.eventDetail.value?.eventImage;
+                    _imageError =
+                        null; // Image is optional when updating (can keep existing)
                   });
 
                   if (isValid &&

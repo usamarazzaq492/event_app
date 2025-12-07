@@ -12,14 +12,24 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Get 4 upcoming events for home page
+        // Get promoted events (featured) - active promotions first
+        $promotedEvents = \App\Models\Event::query()
+            ->where('startDate', '>=', now())
+            ->where('isPromoted', 1)
+            ->where('promotionEndDate', '>', now())
+            ->orderBy('promotionEndDate', 'asc') // Soonest to expire first
+            ->limit(4)
+            ->get();
+
+        // Get 4 upcoming events for home page (prioritize promoted, then by date)
         $upcomingEvents = \App\Models\Event::query()
             ->where('startDate', '>=', now())
+            ->orderByRaw('CASE WHEN isPromoted = 1 AND promotionEndDate > NOW() THEN 0 ELSE 1 END')
             ->orderBy('startDate', 'asc')
             ->limit(4)
             ->get();
 
-        return view('index', compact('upcomingEvents'));
+        return view('index', compact('upcomingEvents', 'promotedEvents'));
     }
 
     /**

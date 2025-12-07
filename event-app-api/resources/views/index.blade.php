@@ -191,6 +191,65 @@
     </div>
 </section>
 
+<!-- Featured Promoted Events Section -->
+@if($promotedEvents && $promotedEvents->count() > 0)
+<section class="py-6" style="background: linear-gradient(180deg, rgba(255, 193, 7, 0.05), rgba(255,255,255,0));">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="mb-1">
+                    <i class="bi bi-star-fill text-warning"></i> Featured Events
+                </h3>
+                <p class="text-muted small mb-0">Promoted events you don't want to miss</p>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            @foreach($promotedEvents as $index => $event)
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="{{ 80 * ($index + 1) }}">
+                <a href="{{ route('events.show', $event->eventId) }}" class="text-decoration-none">
+                    <div class="card rounded-3 border-0 shadow-lg h-100 position-relative" style="border: 2px solid #ffc107 !important;">
+                        <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2" style="z-index: 10; font-size: 0.7rem;">
+                            <i class="bi bi-star-fill"></i> PROMOTED
+                        </span>
+                        @if($event->eventImage)
+                            <img src="{{ asset($event->eventImage) }}"
+                                 class="card-img-top"
+                                 alt="{{ $event->eventTitle }}"
+                                 style="height: 200px; object-fit: cover;"
+                                 onerror="this.src='https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80'">
+                        @else
+                            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80"
+                                 class="card-img-top"
+                                 style="height: 200px; object-fit: cover;"
+                                 alt="{{ $event->eventTitle }}">
+                        @endif
+                        <div class="card-body">
+                            <h5 class="card-title text-dark fw-bold">{{ \Illuminate\Support\Str::limit($event->eventTitle, 30) }}</h5>
+                            <p class="card-text text-muted small mb-2">
+                                <i class="bi bi-calendar-event me-1"></i>{{ \Carbon\Carbon::parse($event->startDate)->format('M d, Y') }}
+                            </p>
+                            <p class="card-text text-muted small mb-2">
+                                <i class="bi bi-geo-alt me-1"></i>{{ $event->city ?? 'Location TBA' }}
+                            </p>
+                            <p class="card-text text-muted small">
+                                <i class="bi bi-currency-dollar me-1"></i>
+                                @if($event->eventPrice && $event->eventPrice > 0)
+                                    ${{ number_format($event->eventPrice, 2) }}
+                                @else
+                                    Free
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 <!-- Upcoming Events Section -->
 <section class="py-6">
     <div class="container">

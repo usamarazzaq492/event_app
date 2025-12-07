@@ -202,9 +202,18 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
             matchesDate;
       }).toList();
 
-      // Sort: by distance when location active, else by date
-      if (_useCurrentLocation && _currentLat != null && _currentLon != null) {
-        _filteredEvents.sort((a, b) {
+      // Sort: Promoted events FIRST, then by distance when location active, else by date
+      _filteredEvents.sort((a, b) {
+        // First priority: Promoted events come first
+        final aIsPromoted = a.isPromotionActive;
+        final bIsPromoted = b.isPromotionActive;
+
+        if (aIsPromoted && !bIsPromoted) return -1; // a comes first
+        if (!aIsPromoted && bIsPromoted) return 1; // b comes first
+
+        // If both promoted or both not promoted, use secondary sorting
+        if (_useCurrentLocation && _currentLat != null && _currentLon != null) {
+          // Sort by distance
           final aLat = double.tryParse(a.latitude ?? '') ?? 0;
           final aLon = double.tryParse(a.longitude ?? '') ?? 0;
           final bLat = double.tryParse(b.latitude ?? '') ?? 0;
@@ -214,17 +223,16 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
           final bDist = LocationService.calculateDistance(
               _currentLat!, _currentLon!, bLat, bLon);
           return aDist.compareTo(bDist);
-        });
-      } else {
-        _filteredEvents.sort((a, b) {
+        } else {
+          // Sort by date
           try {
             return DateTime.parse(a.startDate ?? '')
                 .compareTo(DateTime.parse(b.startDate ?? ''));
           } catch (_) {
             return 0;
           }
-        });
-      }
+        }
+      });
     });
   }
 

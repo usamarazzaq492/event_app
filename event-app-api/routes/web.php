@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\EventWebController;
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\AdsController;
 use App\Http\Controllers\Web\TicketController;
+use App\Http\Controllers\Web\PromotionWebController;
 
 // Home and static pages
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -27,6 +28,10 @@ Route::get('/events/create', [EventWebController::class, 'create'])->name('event
 Route::post('/events', [EventWebController::class, 'store'])->name('events.store')->middleware('auth');
 Route::get('/events/{id}', [EventWebController::class, 'show'])->name('events.show');
 Route::post('/events/{id}/book', [EventWebController::class, 'book'])->name('events.book')->middleware('auth');
+
+// Promotion routes
+Route::get('/events/{id}/promote', [PromotionWebController::class, 'show'])->name('promotion.show')->middleware('auth');
+Route::post('/events/{id}/promote/process', [PromotionWebController::class, 'processPayment'])->name('promotion.process')->middleware('auth');
 
 // Ads routes
 Route::get('/ads', [AdsController::class, 'index'])->name('ads.index');
