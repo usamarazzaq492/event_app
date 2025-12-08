@@ -53,6 +53,8 @@
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open to find nearby events.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs access to your location to find nearby events and provide location-based features. Location access is used to show events near you and help you discover local activities.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location when in the background to find nearby events.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -63,7 +65,6 @@
 	<string>This app needs access to your camera to take photos for events and profile pictures.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to your microphone for video recording.</string>
-	<key>GMSApiKey</key>
-	<string>YOUR_GOOGLE_MAPS_API_KEY</string>
+	<!-- GMSApiKey removed - Map functionality is currently disabled -->
 </dict>
 </plist>
