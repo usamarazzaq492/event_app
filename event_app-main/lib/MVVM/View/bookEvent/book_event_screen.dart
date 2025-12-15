@@ -17,17 +17,32 @@ class _BookEventScreenState extends State<BookEventScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int seatCount = 1;
+  late TextEditingController _seatCountController;
 
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
+    _seatCountController = TextEditingController(text: '1');
     super.initState();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _seatCountController.dispose();
     super.dispose();
+  }
+
+  void _updateSeatCount(int newCount) {
+    if (newCount < 1) {
+      newCount = 1;
+    } else if (newCount > 10) {
+      newCount = 10;
+    }
+    setState(() {
+      seatCount = newCount;
+      _seatCountController.text = newCount.toString();
+    });
   }
 
   @override
@@ -99,7 +114,7 @@ class _BookEventScreenState extends State<BookEventScreen>
               ),
               const SizedBox(height: 20),
 
-              // 🔷 Counter
+              // 🔷 Counter with Text Input
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
                 decoration: BoxDecoration(
@@ -117,27 +132,54 @@ class _BookEventScreenState extends State<BookEventScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _buildCounterButton(Icons.remove, () {
-                      if (seatCount > 1) {
-                        setState(() {
-                          seatCount--;
-                        });
-                      }
+                      _updateSeatCount(seatCount - 1);
                     }),
-                    const SizedBox(width: 30),
-                    Text(
-                      '$seatCount',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28.sp,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Montserrat',
+                    const SizedBox(width: 20),
+                    // TextField for direct input
+                    SizedBox(
+                      width: 80,
+                      child: TextField(
+                        controller: _seatCountController,
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28.sp,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                        ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            return; // Allow empty temporarily while typing
+                          }
+                          final intValue = int.tryParse(value);
+                          if (intValue != null) {
+                            _updateSeatCount(intValue);
+                          }
+                        },
+                        onEditingComplete: () {
+                          // Validate when user finishes editing
+                          final intValue = int.tryParse(_seatCountController.text);
+                          if (intValue == null || intValue < 1) {
+                            _updateSeatCount(1);
+                          } else if (intValue > 10) {
+                            _updateSeatCount(10);
+                          } else {
+                            _updateSeatCount(intValue);
+                          }
+                          FocusScope.of(context).unfocus();
+                        },
                       ),
                     ),
-                    const SizedBox(width: 30),
+                    const SizedBox(width: 20),
                     _buildCounterButton(Icons.add, () {
-                      setState(() {
-                        seatCount++;
-                      });
+                      _updateSeatCount(seatCount + 1);
                     }),
                   ],
                 ),
