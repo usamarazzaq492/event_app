@@ -38,7 +38,9 @@ class User extends Authenticatable
         'interests',
         'isActive',
         'emailVerified',
-        'verificationCode'
+        'verificationCode',
+        'terms_accepted_at',
+        'terms_version_accepted',
     ];
 
      /**

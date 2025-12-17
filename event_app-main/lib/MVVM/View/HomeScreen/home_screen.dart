@@ -10,6 +10,8 @@ import '../../../app/config/app_text_style.dart';
 import '../../view_model/auth_view_model.dart';
 import '../../view_model/bottom_nav_controller.dart';
 import '../EventDetailScreen/event_detail_screen.dart';
+import '../ProfileScreen/public_profile_screen.dart';
+import '../exploreevent/create_event.dart';
 import '../../../Widget/error_widget.dart';
 import '../../../Widget/skeleton_loading.dart';
 import '../../../utils/navigation_utils.dart';
@@ -38,6 +40,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
 
+  // People search state
+  final TextEditingController _userSearchController = TextEditingController();
+  List<dynamic> _userSearchResults = [];
+  bool _showUserSearchResults = false;
+
   String get _greeting {
     final hour = DateTime.now().hour;
 
@@ -57,6 +64,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     _initializeAnimations();
     _setupScrollListener();
+    // Preload users so we can search people from Home
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      authViewModel.fetchUsers();
+    });
   }
 
   void _initializeAnimations() {
@@ -100,11 +111,157 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
+  void _onUserSearchChanged(String query) {
+    final trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setState(() {
+        _userSearchResults = [];
+        _showUserSearchResults = false;
+      });
+      return;
+    }
+
+    final lower = trimmed.toLowerCase();
+    final currentUserId = authViewModel.currentUser['userId'];
+
+    final results = authViewModel.users
+        .where((user) => user.userId != currentUserId)
+        .where((user) {
+          final name = (user.name ?? '').toString().toLowerCase();
+          final email = (user.email ?? '').toString().toLowerCase();
+          return name.contains(lower) || email.contains(lower);
+        })
+        .take(6)
+        .toList();
+
+    setState(() {
+      _userSearchResults = results;
+      _showUserSearchResults = results.isNotEmpty;
+    });
+  }
+
+  Widget _buildPeopleSearchSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Search people',
+          style: TextStyles.regularwhite.copyWith(
+            fontSize: 11.sp,
+            color: Colors.white70,
+          ),
+        ),
+        SizedBox(height: 1.h),
+        TextField(
+          controller: _userSearchController,
+          onChanged: _onUserSearchChanged,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Search by name or email',
+            hintStyle: TextStyle(
+              color: Colors.white54,
+              fontSize: 11.sp,
+            ),
+            prefixIcon: const Icon(Icons.search, color: Colors.white70),
+            filled: true,
+            fillColor: AppColors.signinoptioncolor,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: AppColors.blueColor),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 4.w,
+              vertical: 1.3.h,
+            ),
+          ),
+        ),
+        if (_showUserSearchResults) ...[
+          SizedBox(height: 1.h),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.signinoptioncolor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _userSearchResults.length,
+              separatorBuilder: (_, __) => Divider(
+                color: Colors.white.withValues(alpha: 0.08),
+                height: 0,
+              ),
+              itemBuilder: (context, index) {
+                final user = _userSearchResults[index];
+                final imageUrl = (user.profileImageUrl ?? '').toString().trim();
+
+                return ListTile(
+                  leading: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.grey.shade700,
+                    backgroundImage: imageUrl.isNotEmpty
+                        ? CachedNetworkImageProvider(
+                            imageUrl.startsWith('http')
+                                ? imageUrl
+                                : 'https://eventgo-live.com$imageUrl',
+                          )
+                        : const AssetImage(AppImages.profileicon)
+                            as ImageProvider,
+                  ),
+                  title: Text(
+                    user.name ?? '',
+                    style: TextStyles.regularwhite.copyWith(fontSize: 11.sp),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    user.email ?? '',
+                    style: TextStyles.regularwhite.copyWith(
+                      fontSize: 9.sp,
+                      color: Colors.white60,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  onTap: () {
+                    HapticUtils.navigation();
+                    FocusScope.of(context).unfocus();
+                    setState(() {
+                      _showUserSearchResults = false;
+                      _userSearchResults = [];
+                      _userSearchController.clear();
+                    });
+                    NavigationUtils.push(
+                      context,
+                      PublicProfileScreen(id: user.userId),
+                      routeName: '/public-profile',
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
   @override
   void dispose() {
     _bannerAnimationController.dispose();
     _listAnimationController.dispose();
     _scrollController.dispose();
+    _userSearchController.dispose();
     super.dispose();
   }
 
@@ -295,6 +452,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 SizedBox(height: 3.h),
 
+                // People search on Home
+                _buildPeopleSearchSection(),
+
+                SizedBox(height: 3.h),
+
                 /// Enhanced Motivational Banner
                 AnimatedBuilder(
                   animation: _bannerAnimation,
@@ -363,48 +525,95 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                               ),
                               SizedBox(height: 2.5.h),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    HapticUtils.buttonPress();
-                                    navController.changeTab(1);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: AppColors.blueColor,
-                                    elevation: 8,
-                                    shadowColor:
-                                        Colors.black.withValues(alpha: 0.2),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(2.5.h),
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 1.5.h,
-                                      horizontal: 3.w,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Explore Now",
-                                        style: TextStyles.profiletext.copyWith(
-                                          color: AppColors.blueColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12.sp,
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        HapticUtils.buttonPress();
+                                        navController.changeTab(1);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: AppColors.blueColor,
+                                        elevation: 8,
+                                        shadowColor:
+                                            Colors.black.withValues(alpha: 0.2),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(2.5.h),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 1.5.h,
+                                          horizontal: 3.w,
                                         ),
                                       ),
-                                      SizedBox(width: 2.w),
-                                      const Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 14,
-                                        color: AppColors.blueColor,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Explore Now",
+                                            style:
+                                                TextStyles.profiletext.copyWith(
+                                              color: AppColors.blueColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12.sp,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  SizedBox(width: 3.w),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        HapticUtils.buttonPress();
+                                        NavigationUtils.push(
+                                          context,
+                                          const CreateEvent(),
+                                          routeName: '/create-event',
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.black
+                                            .withValues(alpha: 0.15),
+                                        foregroundColor: Colors.white,
+                                        elevation: 4,
+                                        shadowColor: Colors.black
+                                            .withValues(alpha: 0.15),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(2.5.h),
+                                          side: const BorderSide(
+                                            color: Colors.white24,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 1.5.h,
+                                          horizontal: 3.w,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            "Create Event",
+                                            style:
+                                                TextStyles.profiletext.copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12.sp,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

@@ -37,24 +37,61 @@ class UserService {
 
   /// 🔷 Fetch Current Logged-in User Profile
   Future<ProfileModel> fetchProfile() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
 
-    final uri = Uri.parse('$baseUrl/user');
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
-    );
+      if (token == null || token.isEmpty) {
+        throw Exception('Authentication required. Please log in again.');
+      }
 
-    if (response.statusCode == 200) {
+      final uri = Uri.parse('$baseUrl/user');
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
+      ).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          throw Exception('Connection timeout. Please check your internet connection.');
+        },
+      );
+
       final jsonResponse = json.decode(response.body);
-      print('[fetchProfile] Response: $jsonResponse');
-      return ProfileModel.fromJson(jsonResponse);
-    } else {
-      throw Exception('Failed to load user profile: ${response.statusCode}');
+      print('[fetchProfile] Status: ${response.statusCode}, Response: $jsonResponse');
+
+      if (response.statusCode == 200) {
+        // Check if API returned success: false
+        if (jsonResponse is Map<String, dynamic> && 
+            jsonResponse['success'] == false) {
+          final errorMessage = jsonResponse['message'] ?? 'Failed to load profile';
+          throw Exception(errorMessage);
+        }
+        return ProfileModel.fromJson(jsonResponse);
+      } else if (response.statusCode == 401) {
+        throw Exception('Session expired. Please log in again.');
+      } else if (response.statusCode == 404) {
+        throw Exception('Profile not found.');
+      } else if (response.statusCode >= 500) {
+        throw Exception('Server error. Please try again later.');
+      } else {
+        final errorMessage = jsonResponse['message'] ?? 
+            'Failed to load profile (${response.statusCode})';
+        throw Exception(errorMessage);
+      }
+    } on SocketException {
+      throw Exception('No internet connection. Please check your network.');
+    } on http.ClientException {
+      throw Exception('Network error. Please check your connection.');
+    } on FormatException {
+      throw Exception('Invalid response from server. Please try again.');
+    } catch (e) {
+      if (e is Exception) {
+        rethrow;
+      }
+      throw Exception('Failed to load profile: ${e.toString()}');
     }
   }
 

@@ -54,6 +54,14 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
   String? _bannerText;
   Color _bannerColor = Colors.transparent;
 
+  String _normalizePrice(String raw) {
+    final text = raw.trim();
+    if (text.isEmpty) return '0.00';
+    final value = double.tryParse(text);
+    if (value == null) return text;
+    return value.toStringAsFixed(2);
+  }
+
   void _showBanner(String message, {Color color = Colors.blue}) {
     setState(() {
       _bannerText = message;
@@ -83,7 +91,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
           cityccontroller.text = event.city ?? '';
           addessccontroller.text = event.address ?? '';
           categoryccontroller.text = event.category ?? '';
-          priceccontroller.text = event.eventPrice ?? '';
+          priceccontroller.text = _normalizePrice(event.eventPrice ?? '');
           sdateController.text = event.startDate ?? '';
           edateController.text = event.endDate ?? '';
           liveStreamController.text = event.liveStreamUrl ?? '';
@@ -200,8 +208,22 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
       padding: EdgeInsets.only(bottom: 2.h),
       child: TextFormField(
         controller: controller,
+        keyboardType: hint == 'Price of Event'
+            ? const TextInputType.numberWithOptions(decimal: true)
+            : TextInputType.text,
         style: const TextStyle(color: Colors.white),
         decoration: inputDecoration(hint),
+        onEditingComplete: () {
+          // Automatically format price to 2 decimals when user leaves the field
+          if (hint == 'Price of Event') {
+            final text = controller.text.trim();
+            if (text.isEmpty) return;
+            final value = double.tryParse(text);
+            if (value != null) {
+              controller.text = value.toStringAsFixed(2);
+            }
+          }
+        },
         validator: (value) {
           if (value == null || value.trim().isEmpty) {
             if (hint.contains('Live Stream URL')) {
@@ -476,6 +498,11 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                       } catch (_) {}
                     }
 
+                    // Normalize price so backend always receives 2 decimal places
+                    final normalizedPrice =
+                        _normalizePrice(priceccontroller.text);
+                    priceccontroller.text = normalizedPrice;
+
                     await eventController.updateEvent(
                       id: widget.eventId,
                       eventTitle: titlecontroller.text,
@@ -483,7 +510,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                       endDate: edateController.text,
                       startTime: _startTime,
                       endTime: _endTime,
-                      eventPrice: priceccontroller.text,
+                      eventPrice: normalizedPrice,
                       description: desccontroller.text,
                       category: categoryccontroller.text,
                       address: addessccontroller.text,

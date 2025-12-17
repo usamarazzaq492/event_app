@@ -29,7 +29,8 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
 
   /// Picks an image from gallery
   Future<void> pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         profileImage = File(pickedFile.path);
@@ -105,7 +106,8 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
               Center(
                 child: Text(
                   'Complete Your Profile',
-                  style: TextStyles.profiletext.copyWith(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                  style: TextStyles.profiletext
+                      .copyWith(fontSize: 20.sp, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -121,15 +123,19 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       CircleAvatar(
                         radius: 45,
                         backgroundColor: Colors.grey.shade300,
-                        backgroundImage: profileImage != null ? FileImage(profileImage!) : null,
+                        backgroundImage: profileImage != null
+                            ? FileImage(profileImage!)
+                            : null,
                         child: profileImage == null
-                            ? Icon(Icons.person, size: 40.sp, color: Colors.grey)
+                            ? Icon(Icons.person,
+                                size: 40.sp, color: Colors.grey)
                             : null,
                       ),
                       CircleAvatar(
                         radius: 15,
                         backgroundColor: AppColors.blueColor,
-                        child: Icon(Icons.edit, size: 15.sp, color: Colors.white),
+                        child:
+                            Icon(Icons.edit, size: 15.sp, color: Colors.white),
                       ),
                     ],
                   ),

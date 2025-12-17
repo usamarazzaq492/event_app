@@ -111,12 +111,30 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
   void _generateSearchSuggestions() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _searchSuggestions = controller.events
+      final suggestions = <String>[];
+
+      // Add matching event titles
+      final matchingTitles = controller.events
           .where((event) =>
               event.eventTitle?.toLowerCase().contains(query) ?? false)
           .map((event) => event.eventTitle ?? '')
-          .take(5)
+          .where((title) => title.isNotEmpty)
+          .toSet() // Remove duplicates
+          .take(3)
           .toList();
+      suggestions.addAll(matchingTitles);
+
+      // Add matching cities
+      final matchingCities = controller.events
+          .where((event) => event.city?.toLowerCase().contains(query) ?? false)
+          .map((event) => event.city ?? '')
+          .where((city) => city.isNotEmpty)
+          .toSet() // Remove duplicates
+          .take(2)
+          .toList();
+      suggestions.addAll(matchingCities);
+
+      _searchSuggestions = suggestions.take(5).toList();
     });
   }
 
@@ -134,9 +152,21 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
     setState(() {
       final now = DateTime.now();
       _filteredEvents = controller.events.where((event) {
-        // Search by title
+        // Search by title, category, and location (city + address)
         bool matchesSearch = _searchController.text.isEmpty ||
             (event.eventTitle
+                    ?.toLowerCase()
+                    .contains(_searchController.text.toLowerCase()) ??
+                false) ||
+            (event.category
+                    ?.toLowerCase()
+                    .contains(_searchController.text.toLowerCase()) ??
+                false) ||
+            (event.city
+                    ?.toLowerCase()
+                    .contains(_searchController.text.toLowerCase()) ??
+                false) ||
+            (event.address
                     ?.toLowerCase()
                     .contains(_searchController.text.toLowerCase()) ??
                 false);
@@ -146,19 +176,65 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
             (event.category?.toLowerCase() == _selectedCategory.toLowerCase());
 
         // Filter out past events - only show events that haven't passed
-        bool isNotPast = true;
+        bool isNotPast = false; // Default to false (exclude) for safety
         if (event.startDate != null && event.startDate!.isNotEmpty) {
           try {
-            final eventDate = DateTime.parse(event.startDate!);
-            // Check if event date/time has passed (compare with current date/time)
-            if (eventDate.isBefore(now)) {
-              isNotPast = false;
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+
+            // Combine startDate and startTime if both are available
+            if (event.startTime != null && event.startTime!.isNotEmpty) {
+              DateTime eventDateTime;
+              // Try to parse combined date and time
+              try {
+                final dateTimeString =
+                    '${event.startDate!} ${event.startTime!}';
+                eventDateTime = DateTime.parse(dateTimeString);
+              } catch (_) {
+                // If combined parsing fails, parse date and add time manually
+                final dateOnly = DateTime.parse(event.startDate!);
+                final timeParts = event.startTime!.split(':');
+                if (timeParts.length >= 2) {
+                  final hour = int.tryParse(timeParts[0]) ?? 0;
+                  final minute = int.tryParse(timeParts[1]) ?? 0;
+                  eventDateTime = DateTime(
+                    dateOnly.year,
+                    dateOnly.month,
+                    dateOnly.day,
+                    hour,
+                    minute,
+                  );
+                } else {
+                  // If time parsing fails, use start of day
+                  eventDateTime = DateTime(
+                    dateOnly.year,
+                    dateOnly.month,
+                    dateOnly.day,
+                  );
+                }
+              }
+
+              // For events with time: include only if event datetime is in the future
+              // (exclude if event has already started)
+              isNotPast = eventDateTime.isAfter(now);
+            } else {
+              // Only date available - compare dates only (ignore time)
+              final dateOnly = DateTime.parse(event.startDate!);
+              final eventDate =
+                  DateTime(dateOnly.year, dateOnly.month, dateOnly.day);
+
+              // Include if event date is today or in the future
+              // (exclude if event date is in the past)
+              isNotPast =
+                  eventDate.isAfter(today) || eventDate.isAtSameMomentAs(today);
             }
-          } catch (_) {
-            // If date parsing fails, include the event (don't filter it out)
-            isNotPast = true;
+          } catch (e) {
+            // If date parsing fails, exclude the event to be safe
+            isNotPast = false;
+            print('Error parsing event date: ${event.startDate}, error: $e');
           }
         }
+        // If no start date, isNotPast remains false (event excluded)
 
         // Distance filter (if enabled)
         bool matchesDistance = true;

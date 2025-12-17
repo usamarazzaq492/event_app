@@ -1,118 +1,170 @@
 @extends('layouts.app')
 
-@section('title', 'Terms & Conditions - EventGo')
+@section('title', 'Terms of Service')
 
 @section('content')
-<!-- Terms & Conditions Section -->
-<section class="section terms" id="terms">
-    <div class="container-xxl flex-grow-1 container-p-y mt-5">
-        <div class="container mb-5">
-            <h3>Terms & Conditions</h3>
-            <p class="text-muted">
-                Last updated on: September 22nd, 2024
-            </p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-            <h5>Parties</h5>
-            <p>
-                These Terms & Conditions ("Terms") govern your use of the <b>EventGo</b> platform (hereafter
-                "the Platform"), operated by the Owner/Operator ("the Operator"). By booking, registering,
-                or hosting an event on our platform, you agree to these Terms.
-            </p>
+            <h1 class="mb-5 text-center fw-bold">Terms of Service</h1>
 
-            <h5>Scope of Service</h5>
-            <p>
-                The Platform provides services for event organizers and participants including:
-            </p>
-            <ul>
-                <li>Event listing and promotion</li>
-                <li>Online registration and booking</li>
-                <li>Secure payment processing</li>
-                <li>Ticket allocation and confirmations</li>
-                <li>Communication between organizers and attendees</li>
-            </ul>
-            <p>
-                While we strive to provide accurate information, the Platform does not guarantee
-                availability of tickets, event dates, pricing, or any organizer-provided details.
-            </p>
+            <div class="terms-content" style="line-height: 1.9; font-size: 15px; color:#333;">
 
-            <h5>User Eligibility</h5>
-            <p>
-                You must be at least 13 years old to use the Platform. By registering, you confirm that the
-                information you provide is accurate and up to date.
-            </p>
+                <h2 class="mt-4">Acknowledgment and Acceptance of Terms of Service</h2>
+                <p>
+                    EVENTGO-Live LLC ("EVENTGO-Live", "we" or "us") provides certain services (described below) on or
+                    through our website, www.eventgo-live.com. By using our Service—whether via a personal computer,
+                    mobile phone, or any internet-enabled device (each a "Device")—you agree to be bound by these
+                    Terms of Service.
+                </p>
 
-            <h5>Account Security</h5>
-            <p>
-                You are responsible for maintaining the confidentiality of your account and password. Any
-                activity conducted under your account is your responsibility.
-            </p>
+                <p>
+                    These Terms constitute the entire agreement between you and EVENTGO-LIVE LLC and supersede all
+                    prior agreements. Additional policies, guidelines, or rules applicable to specific features are
+                    incorporated by reference.
+                </p>
 
-            <h5>Organizer Responsibilities</h5>
-            <p>
-                Event organizers using the Platform agree that:
-            </p>
-            <ul>
-                <li>They are authorized representatives of the event or hosting organization.</li>
-                <li>Event details (date, time, venue, fees) provided are accurate.</li>
-                <li>They will honor all valid bookings and ticket sales made through the Platform.</li>
-                <li>They will comply with applicable local laws and venue requirements.</li>
-            </ul>
+                <p>
+                    If you do not agree to these Terms, please do not use the Service. Questions may be directed to
+                    <strong>support@eventgo-live.com</strong>.
+                </p>
 
-            <h5>Booking & Payments</h5>
-            <p>
-                Bookings are only confirmed once payment is successfully processed. Refunds, cancellations,
-                and transfer policies are determined by the event organizer unless otherwise stated.
-            </p>
+                <p class="fw-semibold">
+                    BY USING ANY PART OF THE SERVICE OR COMPLETING ANY REGISTRATION OR PURCHASE, YOU AGREE TO BE
+                    LEGALLY BOUND BY THESE TERMS. IF YOU DO NOT AGREE, DO NOT ACCESS OR USE THE SERVICE.
+                </p>
 
-            <h5>Code of Conduct</h5>
-            <p>
-                All users agree not to:
-            </p>
-            <ul>
-                <li>Use the Platform for fraudulent or unlawful purposes.</li>
-                <li>Harass, abuse, or impersonate other users.</li>
-                <li>Upload harmful, obscene, or copyrighted material without permission.</li>
-                <li>Disrupt the security or functionality of the Platform.</li>
-            </ul>
+                <p class="fw-semibold text-danger">
+                    THESE TERMS CONTAIN A MANDATORY ARBITRATION PROVISION AND CLASS ACTION WAIVER.
+                </p>
 
-            <h5>Content Rights</h5>
-            <p>
-                Organizers grant the Platform a non-exclusive license to use submitted content (logos,
-                descriptions, images) for event promotion. The Operator does not claim ownership of
-                organizer or participant content.
-            </p>
+                <hr class="my-4">
 
-            <h5>Disclaimer</h5>
-            <p>
-                The Platform is provided "as is" without warranties of any kind. The Operator does not
-                guarantee uninterrupted service, error-free operation, or absolute accuracy of event
-                information.
-            </p>
+                <h3>Overview</h3>
+                <p>The EVENTGO-LIVE LLC App allows users to:</p>
+                <ul>
+                    <li>Create and send invitations for free or paid events</li>
+                    <li>Receive and respond to invitations</li>
+                    <li>Search and discover events</li>
+                    <li>Access QR-based tickets</li>
+                    <li>Transfer money peer-to-peer</li>
+                    <li>Maintain a transaction history</li>
+                </ul>
 
-            <h5>Limitation of Liability</h5>
-            <p>
-                The Operator is not liable for any damages, including but not limited to: loss of booking,
-                unauthorized account use, event cancellations, or organizer-related disputes.
-            </p>
+                <p>
+                    Any features added after the "Last Updated" date automatically become part of the Service.
+                </p>
 
-            <h5>Indemnification</h5>
-            <p>
-                You agree to indemnify and hold harmless the Platform, its owners, and partners against
-                claims or damages resulting from your use of the Platform or violation of these Terms.
-            </p>
+                <hr class="my-4">
 
-            <h5>Governing Law</h5>
-            <p>
-                These Terms shall be governed by and interpreted under the laws of the United States of
-                America. New York, USA shall be the legal jurisdiction for any disputes.
-            </p>
+                <h3>Eligibility</h3>
+                <p>
+                    Use of the Service is void where prohibited by law. You represent that you have the legal capacity
+                    to enter into this agreement.
+                </p>
+                <p>
+                    You must be at least <strong>13 years old</strong> to register and at least <strong>18 years old</strong>
+                    to use paid or financial features.
+                </p>
 
-            <h5>Additional Terms for Organizers</h5>
-            <p>
-                Organizers may be subject to additional requirements regarding payout, refunds, and event
-                compliance, which will be communicated separately during onboarding.
-            </p>
+                <hr class="my-4">
+
+                <h3>Privacy Policy</h3>
+                <p>
+                    Your use of the Service is governed by the EVENTGO-LIVE LLC Privacy and Data Use Policy, available
+                    on our website and within our mobile applications.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>Registration</h3>
+                <p>
+                    Registration may be required to access certain features, including sending invitations, managing
+                    accounts, uploading content, and accessing transaction information.
+                </p>
+                <p>
+                    You are solely responsible for maintaining the confidentiality of your login credentials and all
+                    activities conducted under your account.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>Mobile Application</h3>
+                <p>
+                    The Service may be accessed through the EVENTGO-LIVE LLC mobile application. Periodic updates may
+                    be required to continue using the Service.
+                </p>
+
+                <h4>Apple &amp; Android Devices</h4>
+                <p>
+                    These Terms are between you and EVENTGO-LIVE LLC only. Apple and Android are not responsible for
+                    the Service, maintenance, or support.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>License to Use the Service</h3>
+                <p>
+                    EVENTGO-LIVE LLC grants you a limited, non-exclusive, non-transferable license to use the Service
+                    for personal, non-commercial purposes only.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>Content Restrictions</h3>
+                <p>
+                    All content provided through the Service is protected by intellectual property laws. Unauthorized
+                    reproduction or distribution is strictly prohibited.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>User Materials</h3>
+                <p>
+                    You are solely responsible for any content you submit. By submitting content, you grant
+                    EVENTGO-LIVE LLC a perpetual, worldwide, royalty-free license to use such content.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>Prohibited Use</h3>
+                <p>
+                    You agree not to misuse the Service, including posting unlawful, abusive, defamatory, obscene,
+                    infringing, or malicious content, or interfering with other users or system operations.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>Third-Party Links</h3>
+                <p>
+                    The Service may contain links to third-party websites. EVENTGO-LIVE LLC is not responsible for the
+                    content or practices of such third parties.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>Indemnification</h3>
+                <p>
+                    You agree to indemnify and hold harmless EVENTGO-LIVE LLC from any claims arising from your use of
+                    the Service or violation of these Terms.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>Disclaimer of Warranties</h3>
+                <p>
+                    The Service is provided on an "AS IS" and "AS AVAILABLE" basis without warranties of any kind.
+                </p>
+
+                <hr class="my-5">
+
+                <p class="text-center text-muted small">
+                    &copy; EVENTGO-LIVE LLC, 2025. All rights reserved.
+                </p>
+
+            </div>
         </div>
     </div>
-</section>
+</div>
 @endsection

@@ -10,32 +10,35 @@ use Laravel\Sanctum\PersonalAccessToken;
 class AuthController extends Controller
 {
     public function register(Request $request)
-{
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:mstuser,email',
-        'password' => [
-            'required',
-            'string',
-            'min:8',
-            'regex:/[a-z]/',
-            'regex:/[A-Z]/',
-            'regex:/[0-9]/',
-            'regex:/[@$!%*#?&]/',
-            'confirmed',
-        ],
-    ], [
-        'password.regex' => 'Password must include uppercase, lowercase, number, and special character.',
-        'password.confirmed' => 'Password confirmation does not match.',
-    ]);
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:mstuser,email',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/',
+                'confirmed',
+            ],
+            // Mobile app can also send `terms` if you want explicit consent from app registration
+        ], [
+            'password.regex' => 'Password must include uppercase, lowercase, number, and special character.',
+            'password.confirmed' => 'Password confirmation does not match.',
+        ]);
 
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'verificationCode' => rand(1000, 9999),
-        'emailVerified' => 0,
-    ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'verificationCode' => rand(1000, 9999),
+            'emailVerified' => 0,
+            'terms_accepted_at' => now(),
+            'terms_version_accepted' => 'v1', // keep in sync with web version
+        ]);
 
     $to = $user->email;
 $subject = "Email Verification";

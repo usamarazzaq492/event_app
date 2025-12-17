@@ -54,11 +54,28 @@ class PublicProfileController extends GetxController {
   Future<void> fetchUserProfile() async {
     try {
       isLoading.value = true;
+      error.value = ''; // Clear any previous errors
       final result = await _userService.fetchProfile();
-      userProfile.value = result;
-      print("Fetched user profile: ${userProfile.value}");
+      
+      // Validate that we got valid data
+      if (result.data == null) {
+        error.value = 'Failed to load profile';
+        userProfile.value = null;
+      } else {
+        userProfile.value = result;
+        error.value = ''; // Clear error on success
+        print("Fetched user profile: ${userProfile.value?.data?.name}");
+      }
     } catch (e) {
-      error.value = e.toString();
+      // Extract user-friendly error message
+      String errorMessage = 'Failed to load profile';
+      if (e.toString().contains('Exception: ')) {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+      } else {
+        errorMessage = e.toString();
+      }
+      error.value = errorMessage;
+      userProfile.value = null;
       print("Error fetching user profile: $e");
     } finally {
       isLoading.value = false;

@@ -47,6 +47,14 @@ class _CreateEventState extends State<CreateEvent> {
   String? _bannerText;
   Color _bannerColor = Colors.transparent;
 
+  String _normalizePrice(String raw) {
+    final text = raw.trim();
+    if (text.isEmpty) return '0.00';
+    final value = double.tryParse(text);
+    if (value == null) return text;
+    return value.toStringAsFixed(2);
+  }
+
   void _showBanner(String message, {Color color = Colors.blue}) {
     setState(() {
       _bannerText = message;
@@ -131,7 +139,8 @@ class _CreateEventState extends State<CreateEvent> {
                             'Category', categoryController, 'Category'),
                         _buildInputField(
                             'Price', priceController, 'Price of Event',
-                            keyboardType: TextInputType.number),
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true)),
                         Padding(
                           padding: EdgeInsets.only(left: 1.w, bottom: 0.5.h),
                           child: Text('Enter 0 for free events',
@@ -357,6 +366,17 @@ class _CreateEventState extends State<CreateEvent> {
           maxLines: maxLines,
           keyboardType: keyboardType,
           autovalidateMode: AutovalidateMode.onUserInteraction,
+          onEditingComplete: () {
+            // Automatically format price to 2 decimals when user leaves the field
+            if (label == 'Price') {
+              final text = controller.text.trim();
+              if (text.isEmpty) return;
+              final value = double.tryParse(text);
+              if (value != null) {
+                controller.text = value.toStringAsFixed(2);
+              }
+            }
+          },
           validator: (value) {
             // General validation - skip for optional fields
             if (value == null || value.trim().isEmpty) {
@@ -479,7 +499,8 @@ class _CreateEventState extends State<CreateEvent> {
       controller: controller,
       readOnly: true,
       enableInteractiveSelection: false,
-      contextMenuBuilder: (context, editableTextState) => const SizedBox.shrink(),
+      contextMenuBuilder: (context, editableTextState) =>
+          const SizedBox.shrink(),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: InputDecoration(
         hintText: hint,
@@ -622,6 +643,9 @@ class _CreateEventState extends State<CreateEvent> {
         _startTimeError == null &&
         _endTimeError == null &&
         imageFile != null) {
+      // Normalize price so backend always receives 2 decimal places
+      final normalizedPrice = _normalizePrice(priceController.text);
+      priceController.text = normalizedPrice;
       _showBanner('Submitting your event…', color: AppColors.blueColor);
       // Prefer picked coords; else geocode Address+City
       double lat;
@@ -657,7 +681,7 @@ class _CreateEventState extends State<CreateEvent> {
         endDate: edateController.text,
         startTime: _startTime,
         endTime: _endTime,
-        eventPrice: priceController.text,
+        eventPrice: normalizedPrice,
         eventDescription: descController.text,
         eventCategory: categoryController.text,
         eventAddress: addressController.text,

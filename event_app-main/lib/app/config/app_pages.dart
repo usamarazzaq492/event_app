@@ -11,4 +11,5 @@ class RouteName {
   static const String password = 'password_setting';
   static const String forgotpassword = 'forgot_password';
   static const String profileScreen = 'profile_screen';
+  static const String termsScreen = 'terms';
 }

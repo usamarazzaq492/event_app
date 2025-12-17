@@ -1,5 +1,6 @@
 import 'package:event_app/MVVM/View/Auth/sign_in.dart';
 import 'package:event_app/MVVM/View/Auth/sign_up.dart';
+import 'package:event_app/MVVM/View/Auth/terms_screen.dart';
 import 'package:event_app/MVVM/View/HomeScreen/home_screen.dart';
 import 'package:event_app/MVVM/View/Onboarding/onboarding_screen.dart';
 import 'package:event_app/MVVM/View/welcome/welcome_screen.dart';
@@ -46,6 +47,8 @@ class Routes {
         return MaterialPageRoute(builder: (_) => OnboardingScreen());
       case RouteName.signupScreen:
         return MaterialPageRoute(builder: (_) => SignupScreen());
+      case RouteName.termsScreen:
+        return MaterialPageRoute(builder: (_) => const TermsScreen());
 
       case RouteName.loginScreen:
         return MaterialPageRoute(builder: (_) => SigninScreen());

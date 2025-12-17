@@ -76,9 +76,11 @@ class AuthController extends Controller
                 'confirmed',
             ],
             'phone' => 'nullable|string|max:20',
+            'terms' => 'accepted', // require agreeing to disclaimer / terms
         ], [
             'password.regex' => 'Password must include uppercase, lowercase, number, and special character.',
             'password.confirmed' => 'Password confirmation does not match.',
+            'terms.accepted' => 'You must agree to the terms and disclaimer to create an account.',
         ]);
 
         $user = User::create([
@@ -89,6 +91,8 @@ class AuthController extends Controller
             'isActive' => 1,
             'emailVerified' => 0,
             'verificationCode' => rand(1000, 9999),
+            'terms_accepted_at' => now(),
+            'terms_version_accepted' => 'v1', // adjust when you change your legal text
         ]);
 
         // Send verification email

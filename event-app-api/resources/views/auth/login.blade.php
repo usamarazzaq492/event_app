@@ -270,6 +270,31 @@ html, body {
                         <input type="password" name="password_confirmation" placeholder="Confirm password" required>
                     </div>
 
+                    <!-- Terms & Conditions checkbox (replace text later) -->
+                    <div class="input-group" style="margin-top: 0.5rem; text-align: left;">
+                        <label
+  style="display:inline-flex; align-items:center; font-size:0.75rem; color:#555; cursor:pointer; white-space:nowrap;"
+>
+  <input
+    type="checkbox"
+    name="terms"
+    value="1"
+    required
+    style="margin-right:0.5rem;"
+  >
+  <span>
+    I agree to the
+    <a href="{{ route('terms') }}" target="_blank"
+       style="color: var(--primary-color); text-decoration: underline;">
+      Terms &amp; Conditions
+    </a>.
+  </span>
+</label>
+                        @error('terms')
+                            <div style="color: red; font-size: 0.7rem; margin-top: 0.25rem;">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div style="font-size: 0.75rem; color: #666; margin-bottom: 1rem; padding: 0.5rem; background: #f8f9ff; border-radius: 5px;">
                         <strong>Password Requirements:</strong><br>
                         • At least 8 characters<br>

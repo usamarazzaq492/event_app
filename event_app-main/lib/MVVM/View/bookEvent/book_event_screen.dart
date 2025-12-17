@@ -17,13 +17,13 @@ class _BookEventScreenState extends State<BookEventScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int seatCount = 1;
-  late TextEditingController _seatCountController;
+  final TextEditingController _seatCountController =
+      TextEditingController(text: '1');
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
-    _seatCountController = TextEditingController(text: '1');
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -36,9 +36,8 @@ class _BookEventScreenState extends State<BookEventScreen>
   void _updateSeatCount(int newCount) {
     if (newCount < 1) {
       newCount = 1;
-    } else if (newCount > 10) {
-      newCount = 10;
     }
+    // Removed upper limit to allow users to type larger numbers like 25
     setState(() {
       seatCount = newCount;
       _seatCountController.text = newCount.toString();
@@ -53,7 +52,8 @@ class _BookEventScreenState extends State<BookEventScreen>
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: 7.h, left: 4.w, right: 4.w, bottom: 4.h),
+          padding:
+              EdgeInsets.only(top: 7.h, left: 4.w, right: 4.w, bottom: 4.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -104,7 +104,7 @@ class _BookEventScreenState extends State<BookEventScreen>
 
               // 🔷 Seat selection label
               Text(
-                'Choose number of seats',
+                'Choose number of tickets',
                 style: TextStyle(
                   fontSize: 13.sp,
                   fontFamily: 'Montserrat',
@@ -136,8 +136,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                     }),
                     const SizedBox(width: 20),
                     // TextField for direct input
-                    SizedBox(
-                      width: 80,
+                    Expanded(
                       child: TextField(
                         controller: _seatCountController,
                         textAlign: TextAlign.center,
@@ -153,23 +152,40 @@ class _BookEventScreenState extends State<BookEventScreen>
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           contentPadding: EdgeInsets.zero,
+                          hintText: '0',
+                          hintStyle: TextStyle(
+                            color: Colors.white54,
+                            fontSize: 28.sp,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Montserrat',
+                          ),
                         ),
                         onChanged: (value) {
-                          if (value.isEmpty) {
-                            return; // Allow empty temporarily while typing
-                          }
+                          // Allow typing without immediate validation
+                          // Only update if it's a valid number
                           final intValue = int.tryParse(value);
-                          if (intValue != null) {
-                            _updateSeatCount(intValue);
+                          if (intValue != null && intValue >= 1) {
+                            setState(() {
+                              seatCount = intValue;
+                            });
                           }
                         },
                         onEditingComplete: () {
                           // Validate when user finishes editing
-                          final intValue = int.tryParse(_seatCountController.text);
+                          final intValue =
+                              int.tryParse(_seatCountController.text);
                           if (intValue == null || intValue < 1) {
                             _updateSeatCount(1);
-                          } else if (intValue > 10) {
-                            _updateSeatCount(10);
+                          } else {
+                            _updateSeatCount(intValue);
+                          }
+                          FocusScope.of(context).unfocus();
+                        },
+                        onSubmitted: (value) {
+                          // Handle when user presses done/enter
+                          final intValue = int.tryParse(value);
+                          if (intValue == null || intValue < 1) {
+                            _updateSeatCount(1);
                           } else {
                             _updateSeatCount(intValue);
                           }

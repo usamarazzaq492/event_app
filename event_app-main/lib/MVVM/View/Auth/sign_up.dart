@@ -10,6 +10,8 @@ import '../../../app/config/app_pages.dart';
 import '../../../app/config/app_strings.dart';
 import '../../../app/config/app_text_style.dart';
 import '../../../utils/form_validation_utils.dart';
+import '../../../utils/haptic_utils.dart';
+import 'package:flutter/gestures.dart';
 import '../../view_model/auth_view_model.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -35,6 +37,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool _isObscure = true;
   bool _isObscureConfirm = true;
+  bool _acceptedTerms = false;
+  String? _termsError;
 
   @override
   void dispose() {
@@ -50,6 +54,14 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _submitForm() async {
+    if (!_acceptedTerms) {
+      setState(() {
+        _termsError =
+            'You must agree to the terms and conditions to create an account.';
+      });
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       controller.signup(
         nameController.text.trim(),
@@ -216,7 +228,71 @@ class _SignupScreenState extends State<SignupScreen> {
                   Obx(() => controller.confirmPasswordError.value.isNotEmpty
                       ? _buildErrorText(controller.confirmPasswordError.value)
                       : const SizedBox.shrink()),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 2.h),
+
+                  /// Terms & Conditions checkbox
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Transform.translate(
+                        offset: const Offset(0, -2),
+                        child: Checkbox(
+                          value: _acceptedTerms,
+                          activeColor: AppColors.blueColor,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          onChanged: (val) {
+                            setState(() {
+                              _acceptedTerms = val ?? false;
+                              if (_acceptedTerms) _termsError = null;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            text: 'I agree to the ',
+                            style: TextStyles.regularwhite.copyWith(
+                              fontSize: 10.sp,
+                              color: Colors.white70,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'Terms & Conditions',
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 10.sp,
+                                  color: AppColors.blueColor,
+                                  decoration: TextDecoration.underline,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    HapticUtils.navigation();
+                                    Navigator.pushNamed(
+                                        context, RouteName.termsScreen);
+                                  },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_termsError != null)
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.5.h, left: 1.w),
+                      child: Text(
+                        _termsError!,
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 9.sp,
+                        ),
+                      ),
+                    ),
+
+                  SizedBox(height: 3.h),
 
                   /// Signup Button
                   Obx(() => ButtonWidget(

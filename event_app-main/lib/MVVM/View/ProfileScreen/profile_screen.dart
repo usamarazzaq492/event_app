@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/View/ProfileScreen/profile_tab/about_tab.dart';
 import 'package:event_app/MVVM/View/ProfileScreen/profile_tab/event_tab.dart';
+import 'package:event_app/MVVM/View/exploreevent/create_event.dart';
 import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
 import 'package:event_app/MVVM/view_model/ad_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
@@ -101,7 +102,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                   SizedBox(height: 2.h),
                   _buildFollowCounts(profile),
                   SizedBox(height: 2.h),
-                  _buildEditProfileButton(context),
+                  Row(
+                    children: [
+                      Expanded(child: _buildEditProfileButton(context)),
+                      SizedBox(width: 3.w),
+                      Expanded(child: _buildCreateEventButton(context)),
+                    ],
+                  ),
                   SizedBox(height: 3.h),
                   _buildTabBar(),
                   SizedBox(height: 2.h),
@@ -479,6 +486,35 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  Widget _buildCreateEventButton(BuildContext context) {
+    return ElevatedButton.icon(
+      icon: const Icon(Icons.add, size: 18, color: Colors.white),
+      label: Text(
+        'Create Event',
+        style: TextStyles.buttontext.copyWith(
+          color: Colors.white,
+          fontSize: 12.sp,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.blueColor.withValues(alpha: 0.85),
+        foregroundColor: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: 1.4.h),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(2.h),
+        ),
+      ),
+      onPressed: () {
+        HapticUtils.buttonPress();
+        NavigationUtils.push(
+          context,
+          const CreateEvent(),
+          routeName: '/create-event',
+        );
+      },
+    );
+  }
+
   Widget _buildTabBar() {
     return Container(
       decoration: BoxDecoration(
@@ -522,7 +558,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildTabBarView() {
     return TabBarView(
       controller: _tabController,
-      physics: const NeverScrollableScrollPhysics(), // Disable swipe, use tabs only
+      physics:
+          const NeverScrollableScrollPhysics(), // Disable swipe, use tabs only
       children: [
         AboutTab(),
         EventTab(),
