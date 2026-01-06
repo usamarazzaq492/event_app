@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:event_app/MVVM/View/CreateAd/ads_detail_screen.dart';
 import 'package:event_app/MVVM/View/CreateAd/create_ad.dart';
 import 'package:event_app/MVVM/View/EventDetailScreen/event_detail_screen.dart';
 import 'package:event_app/MVVM/body_model/ads_model.dart';

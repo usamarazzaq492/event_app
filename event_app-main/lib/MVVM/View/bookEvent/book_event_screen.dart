@@ -31,7 +31,7 @@ class _BookEventScreenState extends State<BookEventScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
+
     // Set initial tab based on pre-filled ticket type
     if (widget.preFilledTicketType != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
