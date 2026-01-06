@@ -127,7 +127,6 @@
       <p><strong>Quantity:</strong> {{ $quantity }}</p>
       @if(isset($subtotal))
       <p><strong>Subtotal:</strong> ${{ number_format($subtotal, 2) }}</p>
-      <p><strong>Service Fee:</strong> ${{ number_format($serviceFee, 2) }}</p>
       <p><strong>Processing Fee:</strong> ${{ number_format($processingFee, 2) }}</p>
       <p><strong>Total:</strong> ${{ number_format($totalAmount, 2) }}</p>
       @endif
@@ -141,8 +140,20 @@
   </div>
 
   <script>
-    const appId = "{{ env('SQUARE_APPLICATION_ID') }}";
-    const locationId = "{{ env('SQUARE_LOCATION_ID') }}";
+    // Get application ID from config (works even when cached)
+    const appId = @json(config('square.application_id', env('SQUARE_APPLICATION_ID', '')));
+    const locationId = @json(config('square.location_id', env('SQUARE_LOCATION_ID', '')));
+
+    // Validate application ID before initializing
+    if (!appId || appId.trim() === '') {
+      document.getElementById('error-message').innerText = 'Square Application ID is not configured. Please contact support.';
+      throw new Error('Square Application ID is not configured');
+    }
+
+    if (!locationId || locationId.trim() === '') {
+      document.getElementById('error-message').innerText = 'Square Location ID is not configured. Please contact support.';
+      throw new Error('Square Location ID is not configured');
+    }
 
     async function main() {
       try {

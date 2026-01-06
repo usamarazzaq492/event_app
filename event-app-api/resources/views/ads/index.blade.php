@@ -14,7 +14,7 @@
                     <i class="fas fa-plus me-2"></i>Create New Ad
                 </a>
             @else
-                <a href="{{ route('login') }}" class="btn btn-primary btn-lg">
+                <a href="{{ route('login') }}?redirect={{ urlencode(route('ads.create')) }}" class="btn btn-primary btn-lg">
                     <i class="fas fa-sign-in-alt me-2"></i>Login to Create Ad
                 </a>
             @endauth
@@ -168,7 +168,7 @@
                         <i class="fas fa-plus me-2"></i>Create First Campaign
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-primary btn-lg">
+                    <a href="{{ route('login') }}?redirect={{ urlencode(route('ads.create')) }}" class="btn btn-primary btn-lg">
                         <i class="fas fa-sign-in-alt me-2"></i>Login to Create Campaign
                     </a>
                 @endauth

@@ -1,5 +1,6 @@
 import 'package:event_app/MVVM/View/bottombar/bottom_navigation_bar.dart';
 import 'package:event_app/Services/invite_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class InviteViewModel extends GetxController {
@@ -49,6 +50,54 @@ class InviteViewModel extends GetxController {
       responseMessage.value = "Failed to send invitations.";
       print("❌ Error sending invites: $e");
       Get.snackbar("Error", responseMessage.value);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Notification-related observables
+  var receivedInvites = <dynamic>[].obs;
+  var isLoadingInvites = false.obs;
+  var inviteError = ''.obs;
+
+  /// Fetch received invites (notifications)
+  Future<void> fetchReceivedInvites() async {
+    try {
+      isLoadingInvites.value = true;
+      inviteError.value = '';
+      final invites = await _inviteService.getReceivedInvites();
+      receivedInvites.assignAll(invites);
+      print("✅ Fetched ${invites.length} invites");
+    } catch (e) {
+      inviteError.value = e.toString();
+      print("❌ Error fetching invites: $e");
+      receivedInvites.clear();
+    } finally {
+      isLoadingInvites.value = false;
+    }
+  }
+
+  /// Respond to an invite
+  Future<void> respondToInvite(int inviteId, String response) async {
+    try {
+      isLoading.value = true;
+      await _inviteService.respondToInvite(
+        inviteId: inviteId,
+        response: response,
+      );
+      
+      // Refresh invites list
+      await fetchReceivedInvites();
+      
+      Get.snackbar(
+        "Success",
+        "Invite ${response == 'accepted' ? 'accepted' : 'declined'} successfully",
+        backgroundColor: response == 'accepted' ? Colors.green : Colors.orange,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print("❌ Error responding to invite: $e");
+      Get.snackbar("Error", "Failed to respond to invite: ${e.toString()}");
     } finally {
       isLoading.value = false;
     }

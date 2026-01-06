@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:event_app/MVVM/View/bottombar/bottom_navigation_bar.dart';
-import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../Services/data_service.dart';
@@ -32,15 +31,39 @@ class DataViewModel extends GetxController {
     followersCount.value = prevState ? (prevCount - 1) : (prevCount + 1);
 
     try {
-      // 🔷 Call API
-      // Refresh your own profile counts
-      final userService = PublicProfileController();
-      await userService.fetchUserProfile(); // <--- refresh after action
+      // 🔷 Call API to actually follow/unfollow
+      final response = await DataService.toggleFollow(
+        userId: userId,
+        isFollowing: prevState,
+      );
+      
+      print('Follow API Response: $response');
+      
+      // Update follower count from API response if available
+      if (response['followersCount'] != null) {
+        followersCount.value = response['followersCount'] as int;
+      }
+      
+      // Show success message
+      Get.snackbar(
+        prevState ? 'Unfollowed' : 'Followed',
+        prevState ? 'You unfollowed this user' : 'You are now following this user',
+        backgroundColor: AppColors.blueColor,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
     } catch (e) {
       // 🔴 Revert changes on failure
       isFollowing.value = prevState;
       followersCount.value = prevCount;
       print('Follow toggle failed: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to ${prevState ? 'unfollow' : 'follow'} user: ${e.toString()}',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 3),
+      );
     }
   }
 

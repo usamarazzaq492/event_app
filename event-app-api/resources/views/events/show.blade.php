@@ -141,29 +141,38 @@
                 <div class="feature-card text-center">
                     @auth
                         @if(isset($isOwner) && $isOwner)
-                            <!-- Owner View - Only show promotion, never show booking -->
+                            <!-- Owner View - Show management options -->
                             <h5>Your Event</h5>
-                            @if(isset($promotionStatus) && $promotionStatus['isActive'])
-                                <div class="alert alert-success mb-3">
-                                    <i class="bi bi-star-fill"></i> <strong>Promoted!</strong>
-                                    <p class="mb-0 small">
-                                        {{ ucfirst($promotionStatus['package']) }} Package
-                                        <br>
-                                        @if($promotionStatus['daysRemaining'] > 0)
-                                            {{ $promotionStatus['daysRemaining'] }} days remaining
-                                        @else
-                                            Active
-                                        @endif
-                                    </p>
-                                </div>
-                                <p class="small text-muted mb-0">Your event is currently promoted. You can promote again after this promotion expires.</p>
-                            @else
-                                <a href="{{ route('promotion.show', $event->eventId) }}" class="btn btn-warning btn-sm w-100 mb-2">
-                                    <i class="bi bi-megaphone-fill"></i>
-                                    Promote Event
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 mb-3">
+                                <a href="{{ route('events.edit', $event->eventId) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-pencil-square"></i> Edit Event
                                 </a>
-                                <p class="small text-muted mb-0">Promote your event to reach more people!</p>
-                            @endif
+                                <a href="{{ route('payment-qr.show', $event->eventId) }}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-qr-code-scan"></i> Generate Payment QR
+                                </a>
+                                @if(isset($promotionStatus) && $promotionStatus['isActive'])
+                                    <div class="alert alert-success mb-0">
+                                        <i class="bi bi-star-fill"></i> <strong>Promoted!</strong>
+                                        <p class="mb-0 small">
+                                            {{ ucfirst($promotionStatus['package']) }} Package
+                                            <br>
+                                            @if($promotionStatus['daysRemaining'] > 0)
+                                                {{ $promotionStatus['daysRemaining'] }} days remaining
+                                            @else
+                                                Active
+                                            @endif
+                                        </p>
+                                    </div>
+                                @else
+                                    <a href="{{ route('promotion.show', $event->eventId) }}" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-megaphone-fill"></i> Promote Event
+                                    </a>
+                                @endif
+                            </div>
+
+                            <p class="small text-muted mb-0">Manage your event, generate QR codes, or promote it to reach more people!</p>
                         @else
                             <!-- Non-Owner Authenticated View - Only show booking if NOT owner -->
                             <h5>Apply Now!</h5>
@@ -179,9 +188,8 @@
                                     <div class="mb-3">
                                         <label class="form-label small">Ticket Type</label>
                                         <select name="ticket_type" class="form-select form-select-sm" required>
-                                            <option value="general">General - ${{ number_format($event->eventPrice, 2) }}</option>
-                                            <option value="silver">Silver - ${{ number_format($event->eventPrice * 1.2, 2) }}</option>
-                                            <option value="gold">Gold - ${{ number_format($event->eventPrice * 1.5, 2) }}</option>
+                                            <option value="general">General Admission - ${{ number_format($event->eventPrice, 2) }}</option>
+                                            <option value="vip">VIP (Very Important Person) - ${{ number_format($event->eventPrice * 1.5, 2) }}</option>
                                         </select>
                                     </div>
 
@@ -215,7 +223,7 @@
                         @else
                             <p class="small">Free Event</p>
                         @endif
-                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm w-100">
+                        <a href="{{ route('login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn btn-primary btn-sm w-100">
                             Login to Book <i class="bi bi-arrow-right"></i>
                         </a>
                     @endauth
@@ -230,6 +238,46 @@
                 <p style="white-space: pre-wrap;">{{ $event->description }}</p>
             </div>
         </div>
+
+        <!-- QR Codes Section (for organizers) -->
+        @if(isset($isOwner) && $isOwner && $qrCodes->count() > 0)
+        <div class="col-md-12 aos-init aos-animate" data-aos="fade-up" data-aos-delay="80">
+            <div class="feature-card my-4">
+                <h5 class="mb-3">
+                    <i class="bi bi-qr-code-scan"></i> Payment QR Codes
+                </h5>
+                <div class="row g-3">
+                    @foreach($qrCodes as $qr)
+                        @php
+                            $qrData = json_decode($qr->qrCodeData, true);
+                            // Use web URL for QR code (works with all scanners, including iPhone)
+                            $qrString = $qrData['web'] ?? ($qrData['app'] ?? $qr->qrCodeData);
+                        @endphp
+                        <div class="col-md-3 col-sm-4 col-6">
+                            <div class="text-center p-2 border rounded">
+                                <h6 class="small mb-2">
+                                    <span class="badge
+                                        @if($qr->ticketType == 'gold') bg-warning text-dark
+                                        @elseif($qr->ticketType == 'silver') bg-secondary
+                                        @else bg-dark
+                                        @endif">
+                                        {{ strtoupper($qr->ticketType) }}
+                                    </span>
+                                    @if($qr->maxUses && $qr->currentUses >= $qr->maxUses)
+                                        <span class="badge bg-danger ms-1">Limit Reached</span>
+                                    @endif
+                                </h6>
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode($qrString) }}"
+                                     alt="QR Code"
+                                     class="img-fluid"
+                                     style="max-width: 100px;">
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        @endif
 
         <!-- Reviews -->
         <div class="col-md-12 aos-init aos-animate" data-aos="fade-up" data-aos-delay="80">

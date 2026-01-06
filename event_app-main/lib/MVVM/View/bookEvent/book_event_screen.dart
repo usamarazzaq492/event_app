@@ -6,8 +6,15 @@ import 'package:sizer/sizer.dart';
 
 class BookEventScreen extends StatefulWidget {
   final int? id;
+  final String? preFilledTicketType;
+  final double? preFilledPrice;
 
-  const BookEventScreen({super.key, required this.id});
+  const BookEventScreen({
+    super.key,
+    required this.id,
+    this.preFilledTicketType,
+    this.preFilledPrice,
+  });
 
   @override
   State<BookEventScreen> createState() => _BookEventScreenState();
@@ -23,7 +30,22 @@ class _BookEventScreenState extends State<BookEventScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
+    
+    // Set initial tab based on pre-filled ticket type
+    if (widget.preFilledTicketType != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        int initialIndex = 0;
+        switch (widget.preFilledTicketType!.toLowerCase()) {
+          case 'vip':
+            initialIndex = 1;
+            break;
+          default:
+            initialIndex = 0;
+        }
+        _tabController.animateTo(initialIndex);
+      });
+    }
   }
 
   @override
@@ -94,13 +116,46 @@ class _BookEventScreenState extends State<BookEventScreen>
                     fontFamily: 'Montserrat',
                   ),
                   tabs: const [
-                    Tab(text: 'General'),
-                    Tab(text: 'Silver'),
-                    Tab(text: 'Gold'),
+                    Tab(text: 'General Admission'),
+                    Tab(text: 'VIP'),
                   ],
                 ),
               ),
               SizedBox(height: 4.h),
+
+              // 🔷 Pre-filled price display (if from QR scan)
+              if (widget.preFilledPrice != null && widget.preFilledPrice! > 0)
+                Container(
+                  padding: EdgeInsets.all(3.w),
+                  margin: EdgeInsets.only(bottom: 2.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.blueColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(2.h),
+                    border: Border.all(
+                      color: AppColors.blueColor,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.qr_code_scanner,
+                        color: AppColors.blueColor,
+                        size: 20.sp,
+                      ),
+                      SizedBox(width: 2.w),
+                      Text(
+                        'Price: \$${widget.preFilledPrice!.toStringAsFixed(2)} per ticket',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontFamily: 'Montserrat',
+                          color: AppColors.blueColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
               // 🔷 Seat selection label
               Text(
@@ -212,10 +267,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                       ticketType = 'general';
                       break;
                     case 1:
-                      ticketType = 'silver';
-                      break;
-                    case 2:
-                      ticketType = 'gold';
+                      ticketType = 'vip';
                       break;
                     default:
                       ticketType = 'general';

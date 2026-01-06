@@ -51,10 +51,10 @@ class PromotionService {
     }
   }
 
-  /// Purchase promotion for an event
+  /// Purchase boost for an event
   Future<Map<String, dynamic>> purchasePromotion({
     required int eventId,
-    required String package, // 'basic' or 'premium'
+    required String package, // 'boost' (single option)
     required String paymentNonce,
   }) async {
     try {

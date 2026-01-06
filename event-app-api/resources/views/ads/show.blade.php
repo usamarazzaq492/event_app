@@ -183,7 +183,7 @@
                     @else
                         <div class="text-center">
                             <p class="text-muted mb-3">Login to make a donation</p>
-                            <a href="{{ route('login') }}" class="btn btn-primary btn-lg w-100">
+                            <a href="{{ route('login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn btn-primary btn-lg w-100">
                                 <i class="fas fa-sign-in-alt me-2"></i>Login to Donate
                             </a>
                         </div>

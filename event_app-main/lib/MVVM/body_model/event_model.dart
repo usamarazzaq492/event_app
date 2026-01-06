@@ -22,6 +22,8 @@ class EventModel {
   final String? promotionStartDate;
   final String? promotionEndDate;
   final String? promotionPackage;
+  final String? userName;
+  final String? userProfileImage;
 
   EventModel({
     this.eventId,
@@ -47,6 +49,8 @@ class EventModel {
     this.promotionStartDate,
     this.promotionEndDate,
     this.promotionPackage,
+    this.userName,
+    this.userProfileImage,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
@@ -74,6 +78,8 @@ class EventModel {
       promotionStartDate: json['promotionStartDate'],
       promotionEndDate: json['promotionEndDate'],
       promotionPackage: json['promotionPackage'],
+      userName: json['userName'],
+      userProfileImage: json['userProfileImage'],
     );
   }
 

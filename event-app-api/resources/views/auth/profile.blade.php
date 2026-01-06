@@ -205,6 +205,63 @@
                             </div>
                         </div>
 
+                        <!-- Square Payment Connection Section (for Organizers) -->
+                        @if($organizer)
+                        <div class="card border-0 shadow-sm mt-4">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-credit-card me-2"></i>Square Payment Account
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                @if($squareAccount)
+                                    <div class="alert alert-success d-flex align-items-center" role="alert">
+                                        <i class="fas fa-check-circle me-2 fa-lg"></i>
+                                        <div>
+                                            <strong>Square Account Connected!</strong>
+                                            <p class="mb-0 small">
+                                                @if($squareAccount->merchantName)
+                                                    Merchant: {{ $squareAccount->merchantName }}
+                                                @endif
+                                                <br>
+                                                <small class="text-muted">Connected on {{ \Carbon\Carbon::parse($squareAccount->connectedAt)->format('M d, Y') }}</small>
+                                            </p>
+                                            <p class="mb-0 mt-2 small text-muted">
+                                                You'll receive payments directly to your Square account. App owner commission ({{ config('square.commission_rate', 10) }}%) will be automatically deducted.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <form method="POST" action="{{ route('square.disconnect') }}" class="mt-3">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to disconnect your Square account?')">
+                                            <i class="fas fa-unlink me-2"></i>Disconnect Square Account
+                                        </button>
+                                    </form>
+                                @else
+                                    <div class="alert alert-info d-flex align-items-start" role="alert">
+                                        <i class="fas fa-info-circle me-2 fa-lg mt-1"></i>
+                                        <div>
+                                            <strong>Connect Your Square Account</strong>
+                                            <p class="mb-2 small">
+                                                Connect your Square account to receive payments directly when customers book your events.
+                                                The app owner commission ({{ config('square.commission_rate', 10) }}%) will be automatically deducted.
+                                            </p>
+                                            <a href="{{ route('square.connect') }}" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-link me-2"></i>Connect Square Account
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-shield-alt me-1"></i>
+                                            Your payment information is securely handled by Square. We never store your card details.
+                                        </small>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        @endif
+
                         <!-- Change Password Section -->
                         <div class="card border-0 shadow-sm mt-4">
                             <div class="card-header bg-white">

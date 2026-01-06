@@ -102,37 +102,27 @@
                         </div>
                     @endif
 
-                    <h5 class="mb-3">Choose a Promotion Package</h5>
+                    <h5 class="mb-3">Boost Your Event</h5>
                     <div class="row g-3 mb-4" id="package-selection">
-                        <!-- Basic Package -->
-                        <div class="col-md-6">
-                            <div class="package-card position-relative" data-package="basic" onclick="selectPackage('basic')">
-                                <h5>Basic Package</h5>
-                                <h3 class="text-primary">${{ number_format($packages['basic']['price'], 2) }}</h3>
-                                <p class="text-muted mb-2">
-                                    <i class="bi bi-calendar-check"></i> {{ $packages['basic']['durationDays'] }} days
+                        <!-- Single Boost Package: $35 for 10 days -->
+                        <div class="col-md-12">
+                            <div class="package-card position-relative" data-package="boost" onclick="selectPackage('boost')" style="background: linear-gradient(135deg, #4da6ff 0%, #247fd9 100%); color: white; border-color: #4da6ff;">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-rocket-takeoff-fill me-2" style="font-size: 2rem;"></i>
+                                    <h4 class="mb-0">{{ $packages['boost']['name'] ?? 'Event Go-Live Boost' }}</h4>
+                                </div>
+                                <h2 class="mb-3">${{ number_format($packages['boost']['price'], 2) }}</h2>
+                                <p class="mb-3" style="font-size: 1.1rem;">
+                                    <i class="bi bi-calendar-check"></i> {{ $packages['boost']['durationDays'] }} days of promotion
+                                </p>
+                                <p class="mb-3" style="opacity: 0.9;">
+                                    {{ $packages['boost']['description'] ?? 'Boost your event for 10 days to increase visibility' }}
                                 </p>
                                 <ul class="list-unstyled small">
-                                    <li><i class="bi bi-check-circle text-success"></i> Appear first in search</li>
-                                    <li><i class="bi bi-check-circle text-success"></i> "PROMOTED" badge</li>
-                                    <li><i class="bi bi-check-circle text-success"></i> Increased visibility</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- Premium Package -->
-                        <div class="col-md-6">
-                            <div class="package-card premium position-relative" data-package="premium" onclick="selectPackage('premium')">
-                                <span class="package-badge">POPULAR</span>
-                                <h5>Premium Package</h5>
-                                <h3 class="text-warning">${{ number_format($packages['premium']['price'], 2) }}</h3>
-                                <p class="text-muted mb-2">
-                                    <i class="bi bi-calendar-check"></i> {{ $packages['premium']['durationDays'] }} days
-                                </p>
-                                <ul class="list-unstyled small">
-                                    <li><i class="bi bi-check-circle text-success"></i> All Basic features</li>
-                                    <li><i class="bi bi-check-circle text-success"></i> 3x longer duration</li>
-                                    <li><i class="bi bi-check-circle text-success"></i> Maximum visibility</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill"></i> Appear in Ads section</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill"></i> "PROMOTED" badge</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill"></i> Increased visibility</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill"></i> Featured on homepage</li>
                                 </ul>
                             </div>
                         </div>
@@ -166,13 +156,14 @@
     let card = null;
 
     function selectPackage(package) {
-        selectedPackage = package;
+        // Always use 'boost' for new system
+        selectedPackage = 'boost';
 
         // Update UI
         document.querySelectorAll('.package-card').forEach(card => {
             card.classList.remove('selected');
         });
-        document.querySelector(`[data-package="${package}"]`).classList.add('selected');
+        document.querySelector(`[data-package="boost"]`).classList.add('selected');
 
         // Show payment section
         document.getElementById('payment-section').style.display = 'block';
@@ -182,6 +173,11 @@
             initializePayment();
         }
     }
+
+    // Auto-select boost package on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        selectPackage('boost');
+    });
 
     async function initializePayment() {
         try {

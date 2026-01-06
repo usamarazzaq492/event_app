@@ -46,19 +46,27 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
   @override
   void initState() {
     super.initState();
+    // Always reload profile when screen opens to get fresh data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadProfile();
     });
   }
 
   Future<void> loadProfile() async {
+    print('🔷 Loading profile for user ID: ${widget.id}');
     await controller.loadPublicProfile(widget.id);
     final profile = controller.profile.value;
     if (profile != null) {
+      print(
+          '🔷 Profile loaded - isFollowing: ${profile.isFollowing}, followersCount: ${profile.followersCount}');
       dataViewModel.initializeFollowState(
         profile.isFollowing ?? false,
         profile.followersCount ?? 0,
       );
+      print(
+          '🔷 Follow state initialized - isFollowing: ${dataViewModel.isFollowing.value}, followersCount: ${dataViewModel.followersCount.value}');
+    } else {
+      print('❌ Profile is null after loading');
     }
   }
 
@@ -82,6 +90,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
 
         return RefreshIndicator(
           onRefresh: () async {
+            print('🔷 Refreshing profile...');
             await loadProfile();
           },
           child: SingleChildScrollView(
@@ -340,7 +349,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
   // Action Buttons
   Widget _buildActionButtons(dynamic profile) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Obx(() {
           final isFollowing = dataViewModel.isFollowing.value;
@@ -359,15 +368,6 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
             ),
           );
         }),
-        buildActionButton(
-          icon: Icons.message,
-          label: 'Message',
-          filled: false,
-          onTap: () {
-            HapticUtils.light();
-            // Navigate to chat screen
-          },
-        ),
       ],
     );
   }

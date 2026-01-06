@@ -16,8 +16,13 @@ use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function showLogin(Request $request)
     {
+        // Store redirect URL if provided
+        if ($request->has('redirect')) {
+            session(['url.intended' => $request->get('redirect')]);
+        }
+
         return view('auth.login');
     }
 
@@ -52,7 +57,26 @@ class AuthController extends Controller
         Auth::login($user, $request->has('remember'));
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'))->with('success', '👋 Welcome back! You have successfully logged in to EventGo!');
+        // Get intended URL from session, request parameter, or default to home
+        $redirectUrl = session()->pull('url.intended', $request->get('redirect', route('home')));
+
+        // Validate and redirect
+        if ($redirectUrl && $redirectUrl !== route('home')) {
+            // Check if it's a full URL or relative path
+            if (filter_var($redirectUrl, FILTER_VALIDATE_URL)) {
+                // Full URL - validate it's from same domain (security)
+                $parsedUrl = parse_url($redirectUrl);
+                $appUrl = parse_url(config('app.url'));
+                if (isset($parsedUrl['host']) && $parsedUrl['host'] === $appUrl['host']) {
+                    return redirect($redirectUrl)->with('success', '👋 Welcome back! You have successfully logged in to EventGo!');
+                }
+            } else {
+                // Relative path - safe to redirect
+                return redirect($redirectUrl)->with('success', '👋 Welcome back! You have successfully logged in to EventGo!');
+            }
+        }
+
+        return redirect(route('home'))->with('success', '👋 Welcome back! You have successfully logged in to EventGo!');
     }
 
     public function showRegister()
@@ -313,7 +337,31 @@ class AuthController extends Controller
             ->orderBy('addDate', 'desc')
             ->get();
 
-        return view('auth.profile', compact('user', 'bookings', 'userEvents', 'userAds'));
+        // Check if user is an organizer, create if doesn't exist
+        $organizer = DB::table('organizers')
+            ->where('userId', $user->userId)
+            ->first();
+
+        // Auto-create organizer record if doesn't exist (so Square section always shows)
+        if (!$organizer) {
+            $organizerId = DB::table('organizers')->insertGetId([
+                'userId' => $user->userId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $organizer = (object)['organizerId' => $organizerId, 'userId' => $user->userId];
+        }
+
+        // Check for Square account connection
+        $squareAccount = null;
+        if ($organizer) {
+            $squareAccount = DB::table('organizer_square_accounts')
+                ->where('organizerId', $organizer->organizerId)
+                ->where('status', 'connected')
+                ->first();
+        }
+
+        return view('auth.profile', compact('user', 'bookings', 'userEvents', 'userAds', 'organizer', 'squareAccount'));
     }
 
     public function updateProfile(Request $request)

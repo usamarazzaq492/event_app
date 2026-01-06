@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Crypt;
 use Square\SquareClient;
 use Square\Environments;
 use Square\Types\Money;
@@ -17,20 +18,35 @@ use Illuminate\Support\Str;
 class BookingController extends Controller
 {
     // Constants for fee structure
-    const FEE_PER_TICKET = 0.99;
-    const SERVICE_FEE_PERCENT = 1.5;
     const PROCESSING_FEE_PERCENT = 2.9;
     const FIXED_PROCESSING_FEE = 0.30;
+    const COMMISSION_RATE = 10.0; // App owner commission rate (percentage of subtotal)
 
     private $squareClient;
 
-    public function __construct()
+    /**
+     * Get or initialize SquareClient (lazy initialization)
+     */
+    private function getSquareClient()
     {
-        $square = new SquareClient(options: [
-    'accessToken' => env('SQUARE_TOKEN'),
-    'baseUrl' => Environments::Sandbox->value, // or Production
-]);
-        $this->squareClient = $square;
+        if ($this->squareClient === null) {
+            // Use config() with fallbacks for better compatibility with cached configurations
+            $accessToken = config('square.access_token', '') ?: env('SQUARE_ACCESS_TOKEN', '') ?: env('SQUARE_TOKEN', '');
+            $environment = config('square.environment', '') ?: env('SQUARE_ENVIRONMENT', 'sandbox');
+
+            if (empty($accessToken)) {
+                throw new \Exception('Square access token not configured. Please set SQUARE_ACCESS_TOKEN or SQUARE_TOKEN in your .env file.');
+            }
+
+            $this->squareClient = new SquareClient(options: [
+                'accessToken' => $accessToken,
+                'baseUrl' => $environment === 'production'
+                    ? Environments::Production->value
+                    : Environments::Sandbox->value,
+            ]);
+        }
+
+        return $this->squareClient;
     }
 
     /**
@@ -41,7 +57,7 @@ class BookingController extends Controller
         $user = $request->user();
 
         $validator = Validator::make($request->all(), [
-            'ticket_type' => 'required|in:gold,silver,general',
+            'ticket_type' => 'required|in:vip,general',
             'quantity' => 'required|integer|min:1|max:10',
             'payment_nonce' => 'required|string',
         ]);
@@ -73,13 +89,23 @@ class BookingController extends Controller
             $paymentResponse = $this->processSquarePayment(
                 $request->payment_nonce,
                 $pricing['total_amount'],
+                $pricing['commission'],
                 "Event: {$event->eventTitle}",
-                $user->userId
+                $user->userId,
+                $event
             );
 
             if (!$paymentResponse->getPayment() || !$paymentResponse->getPayment()->getId()) {
                 throw new \Exception('Invalid payment response from Square', 500);
             }
+
+            // Get organizer's Square account info (if connected)
+            $organizerSquareAccount = DB::table('organizer_square_accounts')
+                ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+                ->where('organizers.userId', $event->userId)
+                ->where('organizer_square_accounts.status', 'connected')
+                ->select('organizer_square_accounts.squareMerchantId', 'organizer_square_accounts.squareLocationId')
+                ->first();
 
             $bookingId = DB::table('booking')->insertGetId([
                 'eventId' => $eventId,
@@ -88,10 +114,21 @@ class BookingController extends Controller
                 'quantity' => $request->quantity,
                 'basePrice' => $event->eventPrice,
                 'subtotal' => $pricing['subtotal'],
-                'serviceFee' => $pricing['service_fee'],
+                'serviceFee' => 0, // Service fee removed
                 'processingFee' => $pricing['processing_fee'],
                 'totalAmount' => $pricing['total_amount'],
                 'squarePaymentId' => $paymentResponse->getPayment()->getId(),
+                'appOwnerCommission' => $pricing['commission'],
+                'organizerPayout' => $pricing['organizer_payout'],
+                'organizerSquareMerchantId' => $organizerSquareAccount->squareMerchantId ?? null,
+                'organizerSquareLocationId' => $organizerSquareAccount->squareLocationId ?? null,
+                'paymentType' => $organizerSquareAccount ? 'split' : 'direct',
+                'splitPaymentDetails' => json_encode([
+                    'commission_rate' => self::COMMISSION_RATE,
+                    'commission_amount' => $pricing['commission'],
+                    'organizer_payout_amount' => $pricing['organizer_payout'],
+                    'organizer_has_square' => $organizerSquareAccount ? true : false,
+                ]),
                 'feeBreakdown' => json_encode($pricing['fee_breakdown']),
                 'bookingDate' => now(),
                 'status' => 'confirmed'
@@ -157,7 +194,7 @@ class BookingController extends Controller
                 'autocomplete' => true
             ]);
 
-            $paymentResponse = $this->squareClient->payments->create($paymentRequest);
+            $paymentResponse = $this->getSquareClient()->payments->create($paymentRequest);
 
             if (!$paymentResponse->getPayment() || !$paymentResponse->getPayment()->getId()) {
                 throw new \Exception('Invalid payment response from Square', 500);
@@ -174,36 +211,45 @@ class BookingController extends Controller
     private function calculatePricing($basePrice, $ticketType, $quantity)
     {
         $typeMultipliers = [
-            'gold' => 1.5,
-            'silver' => 1.2,
+            'vip' => 1.5,
             'general' => 1.0
         ];
 
         $adjustedBasePrice = $basePrice * $typeMultipliers[$ticketType];
         $subtotal = $adjustedBasePrice * $quantity;
-        $serviceFee = ($subtotal * self::SERVICE_FEE_PERCENT / 100) +
-            (self::FEE_PER_TICKET * $quantity);
-        $processingFee = ($subtotal + $serviceFee) * self::PROCESSING_FEE_PERCENT / 100 +
-            self::FIXED_PROCESSING_FEE;
-        $totalAmount = $subtotal + $serviceFee + $processingFee;
+
+        // Service fee removed - no longer charged
+        $serviceFee = 0;
+
+        // Processing fee: Square's actual fee (2.9% + $0.30) calculated on subtotal only
+        $processingFee = ($subtotal * self::PROCESSING_FEE_PERCENT / 100) + self::FIXED_PROCESSING_FEE;
+        $totalAmount = $subtotal + $processingFee;
+
+        // Calculate commission and payout for split payment
+        $commission = $subtotal * (self::COMMISSION_RATE / 100);
+        $organizerPayout = ($subtotal - $commission) + $processingFee;
 
         return [
             'subtotal' => round($subtotal, 2),
-            'service_fee' => round($serviceFee, 2),
+            'service_fee' => 0, // Removed
             'processing_fee' => round($processingFee, 2),
             'total_amount' => round($totalAmount, 2),
+            'commission' => round($commission, 2),
+            'organizer_payout' => round($organizerPayout, 2),
             'fee_breakdown' => [
                 'base_price' => $basePrice,
                 'ticket_type_multiplier' => $typeMultipliers[$ticketType],
-                'per_ticket_fee' => self::FEE_PER_TICKET,
-                'service_fee_percentage' => self::SERVICE_FEE_PERCENT,
+                'service_fee' => 0, // Removed
                 'processing_fee_percentage' => self::PROCESSING_FEE_PERCENT,
-                'fixed_processing_fee' => self::FIXED_PROCESSING_FEE
+                'fixed_processing_fee' => self::FIXED_PROCESSING_FEE,
+                'commission_rate' => self::COMMISSION_RATE,
+                'commission_amount' => round($commission, 2),
+                'organizer_payout_amount' => round($organizerPayout, 2)
             ]
         ];
     }
 
-    private function processSquarePayment($paymentNonce, $amount, $note, $customerId)
+    private function processSquarePayment($paymentNonce, $amount, $commission, $note, $customerId, $event)
 {
     try {
         // Validate amount
@@ -215,22 +261,91 @@ class BookingController extends Controller
         $amountCents = (int)round($amount * 100);
 
         // Create Money object using SDK 42.0+ syntax
-         $amountMoney = new Money();
+        $amountMoney = new Money();
         $amountMoney->setAmount($amountCents);
         $amountMoney->setCurrency('USD');
 
-        // Verify location ID
-        $locationId = env('SQUARE_LOCATION_ID');
+        // Get organizer's Square account (if connected)
+        $organizerSquareAccount = DB::table('organizer_square_accounts')
+            ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+            ->where('organizers.userId', $event->userId)
+            ->where('organizer_square_accounts.status', 'connected')
+            ->select('organizer_square_accounts.*')
+            ->first();
+
+        $useSplitPayment = false;
+        $squareClient = $this->getSquareClient();
+        $locationId = config('square.location_id', '') ?: env('SQUARE_LOCATION_ID', '');
+
+        if ($organizerSquareAccount) {
+            try {
+                // Decrypt access token
+                $accessToken = Crypt::decryptString($organizerSquareAccount->accessToken);
+
+                // Get application ID for split payments (required when using applicationFeeMoney)
+                $applicationId = config('square.application_id', env('SQUARE_APPLICATION_ID', ''));
+
+                if (empty($applicationId)) {
+                    throw new \RuntimeException('Square Application ID is required for split payments. Please set SQUARE_APPLICATION_ID in your .env file.');
+                }
+
+                // Create Square client with organizer's token and application ID
+                $squareClientOptions = [
+                    'accessToken' => $accessToken,
+                    'baseUrl' => $organizerSquareAccount->environment === 'production'
+                        ? Environments::Production->value
+                        : Environments::Sandbox->value,
+                ];
+
+                // Add applicationId for split payments
+                $squareClientOptions['applicationId'] = $applicationId;
+
+                $squareClient = new SquareClient(options: $squareClientOptions);
+
+                $locationId = $organizerSquareAccount->squareLocationId;
+                $useSplitPayment = true;
+
+                Log::info('Using split payment', [
+                    'organizer_id' => $event->userId,
+                    'merchant_id' => $organizerSquareAccount->squareMerchantId,
+                    'application_id' => $applicationId
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to use organizer Square account, falling back to direct payment', [
+                    'error' => $e->getMessage(),
+                    'organizer_id' => $event->userId
+                ]);
+                // Fall back to direct payment
+            }
+        }
+
         if (empty($locationId)) {
             throw new \RuntimeException('Square location ID is not configured');
         }
 
-        // Create payment request with newer SDK syntax
-        $paymentRequest = new CreatePaymentRequest([
-    'idempotencyKey' => Str::uuid()->toString(),
-    'sourceId' => $paymentNonce,
-    'amountMoney' => $amountMoney
-]);
+        // Prepare payment request data
+        $paymentRequestData = [
+            'idempotencyKey' => Str::uuid()->toString(),
+            'sourceId' => $paymentNonce,
+            'amountMoney' => $amountMoney
+        ];
+
+        // If split payment, set application fee (app owner's commission)
+        if ($useSplitPayment && $commission > 0) {
+            $commissionCents = (int)round($commission * 100);
+            $applicationFeeMoney = new Money();
+            $applicationFeeMoney->setAmount($commissionCents);
+            $applicationFeeMoney->setCurrency('USD');
+            $paymentRequestData['applicationFeeMoney'] = $applicationFeeMoney;
+
+            Log::debug('Split payment with application fee', [
+                'commission' => $commission,
+                'commission_cents' => $commissionCents
+            ]);
+        }
+
+        // Create payment request
+        $paymentRequest = new CreatePaymentRequest($paymentRequestData);
 
         // Set additional parameters
         $paymentRequest->setNote(substr($note, 0, 500));
@@ -246,11 +361,13 @@ class BookingController extends Controller
             ],
             'sourceId' => $paymentNonce,
             'customer_id' => $customerId,
-            'location_id' => $locationId
+            'location_id' => $locationId,
+            'split_payment' => $useSplitPayment,
+            'application_fee' => $useSplitPayment ? $commission : null
         ]);
 
         // Process payment using the Payments API
-        $paymentsApi = $this->squareClient->payments;
+        $paymentsApi = $squareClient->payments;
         $response = $paymentsApi->create($paymentRequest);
 
         // Check for errors in response
@@ -327,7 +444,7 @@ class BookingController extends Controller
                 'idempotencyKey' => Str::uuid()->toString()
             ]);
 
-            $customerResponse = $this->squareClient->customers->create($customerRequest);
+            $customerResponse = $this->getSquareClient()->customers->create($customerRequest);
             $customerId = $customerResponse->getCustomer()->getId();
 
             $cardRequest = new CreateCardRequest([
@@ -339,7 +456,7 @@ class BookingController extends Controller
                 ]
             ]);
 
-            $cardResponse = $this->squareClient->cards->create($cardRequest);
+            $cardResponse = $this->getSquareClient()->cards->create($cardRequest);
 
             DB::table('user_payment_methods')->insert([
                 'userId' => $userId,
@@ -397,6 +514,7 @@ class BookingController extends Controller
             'events.address',
             'events.city',
             'tickets.ticketNumber',
+            'tickets.qrCodeData', // Include QR code data for check-in
             DB::raw("CONCAT('" . url('/tickets') . "/', tickets.ticketNumber, '/download') as download_url")
         ])
         ->orderBy('booking.bookingDate', 'desc')

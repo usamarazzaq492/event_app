@@ -176,13 +176,8 @@
             letter-spacing: 0.5px;
         }
 
-        .ticket-type-gold {
+        .ticket-type-vip {
             background: #ffd700;
-            color: #333;
-        }
-
-        .ticket-type-silver {
-            background: #c0c0c0;
             color: #333;
         }
 
@@ -284,7 +279,11 @@
                         <div class="info-label">Type</div>
                         <div class="info-value">
                             <span class="ticket-type-badge ticket-type-{{ $ticket['ticket_type'] }}">
-                                {{ ucfirst($ticket['ticket_type']) }}
+                                @if($ticket['ticket_type'] === 'vip')
+                                    VIP
+                                @else
+                                    General Admission
+                                @endif
                             </span>
                         </div>
                     </div>
@@ -331,12 +330,20 @@
                 <!-- QR Code Section -->
                 <div class="qr-section">
                     <div class="qr-label">Scan for verification</div>
-                    <div class="qr-code">
-                        QR CODE<br>
-                        {{ $ticket['ticket_number'] }}
-                    </div>
-                    <div style="font-size: 10px; color: #999;">
+                    @php
+                        // Get QR code data (it's JSON string)
+                        $qrDataString = $ticket['qr_data'];
+                        // If it's already a JSON string, use it; otherwise encode it
+                        $qrDataForDisplay = is_string($qrDataString) ? $qrDataString : json_encode($qrDataString);
+                    @endphp
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode($qrDataForDisplay) }}"
+                         alt="QR Code"
+                         style="width: 200px; height: 200px; margin: 0 auto; display: block; border: 2px solid #ddd; border-radius: 8px; padding: 10px; background: white;">
+                    <div style="font-size: 10px; color: #999; margin-top: 10px;">
                         Present this ticket at the event entrance
+                    </div>
+                    <div style="font-size: 9px; color: #999; margin-top: 5px;">
+                        Ticket: {{ $ticket['ticket_number'] }}
                     </div>
                 </div>
             </div>

@@ -9,6 +9,8 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\PaymentQrController;
+use App\Http\Controllers\NotificationController;
 
 Route::prefix('v1')->group(function () {
     // 🔐 Auth
@@ -23,6 +25,9 @@ Route::prefix('v1')->group(function () {
 
     // 💰 Promotion Packages (Public - accessible without authentication)
     Route::get('/promotion/packages', [PromotionController::class, 'getPackages']);
+
+    // 📱 Payment QR Code Validation (Public - for scanning)
+    Route::post('/payment-qr/validate', [PaymentQrController::class, 'validatePaymentQr']);
 
     // 🔒 Authenticated User Actions
     Route::middleware('auth:sanctum')->group(function () {
@@ -44,6 +49,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/add', [EventController::class, 'store']);             // Create event
             Route::post('/', [EventController::class, 'index']);              // List all events
             Route::get('/my', [EventController::class, 'myEvents']);         // List my events
+            Route::get('/timeline', [EventController::class, 'getTimelineEvents']); // Timeline: events from followed users
             Route::get('/{id}', [EventController::class, 'show']);           // View single event
             Route::post('/{id}', [EventController::class, 'update']);         // Update event
             Route::delete('/{id}', [EventController::class, 'destroy']);     // Delete event
@@ -55,6 +61,10 @@ Route::prefix('v1')->group(function () {
             // 💰 Promotion
             Route::post('/{id}/promote', [PromotionController::class, 'purchasePromotion']);
             Route::get('/{id}/promotion-status', [PromotionController::class, 'getPromotionStatus']);
+
+            // 📱 Payment QR Codes
+            Route::post('/{id}/payment-qr/generate', [PaymentQrController::class, 'generatePaymentQr']);
+            Route::get('/{id}/payment-qr/list', [PaymentQrController::class, 'getEventQrCodes']);
         });
 
         // Invites
@@ -63,7 +73,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/get-invites', [InviteController::class, 'getReceivedInvites']);
         Route::post('/{inviteId}/respond', [InviteController::class, 'respond']);
         });
-        
+
+        // Notifications (unified)
+        Route::get('/notifications', [NotificationController::class, 'getAllNotifications']);
+
         // Ads
         Route::prefix('ads')->group(function () {
     Route::post('/add', [DonationController::class, 'createAd']);
@@ -71,6 +84,22 @@ Route::prefix('v1')->group(function () {
     Route::get('/{adId}', [DonationController::class, 'getAd']);
     Route::post('/{adId}/donate', [DonationController::class, 'donate']);
 });
+
+        // 📱 Payment QR Code Management
+        Route::post('/payment-qr/{qrId}/deactivate', [PaymentQrController::class, 'deactivateQrCode']);
+
+        // 🔗 Square Connect
+        Route::prefix('square')->group(function () {
+            Route::get('/status', [App\Http\Controllers\SquareConnectController::class, 'checkStatus']);
+            Route::get('/connect', [App\Http\Controllers\SquareConnectController::class, 'initiateOAuth']);
+            Route::post('/disconnect', [App\Http\Controllers\SquareConnectController::class, 'disconnect']);
+        });
+
+        // 🎫 Ticket Check-in (for organizers)
+        Route::prefix('tickets')->group(function () {
+            Route::post('/checkin', [App\Http\Controllers\TicketCheckInController::class, 'checkIn']);
+            Route::post('/verify', [App\Http\Controllers\TicketCheckInController::class, 'verify']);
+        });
     });
 });
 

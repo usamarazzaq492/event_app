@@ -22,13 +22,29 @@ class DonationController extends Controller
 
     private $squareClient;
 
-    public function __construct()
+    /**
+     * Get or initialize SquareClient (lazy initialization)
+     */
+    private function getSquareClient()
     {
-        $square = new SquareClient(options: [
-            'accessToken' => env('SQUARE_TOKEN'),
-            'baseUrl' => Environments::Sandbox->value, // or Production
-        ]);
-        $this->squareClient = $square;
+        if ($this->squareClient === null) {
+            // Use config() with fallbacks for better compatibility with cached configurations
+            $accessToken = config('square.access_token', '') ?: env('SQUARE_ACCESS_TOKEN', '') ?: env('SQUARE_TOKEN', '');
+            $environment = config('square.environment', '') ?: env('SQUARE_ENVIRONMENT', 'sandbox');
+
+            if (empty($accessToken)) {
+                throw new \Exception('Square access token not configured. Please set SQUARE_ACCESS_TOKEN or SQUARE_TOKEN in your .env file.');
+            }
+
+            $this->squareClient = new SquareClient(options: [
+                'accessToken' => $accessToken,
+                'baseUrl' => $environment === 'production'
+                    ? Environments::Production->value
+                    : Environments::Sandbox->value,
+            ]);
+        }
+
+        return $this->squareClient;
     }
 
     // Create new ad
@@ -61,15 +77,47 @@ class DonationController extends Controller
         ]);
     }
 
-    // List active ads
+    // List boosted events (Ads section - only shows paid/boosted events)
     public function listAds()
     {
-        $ads = DB::table('donation')
-            ->where('isActive', true)
-            ->orderBy('addDate', 'desc')
-            ->get();
+        // Get only active boosted events (isPromoted = 1 AND promotionEndDate > NOW())
+        $boostedEvents = DB::table('events')
+            ->where('isActive', 1)
+            ->where('isPromoted', 1)
+            ->where('promotionEndDate', '>', now())
+            ->orderBy('promotionEndDate', 'asc') // Show events expiring soon first
+            ->orderBy('startDate', 'asc')
+            ->get([
+                // Map event fields to match AdsModel format for Flutter app compatibility
+                'eventId as donationId', // Map eventId to donationId for compatibility
+                'userId',
+                'eventTitle as title',
+                'eventImage as imageUrl',
+                'description',
+                'eventPrice as amount',
+                'city',
+                DB::raw("NULL as state"), // Events don't have state field
+                DB::raw("NULL as zipcode"), // Events don't have zipcode field
+                'isActive',
+                'addDate',
+                'editDate as updated_at',
+                // Include event-specific fields that might be useful
+                'eventId',
+                'startDate',
+                'endDate',
+                'startTime',
+                'endTime',
+                'category',
+                'address',
+                'latitude',
+                'longitude',
+                'isPromoted',
+                'promotionStartDate',
+                'promotionEndDate',
+                'promotionPackage'
+            ]);
 
-        return response()->json($ads);
+        return response()->json($boostedEvents);
     }
 
     // Process donation
@@ -153,7 +201,7 @@ class DonationController extends Controller
             $amountMoney->setAmount((int)($amount * 100));
             $amountMoney->setCurrency('USD');
 
-            $locationId = env('SQUARE_LOCATION_ID');
+            $locationId = config('square.location_id', '') ?: env('SQUARE_LOCATION_ID', '');
             if (empty($locationId)) {
                 throw new \RuntimeException('Square location ID missing');
             }
@@ -168,7 +216,7 @@ class DonationController extends Controller
             $paymentRequest->setAutocomplete(true);
             $paymentRequest->setLocationId($locationId);
 
-            $paymentsApi = $this->squareClient->payments;
+            $paymentsApi = $this->getSquareClient()->payments;
         $response = $paymentsApi->create($paymentRequest);
 
             if ($response->getErrors()) {
@@ -202,7 +250,7 @@ class DonationController extends Controller
                 'idempotencyKey' => Str::uuid()->toString()
             ]);
 
-            $customerResponse = $this->squareClient->customers->create($customerRequest);
+            $customerResponse = $this->getSquareClient()->customers->create($customerRequest);
             $customerId = $customerResponse->getCustomer()->getId();
 
             $cardRequest = new CreateCardRequest([
@@ -214,7 +262,7 @@ class DonationController extends Controller
                 ]
             ]);
 
-            $cardResponse = $this->squareClient->cards->create($cardRequest);
+            $cardResponse = $this->getSquareClient()->cards->create($cardRequest);
 
             DB::table('user_payment_methods')->insert([
                 'userId' => $userId,

@@ -19,6 +19,12 @@ import '../bottombar/bottom_navigation_bar.dart';
 import '../../../Widget/live_stream_widget.dart';
 import '../Promotion/promote_event_screen.dart';
 import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart';
+import 'package:event_app/MVVM/View/PaymentQr/generate_payment_qr_screen.dart';
+import 'package:event_app/MVVM/View/TicketCheckIn/ticket_checkin_scanner.dart';
+import 'package:event_app/Services/payment_qr_service.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Safe Google Map Widget with error handling - COMMENTED OUT
 /*
@@ -243,6 +249,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   final PublicProfileController hostProfileController =
       Get.put(PublicProfileController());
   final authViewModel = Get.put(AuthViewModel());
+  final PaymentQrService _qrService = PaymentQrService();
+  List<dynamic> _qrCodes = [];
+  bool _isLoadingQrCodes = false;
 
   @override
   void initState() {
@@ -250,8 +259,40 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchEventDetailById(widget.eventId, onLoaded: (detail) {
         hostProfileController.loadPublicProfile(detail.userId);
+        // Load QR codes if user is the creator
+        final currentUserId = authViewModel.currentUser['userId'];
+        if (currentUserId == detail.userId) {
+          _loadQrCodes();
+        }
       });
     });
+  }
+
+  Future<void> _loadQrCodes() async {
+    setState(() {
+      _isLoadingQrCodes = true;
+    });
+
+    try {
+      final response = await _qrService
+          .getEventQrCodes(int.parse(widget.eventId.toString()));
+      final responseData = json.decode(response.body);
+
+      if (response.statusCode == 200 && responseData['success'] == true) {
+        setState(() {
+          _qrCodes = responseData['data'] ?? [];
+          _isLoadingQrCodes = false;
+        });
+      } else {
+        setState(() {
+          _isLoadingQrCodes = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isLoadingQrCodes = false;
+      });
+    }
   }
 
   @override
@@ -268,10 +309,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           return _buildErrorState();
         }
 
-        // Load host profile after event loads
-        if (hostProfileController.profile.value == null ||
-            hostProfileController.profile.value!.userId != event.userId) {
-          hostProfileController.loadPublicProfile(event.userId);
+        // Load host profile after event loads (defer to avoid build-time state changes)
+        if ((hostProfileController.profile.value == null ||
+            hostProfileController.profile.value!.userId != event.userId) &&
+            !hostProfileController.isLoading.value) {
+          Future.microtask(() {
+            hostProfileController.loadPublicProfile(event.userId);
+          });
         }
 
         final hostProfile = hostProfileController.profile.value;
@@ -313,6 +357,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     // About Section
                     _buildAboutSection(event),
                     SizedBox(height: 3.h),
+
+                    // QR Codes Section (for organizers)
+                    if (isCreator && _qrCodes.isNotEmpty)
+                      _buildQrCodesSection(),
+                    if (isCreator && _qrCodes.isNotEmpty) SizedBox(height: 3.h),
 
                     // Live Stream Section
                     if (event.liveStreamUrl != null)
@@ -574,9 +623,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       child: Text(
                         '\$${event.eventPrice}',
                         style: TextStyles.regularwhite.copyWith(
-                          fontSize: 11.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.green,
                         ),
                       ),
                     ),
@@ -782,34 +831,80 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               if (event.latitude != null && event.longitude != null) ...[
                 SizedBox(height: 1.h),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.blueColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(1.h),
-                    border: Border.all(
-                      color: AppColors.blueColor.withValues(alpha: 0.3),
-                      width: 1,
+                InkWell(
+                  borderRadius: BorderRadius.circular(1.h),
+                  onTap: () async {
+                    final latStr = event.latitude;
+                    final lonStr = event.longitude;
+                    if (latStr == null || lonStr == null) return;
+
+                    final lat = double.tryParse(latStr);
+                    final lon = double.tryParse(lonStr);
+                    if (lat == null || lon == null) {
+                      Get.snackbar(
+                        'Location not available',
+                        'This event does not have a valid location.',
+                        backgroundColor: Colors.redAccent,
+                        colorText: Colors.white,
+                      );
+                      return;
+                    }
+
+                    final url = Uri.parse(
+                      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon&travelmode=driving',
+                    );
+
+                    try {
+                      if (!await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      )) {
+                        Get.snackbar(
+                          'Maps not available',
+                          'Could not open Google Maps on this device.',
+                          backgroundColor: Colors.redAccent,
+                          colorText: Colors.white,
+                        );
+                      }
+                    } catch (_) {
+                      Get.snackbar(
+                        'Maps not available',
+                        'Could not open Google Maps on this device.',
+                        backgroundColor: Colors.redAccent,
+                        colorText: Colors.white,
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
+                    decoration: BoxDecoration(
+                      color: AppColors.blueColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(1.h),
+                      border: Border.all(
+                        color: AppColors.blueColor.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.map,
-                        size: 10.sp,
-                        color: AppColors.blueColor,
-                      ),
-                      SizedBox(width: 1.w),
-                      Text(
-                        'View on Map',
-                        style: TextStyles.regularwhite.copyWith(
-                          fontSize: 9.sp,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.map,
+                          size: 10.sp,
                           color: AppColors.blueColor,
-                          fontWeight: FontWeight.w600,
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 1.w),
+                        Text(
+                          'View on Map',
+                          style: TextStyles.regularwhite.copyWith(
+                            fontSize: 9.sp,
+                            color: AppColors.blueColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -829,9 +924,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 Text(
                   '\$${event.eventPrice}',
                   style: TextStyles.regularhometext1.copyWith(
-                    fontSize: 14.sp,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.blueColor,
+                    color: Colors.green,
                   ),
                 )
               else
@@ -1525,6 +1620,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             child: InkWell(
                               onTap: () {
                                 HapticUtils.buttonPress();
+                                // Open boost screen (now uses single boost option: $35 for 10 days)
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -1534,7 +1630,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     ),
                                   ),
                                 ).then((_) {
-                                  // Refresh event details after promotion
+                                  // Refresh event details after boost
                                   controller
                                       .fetchEventDetailById(widget.eventId);
                                 });
@@ -1567,7 +1663,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     ),
                                     SizedBox(width: 3.w),
                                     Text(
-                                      'Promote Event',
+                                      'Boost Event',
                                       style: TextStyle(
                                         fontSize: 12.sp,
                                         fontWeight: FontWeight.bold,
@@ -1583,6 +1679,161 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         );
                       }
                     },
+                  ),
+
+                  // Generate Payment QR Button (for organizers)
+                  SizedBox(height: 2.h),
+                  Container(
+                    width: double.infinity,
+                    height: 5.h,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.blueColor,
+                          AppColors.lightColor,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(2.h),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.blueColor.withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          HapticUtils.buttonPress();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => GeneratePaymentQrScreen(
+                                eventId: event.eventId!,
+                              ),
+                            ),
+                          ).then((_) {
+                            // Reload QR codes after generating
+                            _loadQrCodes();
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(2.h),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2.h),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(1.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(1.h),
+                                ),
+                                child: Icon(
+                                  Icons.qr_code_scanner,
+                                  size: 14.sp,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(width: 3.w),
+                              Text(
+                                'Generate Payment QR',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Check In Tickets Button (for organizers)
+                  SizedBox(height: 2.h),
+                  Container(
+                    width: double.infinity,
+                    height: 5.h,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.green.shade600,
+                          Colors.green.shade700,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(2.h),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green.withValues(alpha: 0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          HapticUtils.buttonPress();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const TicketCheckInScanner(),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(2.h),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2.h),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(1.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(1.h),
+                                ),
+                                child: Icon(
+                                  Icons.qr_code_scanner,
+                                  size: 14.sp,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(width: 3.w),
+                              Text(
+                                'Check In Tickets',
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ],
@@ -1609,6 +1860,153 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     } catch (e) {
       return time ?? '';
     }
+  }
+
+  Widget _buildQrCodesSection() {
+    return Container(
+      padding: EdgeInsets.all(3.w),
+      decoration: BoxDecoration(
+        color: AppColors.signinoptioncolor,
+        borderRadius: BorderRadius.circular(2.h),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.qr_code_scanner,
+                color: AppColors.blueColor,
+                size: 18.sp,
+              ),
+              SizedBox(width: 2.w),
+              Text(
+                'Payment QR Codes',
+                style: TextStyles.homeheadingtext.copyWith(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2.h),
+          if (_isLoadingQrCodes)
+            const Center(
+              child: CircularProgressIndicator(),
+            )
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 2.w,
+                mainAxisSpacing: 2.h,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: _qrCodes.length,
+              itemBuilder: (context, index) {
+                final qr = _qrCodes[index];
+                return _buildQrCodeItem(qr);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQrCodeItem(Map<String, dynamic> qr) {
+    final qrCodeData = qr['qrCodeData'];
+    Map<String, dynamic> qrDataMap;
+
+    try {
+      qrDataMap = json.decode(qrCodeData);
+    } catch (e) {
+      qrDataMap = {'web': qrCodeData, 'app': qrCodeData};
+    }
+    
+    // Use web URL for QR code (works with all scanners, including iPhone)
+    final qrString = qrDataMap['web'] ?? (qrDataMap['app'] ?? qrCodeData);
+    final ticketType = qr['ticketType'] ?? 'general';
+    final currentUses = qr['currentUses'] ?? 0;
+    final maxUses = qr['maxUses'];
+    final isLimitReached = maxUses != null && currentUses >= maxUses;
+
+    Color badgeColor;
+    Color textColor;
+
+    switch (ticketType.toLowerCase()) {
+      case 'vip':
+        badgeColor = const Color(0xFFFFD700);
+        textColor = Colors.black87;
+        break;
+      default:
+        badgeColor = const Color(0xFF6C757D);
+        textColor = Colors.white;
+    }
+
+    return Container(
+      padding: EdgeInsets.all(2.w),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(1.5.h),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+                decoration: BoxDecoration(
+                  color: badgeColor,
+                  borderRadius: BorderRadius.circular(1.h),
+                ),
+                child: Text(
+                  ticketType.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 8.sp,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+              ),
+              if (isLimitReached) ...[
+                SizedBox(width: 1.w),
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 1.5.w, vertical: 0.3.h),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(1.h),
+                  ),
+                  child: Text(
+                    'LIMIT',
+                    style: TextStyle(
+                      fontSize: 6.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          SizedBox(height: 1.h),
+          QrImageView(
+            data: qrString,
+            version: QrVersions.auto,
+            size: 20.w,
+            backgroundColor: Colors.white,
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildLiveStreamSection(EventDetailModel event) {

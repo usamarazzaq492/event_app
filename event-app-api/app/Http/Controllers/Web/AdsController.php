@@ -14,18 +14,34 @@ class AdsController extends Controller
 {
     public function index()
     {
-        $ads = DB::table('donation')
-            ->join('mstuser', 'donation.userId', '=', 'mstuser.userId')
-            ->select('donation.*', 'mstuser.name as userName', 'mstuser.email as userEmail')
-            ->where('donation.isActive', 1)
-            ->orderBy('donation.addDate', 'desc')
+        // Ads section now shows only boosted events (paid/promoted events)
+        $ads = DB::table('events')
+            ->join('mstuser', 'events.userId', '=', 'mstuser.userId')
+            ->select(
+                'events.*',
+                'mstuser.name as userName',
+                'mstuser.email as userEmail'
+            )
+            ->where('events.isActive', 1)
+            ->where('events.isPromoted', 1)
+            ->where('events.promotionEndDate', '>', now())
+            ->orderBy('events.promotionEndDate', 'asc') // Show events expiring soon first
+            ->orderBy('events.startDate', 'asc')
             ->paginate(12);
 
-        // Calculate stats
+        // Calculate stats for boosted events
         $stats = [
-            'active_campaigns' => DB::table('donation')->where('isActive', 1)->count(),
-            'total_raised' => DB::table('donation_transactions')->sum('amount'),
-            'total_donations' => DB::table('donation_transactions')->count(),
+            'active_boosted_events' => DB::table('events')
+                ->where('isActive', 1)
+                ->where('isPromoted', 1)
+                ->where('promotionEndDate', '>', now())
+                ->count(),
+            'total_boost_revenue' => DB::table('promotion_transactions')
+                ->where('status', 'completed')
+                ->sum('amount'),
+            'total_boosts' => DB::table('promotion_transactions')
+                ->where('status', 'completed')
+                ->count(),
         ];
 
         return view('ads.index', compact('ads', 'stats'));

@@ -9,30 +9,73 @@ class FollowController extends Controller
 {
     public function followUser(Request $request, $id)
     {
-        $followerId = $request->user()->userId;
+        try {
+            $followerId = $request->user()->userId;
 
-        if ($followerId == $id) {
-            return response()->json(['error' => 'You cannot follow yourself.'], 400);
+            if ($followerId == $id) {
+                return response()->json(['error' => 'You cannot follow yourself.'], 400);
+            }
+
+            // Check if already following
+            $exists = DB::table('follows')
+                ->where('follower_id', $followerId)
+                ->where('followee_id', $id)
+                ->exists();
+
+            if (!$exists) {
+                // Insert new follow relationship
+                DB::table('follows')->insert([
+                    'follower_id' => $followerId,
+                    'followee_id' => $id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // Return updated follower count
+            $followersCount = DB::table('follows')
+                ->where('followee_id', $id)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Followed successfully.',
+                'followersCount' => $followersCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to follow user: ' . $e->getMessage()
+            ], 500);
         }
-
-        DB::table('follows')->updateOrInsert(
-            ['follower_id' => $followerId, 'followee_id' => $id],
-            ['created_at' => now()]
-        );
-
-        return response()->json(['message' => 'Followed successfully.']);
     }
 
     public function unfollowUser(Request $request, $id)
     {
-        $followerId = $request->user()->userId;
+        try {
+            $followerId = $request->user()->userId;
 
-        DB::table('follows')
-            ->where('follower_id', $followerId)
-            ->where('followee_id', $id)
-            ->delete();
+            $deleted = DB::table('follows')
+                ->where('follower_id', $followerId)
+                ->where('followee_id', $id)
+                ->delete();
 
-        return response()->json(['message' => 'Unfollowed successfully.']);
+            // Return updated follower count
+            $followersCount = DB::table('follows')
+                ->where('followee_id', $id)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Unfollowed successfully.',
+                'followersCount' => $followersCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to unfollow user: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function getFollowers($id)

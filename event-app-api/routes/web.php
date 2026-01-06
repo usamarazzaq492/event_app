@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\AdsController;
 use App\Http\Controllers\Web\TicketController;
 use App\Http\Controllers\Web\PromotionWebController;
+use App\Http\Controllers\Web\PaymentQrWebController;
 
 // Home and static pages
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -27,11 +28,19 @@ Route::get('/events/search', [EventWebController::class, 'search'])->name('event
 Route::get('/events/create', [EventWebController::class, 'create'])->name('events.create')->middleware('auth');
 Route::post('/events', [EventWebController::class, 'store'])->name('events.store')->middleware('auth');
 Route::get('/events/{id}', [EventWebController::class, 'show'])->name('events.show');
+Route::get('/events/{id}/edit', [EventWebController::class, 'edit'])->name('events.edit')->middleware('auth');
+Route::put('/events/{id}', [EventWebController::class, 'update'])->name('events.update')->middleware('auth');
 Route::post('/events/{id}/book', [EventWebController::class, 'book'])->name('events.book')->middleware('auth');
 
 // Promotion routes
 Route::get('/events/{id}/promote', [PromotionWebController::class, 'show'])->name('promotion.show')->middleware('auth');
 Route::post('/events/{id}/promote/process', [PromotionWebController::class, 'processPayment'])->name('promotion.process')->middleware('auth');
+
+// Payment QR Code routes
+Route::get('/events/{id}/payment-qr', [PaymentQrWebController::class, 'showGenerate'])->name('payment-qr.show')->middleware('auth');
+Route::post('/events/{id}/payment-qr/generate', [PaymentQrWebController::class, 'generate'])->name('payment-qr.generate')->middleware('auth');
+Route::post('/events/{id}/payment-qr/{qrId}/deactivate', [PaymentQrWebController::class, 'deactivate'])->name('payment-qr.deactivate')->middleware('auth');
+Route::get('/pay', [PaymentQrWebController::class, 'showPayment'])->name('payment-qr.payment');
 
 // Ads routes
 Route::get('/ads', [AdsController::class, 'index'])->name('ads.index');
@@ -76,6 +85,16 @@ Route::post('/square-payment/{eventId}', [App\Http\Controllers\Web\SquarePayment
 
 Route::get('/square-donate/{transactionId}', [App\Http\Controllers\Web\SquarePaymentController::class, 'showDonationForm'])->name('square.donate');
 Route::post('/square-donate/{transactionId}', [App\Http\Controllers\Web\SquarePaymentController::class, 'processDonation'])->name('square.donate.process');
+
+// Square Connect OAuth Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/square/connect', [App\Http\Controllers\SquareConnectController::class, 'initiateOAuth'])->name('square.connect');
+    Route::post('/square/disconnect', [App\Http\Controllers\SquareConnectController::class, 'disconnect'])->name('square.disconnect');
+});
+
+// OAuth callback must be accessible without auth (Square redirects here)
+// Security is handled via state token validation in the controller
+Route::get('/square/callback', [App\Http\Controllers\SquareConnectController::class, 'handleCallback'])->name('square.callback');
 
 // Debug route for testing CSRF
 Route::get('/test-csrf', function () {

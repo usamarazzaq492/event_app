@@ -138,15 +138,19 @@ class _ADsDetailScreenState extends State<ADsDetailScreen> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 3.w, vertical: 0.8.h),
                           decoration: BoxDecoration(
-                            color: AppColors.blueColor.withValues(alpha: 0.2),
+                            color: Colors.green.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: Colors.green.withValues(alpha: 0.5),
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             '\$${ad.amount ?? '0'} Target',
                             style: TextStyle(
-                              color: AppColors.blueColor,
+                              color: Colors.green,
                               fontWeight: FontWeight.bold,
-                              fontSize: 10.sp,
+                              fontSize: 14.sp,
                             ),
                           ),
                         ),

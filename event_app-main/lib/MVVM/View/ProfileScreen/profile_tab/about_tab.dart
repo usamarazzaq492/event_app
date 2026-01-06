@@ -1,4 +1,6 @@
 import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
+import 'package:event_app/MVVM/View/SquareConnect/square_oauth_webview.dart';
+import 'package:event_app/Services/square_connect_service.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,95 @@ class _AboutTabState extends State<AboutTab> {
   final controller = Get.put(PublicProfileController());
 
   final IconData defaultIcon = FontAwesomeIcons.bolt;
+  bool _isCheckingSquare = false;
+  Map<String, dynamic>? _squareStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSquareStatus();
+  }
+
+  Future<void> _checkSquareStatus() async {
+    setState(() {
+      _isCheckingSquare = true;
+    });
+
+    final status = await SquareConnectService.checkConnectionStatus();
+
+    if (mounted) {
+      setState(() {
+        _squareStatus = status;
+        _isCheckingSquare = false;
+      });
+    }
+  }
+
+  Future<void> _connectSquare() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const SquareOAuthWebView(),
+      ),
+    );
+
+    if (result == true) {
+      // Refresh status after successful connection
+      await _checkSquareStatus();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Square account connected successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _disconnectSquare() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Disconnect Square Account'),
+        content: const Text(
+            'Are you sure you want to disconnect your Square account? You will need to reconnect to receive payments directly.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Disconnect'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final success = await SquareConnectService.disconnect();
+      if (mounted) {
+        if (success) {
+          await _checkSquareStatus();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Square account disconnected'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to disconnect Square account'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
 
 // Known mappings
   final Map<String, IconData> knownInterestIcons = {
@@ -92,6 +183,12 @@ class _AboutTabState extends State<AboutTab> {
 
             SizedBox(height: 3.h),
 
+            /// 🔹 Square Payment Connection (for Organizers)
+            buildSectionHeader('Payment Account', Icons.payment),
+            _buildSquareConnectionCard(),
+
+            SizedBox(height: 3.h),
+
             /// 🔹 Interests header
             buildSectionHeader('Interests', Icons.star),
 
@@ -112,7 +209,8 @@ class _AboutTabState extends State<AboutTab> {
                           )
                           .value;
 
-                      final color = gradientColors[index % gradientColors.length];
+                      final color =
+                          gradientColors[index % gradientColors.length];
 
                       return Chip(
                         avatar: Icon(icon, color: Colors.white, size: 12.sp),
@@ -146,6 +244,102 @@ class _AboutTabState extends State<AboutTab> {
           Text(
             title,
             style: TextStyles.subheading,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🔹 Square Connection Card
+  Widget _buildSquareConnectionCard() {
+    if (_isCheckingSquare) {
+      return Container(
+        padding: EdgeInsets.all(3.w),
+        decoration: BoxDecoration(
+          color: AppColors.signinoptioncolor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    final isConnected = _squareStatus?['connected'] == true;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(3.w),
+      decoration: BoxDecoration(
+        color: AppColors.signinoptioncolor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isConnected ? Colors.green : AppColors.blueColor,
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isConnected ? Icons.check_circle : Icons.link,
+                color: isConnected ? Colors.green : AppColors.blueColor,
+                size: 20.sp,
+              ),
+              SizedBox(width: 2.w),
+              Expanded(
+                child: Text(
+                  isConnected
+                      ? 'Square Account Connected'
+                      : 'Connect Square Account',
+                  style: TextStyles.subheading.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 1.h),
+          Text(
+            isConnected
+                ? 'You receive payments directly to your Square account. App owner commission (10%) is automatically deducted.'
+                : 'Connect your Square account to receive payments directly when customers book your events.',
+            style: TextStyles.regularwhite.copyWith(
+              fontSize: 10.sp,
+              color: Colors.white70,
+            ),
+          ),
+          if (isConnected && _squareStatus?['merchant_name'] != null) ...[
+            SizedBox(height: 1.h),
+            Text(
+              'Merchant: ${_squareStatus!['merchant_name']}',
+              style: TextStyles.regularwhite.copyWith(
+                fontSize: 9.sp,
+                color: Colors.white60,
+              ),
+            ),
+          ],
+          SizedBox(height: 2.h),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: isConnected ? _disconnectSquare : _connectSquare,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isConnected ? Colors.red : AppColors.blueColor,
+                padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                isConnected ? 'Disconnect' : 'Connect Square Account',
+                style: TextStyles.regularwhite.copyWith(
+                  fontSize: 11.sp,
+                ),
+              ),
+            ),
           ),
         ],
       ),

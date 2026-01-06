@@ -243,7 +243,7 @@
                     <i class="fas fa-plus me-2"></i>Create Event
                 </a>
             @else
-                <a href="{{ route('login') }}" class="btn btn-outline-primary">
+                <a href="{{ route('login') }}?redirect={{ urlencode(route('events.create')) }}" class="btn btn-outline-primary">
                     <i class="fas fa-sign-in-alt me-2"></i>Login to Create Event
                 </a>
             @endauth
@@ -304,7 +304,7 @@
                         <i class="fas fa-plus me-2"></i>Create Event
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-primary">
+                    <a href="{{ route('login') }}?redirect={{ urlencode(route('events.create')) }}" class="btn btn-primary">
                         <i class="fas fa-sign-in-alt me-2"></i>Login to Create Event
                     </a>
                 @endauth

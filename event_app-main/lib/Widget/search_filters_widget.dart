@@ -293,11 +293,17 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
           children: [
             Text(
               '\$${_priceRange.start.round()}',
-              style: TextStyles.regulartext,
+              style: TextStyles.regulartext.copyWith(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Text(
               '\$${_priceRange.end.round()}',
-              style: TextStyles.regulartext,
+              style: TextStyles.regulartext.copyWith(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

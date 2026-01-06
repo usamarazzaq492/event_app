@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle, Uint8List;
 import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -48,15 +48,33 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
   final eventTitle = ticketData['eventTitle'] ?? 'Event Name';
   final date = ticketData['startDate'] ?? '11.11.2020';
   final time = ticketData['startTime'] ?? '09:00 PM';
-  final price = ticketData['eventPrice']?.toString() ?? '\$50';
+  final price =
+      (ticketData['eventPrice']?.toString() ?? '50').replaceAll('\$', '');
   final ticketType = ticketData['ticketType'] ?? 'VIP';
   final ticketNumber = ticketData['ticketNumber'] ?? 'EVT123456';
   final address = ticketData['address'] ?? '';
   final city = ticketData['city'] ?? '';
+  final qrCodeData = ticketData['qrCodeData'] ?? ''; // Get QR code data from API
 
   final venue = (address.isNotEmpty && city.isNotEmpty)
       ? '$address, $city'
       : (address.isNotEmpty ? address : (city.isNotEmpty ? city : 'N/A'));
+
+  // 🔷 Generate QR code image bytes
+  Uint8List? qrCodeImageBytes;
+  if (qrCodeData.isNotEmpty) {
+    try {
+      // Use online QR code API to generate QR code image
+      final qrDataString = qrCodeData is String ? qrCodeData : jsonEncode(qrCodeData);
+      final qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(qrDataString)}';
+      final qrResponse = await http.get(Uri.parse(qrCodeUrl));
+      if (qrResponse.statusCode == 200) {
+        qrCodeImageBytes = qrResponse.bodyBytes;
+      }
+    } catch (e) {
+      print("Failed to generate QR code image: $e");
+    }
+  }
 
   // 🔷 Format dates and times
   String formattedStartDate = date.isNotEmpty
@@ -65,7 +83,6 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
   String formattedStartTime = time.isNotEmpty
       ? DateFormat.jm().format(DateFormat("HH:mm:ss").parse(time))
       : 'N/A';
-  final random = Random();
   // 🔷 Create PDF
   pdf.addPage(
     pw.Page(
@@ -228,7 +245,7 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
                           '\$$price',
                           style: pw.TextStyle(
                             font: interBold,
-                            fontSize: 14,
+                            fontSize: 18,
                             color: PdfColors.greenAccent400,
                           ),
                         ),
@@ -237,30 +254,60 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
 
                     pw.SizedBox(height: 16),
 
-                    // Barcode simulation
-                    pw.Container(
-                      height: 40,
-                      decoration: pw.BoxDecoration(
-                        color: PdfColors.white,
-                        borderRadius: pw.BorderRadius.circular(4),
-                      ),
-                      child: pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.center,
-                        children: List.generate(
-                          30,
-                          (index) {
-                            final barHeight = 20 +
-                                random.nextInt(20); // height between 20 and 40
-                            return pw.Container(
-                              width: 2,
-                              height: barHeight.toDouble(),
-                              margin: const pw.EdgeInsets.only(right: 2),
-                              color: PdfColors.black,
-                            );
-                          },
+                    // QR Code
+                    if (qrCodeImageBytes != null)
+                      pw.Container(
+                        padding: const pw.EdgeInsets.all(8),
+                        decoration: pw.BoxDecoration(
+                          color: PdfColors.white,
+                          borderRadius: pw.BorderRadius.circular(8),
+                        ),
+                        child: pw.Column(
+                          children: [
+                            pw.Text(
+                              'Scan for verification',
+                              style: pw.TextStyle(
+                                font: interRegular,
+                                fontSize: 8,
+                                color: PdfColors.grey700,
+                              ),
+                            ),
+                            pw.SizedBox(height: 8),
+                            pw.Image(
+                              pw.MemoryImage(qrCodeImageBytes),
+                              width: 120,
+                              height: 120,
+                            ),
+                            pw.SizedBox(height: 4),
+                            pw.Text(
+                              'Ticket: $ticketNumber',
+                              style: pw.TextStyle(
+                                font: interRegular,
+                                fontSize: 7,
+                                color: PdfColors.grey600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      // Fallback: Show ticket number if QR code not available
+                      pw.Container(
+                        padding: const pw.EdgeInsets.all(12),
+                        decoration: pw.BoxDecoration(
+                          color: PdfColors.white,
+                          borderRadius: pw.BorderRadius.circular(4),
+                        ),
+                        child: pw.Text(
+                          'Ticket: $ticketNumber\n(QR Code not available)',
+                          style: pw.TextStyle(
+                            font: interRegular,
+                            fontSize: 10,
+                            color: PdfColors.grey700,
+                          ),
+                          textAlign: pw.TextAlign.center,
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),

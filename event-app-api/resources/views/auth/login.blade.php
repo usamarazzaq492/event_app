@@ -328,6 +328,9 @@ html, body {
                 <form class="auth-form sign-in" method="POST" action="{{ route('login') }}">
                     @csrf
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    @if(request()->has('redirect'))
+                        <input type="hidden" name="redirect" value="{{ request()->get('redirect') }}">
+                    @endif
                     <div class="input-group">
                         <i class='bi bi-envelope'></i>
                         <input type="email" name="email" placeholder="Email" value="{{ old('email') }}" required>

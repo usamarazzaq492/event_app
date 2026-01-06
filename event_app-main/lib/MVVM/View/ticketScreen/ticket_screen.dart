@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/view_model/ticket_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
@@ -7,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../Services/ticket_pdf_service.dart';
 
@@ -31,7 +33,7 @@ class _TicketScreenState extends State<TicketScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
@@ -51,17 +53,15 @@ class _TicketScreenState extends State<TicketScreen> {
                 indicatorColor: AppColors.blueColor,
                 unselectedLabelColor: Colors.grey,
                 tabs: [
-                  Tab(text: 'General'),
-                  Tab(text: 'Silver'),
-                  Tab(text: 'Gold'),
+                  Tab(text: 'General Admission'),
+                  Tab(text: 'VIP'),
                 ],
               ),
               Expanded(
                 child: TabBarView(
                   children: [
                     _buildTicketList('general'),
-                    _buildTicketList('silver'),
-                    _buildTicketList('gold'),
+                    _buildTicketList('vip'),
                   ],
                 ),
               ),
@@ -109,6 +109,7 @@ class _TicketScreenState extends State<TicketScreen> {
           final endTime = t['endTime'] ?? '';
           final ticketNumber = t['ticketNumber'] ?? 'N/A';
           final eventPrice = t['eventPrice']?.toString() ?? 'N/A';
+          final qrCodeData = t['qrCodeData'] ?? ''; // Get QR code data from API
 
           // 🔷 Format dates and times
           String formattedStartDate = startDate.isNotEmpty
@@ -177,9 +178,9 @@ class _TicketScreenState extends State<TicketScreen> {
                       Text(
                         "Price: \$$eventPrice",
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
+                          color: Colors.green,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -193,6 +194,59 @@ class _TicketScreenState extends State<TicketScreen> {
                     ],
                   ),
                 ),
+                const Divider(color: Colors.white24, height: 1),
+                
+                // QR Code Display
+                if (qrCodeData.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Scan for verification',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: QrImageView(
+                              data: qrCodeData is String ? qrCodeData : jsonEncode(qrCodeData),
+                              version: QrVersions.auto,
+                              size: 150,
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Ticket: $ticketNumber',
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 10.sp,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                
                 const Divider(color: Colors.white24, height: 1),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),

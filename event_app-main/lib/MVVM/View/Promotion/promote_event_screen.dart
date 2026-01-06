@@ -25,17 +25,20 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
   final PromotionService _promotionService = PromotionService();
   bool _isLoading = false;
   bool _isLoadingPackages = true;
-  Map<String, dynamic>? _packages;
-  String? _selectedPackage;
+  Map<String, dynamic>? _boostPackage;
   String? _error;
+
+  // Single boost option: $35 for 10 days
+  static const double BOOST_PRICE = 35.00;
+  static const int BOOST_DURATION_DAYS = 10;
 
   @override
   void initState() {
     super.initState();
-    _loadPackages();
+    _loadBoostPackage();
   }
 
-  Future<void> _loadPackages() async {
+  Future<void> _loadBoostPackage() async {
     try {
       setState(() {
         _isLoadingPackages = true;
@@ -47,54 +50,63 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
       // Handle different response formats
       if (response['success'] == true || response['success'] == 'true') {
         final data = response['data'];
-        if (data != null && data is Map) {
+        if (data != null && data is Map && data['boost'] != null) {
           setState(() {
-            _packages = Map<String, dynamic>.from(data);
+            _boostPackage = Map<String, dynamic>.from(data['boost']);
             _isLoadingPackages = false;
           });
         } else {
-          throw Exception('Invalid package data format');
+          // Fallback to default boost values
+          setState(() {
+            _boostPackage = {
+              'price': BOOST_PRICE,
+              'durationDays': BOOST_DURATION_DAYS,
+              'name': 'Event Go-Live Boost',
+              'description': 'Boost your event for 10 days to increase visibility',
+            };
+            _isLoadingPackages = false;
+          });
         }
       } else {
-        final errorMsg = response['message'] ??
-            response['error'] ??
-            'Failed to load packages';
-        throw Exception(errorMsg);
+        // Fallback to default boost values
+        setState(() {
+          _boostPackage = {
+            'price': BOOST_PRICE,
+            'durationDays': BOOST_DURATION_DAYS,
+            'name': 'Event Go-Live Boost',
+            'description': 'Boost your event for 10 days to increase visibility',
+          };
+          _isLoadingPackages = false;
+        });
       }
     } catch (e) {
-      print('Error loading packages: $e');
+      print('Error loading boost package: $e');
+      // Use fallback values on error
       setState(() {
-        _error = e.toString().replaceAll('Exception: ', '');
+        _boostPackage = {
+          'price': BOOST_PRICE,
+          'durationDays': BOOST_DURATION_DAYS,
+          'name': 'Event Go-Live Boost',
+          'description': 'Boost your event for 10 days to increase visibility',
+        };
         _isLoadingPackages = false;
       });
-      Get.snackbar(
-        'Error',
-        'Failed to load promotion packages: ${e.toString().replaceAll('Exception: ', '')}',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
     }
   }
 
-  Future<void> _purchasePromotion() async {
-    if (_selectedPackage == null) {
-      Get.snackbar('Selection Required', 'Please select a promotion package',
-          backgroundColor: Colors.orange);
-      return;
-    }
-
+  Future<void> _purchaseBoost() async {
     try {
       setState(() {
         _isLoading = true;
         _error = null;
       });
 
-      // Navigate to Square payment page
+      // Navigate to Square payment page with 'boost' package
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => SquarePaymentPage(
-            category: _selectedPackage == 'basic' ? 'basic' : 'premium',
+            category: 'boost', // Always use 'boost' for new system
             seats: 1,
             id: widget.eventId,
             isPromotion: true,
@@ -105,7 +117,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
           Get.back(); // Close promotion screen
           Get.snackbar(
             'Success! 🎉',
-            'Your event is now promoted!',
+            'Your event is now boosted for 10 days!',
             backgroundColor: AppColors.blueColor,
             colorText: Colors.white,
           );
@@ -142,152 +154,137 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
       ),
       body: _isLoadingPackages
           ? const Center(child: CircularProgressIndicator())
-          : _error != null && _packages == null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Error loading packages',
-                        style:
-                            TextStyles.regularwhite.copyWith(color: Colors.red),
-                      ),
-                      SizedBox(height: 2.h),
-                      ButtonWidget(
-                        text: 'Retry',
-                        onPressed: _loadPackages,
-                        backgroundColor: AppColors.blueColor,
-                      ),
-                    ],
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: EdgeInsets.all(4.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Event Title
-                      Container(
-                        padding: EdgeInsets.all(3.w),
-                        decoration: BoxDecoration(
-                          color: AppColors.signinoptioncolor,
-                          borderRadius: BorderRadius.circular(2.h),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.event, color: AppColors.blueColor),
-                            SizedBox(width: 2.w),
-                            Expanded(
-                              child: Text(
-                                widget.eventTitle,
-                                style: TextStyles.homeheadingtext,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 4.h),
-
-                      // Benefits Section
-                      Text(
-                        'Promotion Benefits',
-                        style: TextStyles.subheading,
-                      ),
-                      SizedBox(height: 2.h),
-                      _buildBenefitItem(
-                        Icons.trending_up,
-                        'Top of Search Results',
-                        'Your event appears first in all search results',
-                      ),
-                      _buildBenefitItem(
-                        Icons.verified,
-                        'Promoted Badge',
-                        'Get a special "Promoted" badge on your event',
-                      ),
-                      _buildBenefitItem(
-                        Icons.home,
-                        'Homepage Featured',
-                        'Featured section on the homepage',
-                      ),
-                      SizedBox(height: 4.h),
-
-                      // Packages Section
-                      Text(
-                        'Choose a Package',
-                        style: TextStyles.subheading,
-                      ),
-                      SizedBox(height: 2.h),
-
-                      if (_packages != null && _packages!.isNotEmpty) ...[
-                        // Basic Package
-                        if (_packages!['basic'] != null)
-                          _buildPackageCard(
-                            'Basic',
-                            _packages!['basic'],
-                            'basic',
-                            Colors.blue,
-                          ),
-                        if (_packages!['basic'] != null) SizedBox(height: 2.h),
-
-                        // Premium Package
-                        if (_packages!['premium'] != null)
-                          _buildPackageCard(
-                            'Premium',
-                            _packages!['premium'],
-                            'premium',
-                            Colors.orange,
-                          ),
-                      ] else ...[
-                        // Fallback packages if API fails
-                        _buildPackageCard(
-                          'Basic',
-                          {'price': 35.00, 'durationDays': 10},
-                          'basic',
-                          Colors.blue,
-                        ),
-                        SizedBox(height: 2.h),
-                        _buildPackageCard(
-                          'Premium',
-                          {'price': 75.00, 'durationDays': 30},
-                          'premium',
-                          Colors.orange,
-                        ),
-                      ],
-
-                      SizedBox(height: 4.h),
-
-                      // Purchase Button
-                      ButtonWidget(
-                        text:
-                            _isLoading ? 'Processing...' : 'Purchase Promotion',
-                        onPressed: _isLoading ? null : _purchasePromotion,
-                        backgroundColor: _selectedPackage != null
-                            ? AppColors.blueColor
-                            : Colors.grey,
-                        textColor: Colors.white,
-                        borderRadius: 4.h,
-                      ),
-
-                      if (_error != null) ...[
-                        SizedBox(height: 2.h),
-                        Container(
-                          padding: EdgeInsets.all(2.w),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(1.h),
-                          ),
+          : SingleChildScrollView(
+              padding: EdgeInsets.all(4.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Event Title
+                  Container(
+                    padding: EdgeInsets.all(3.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.signinoptioncolor,
+                      borderRadius: BorderRadius.circular(2.h),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.event, color: AppColors.blueColor),
+                        SizedBox(width: 2.w),
+                        Expanded(
                           child: Text(
-                            _error!,
-                            style: TextStyles.regularwhite
-                                .copyWith(color: Colors.red),
+                            widget.eventTitle,
+                            style: TextStyles.homeheadingtext,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
-                    ],
+                    ),
                   ),
-                ),
+                  SizedBox(height: 4.h),
+
+                  // Boost Benefits Section
+                  Text(
+                    'Boost Your Event',
+                    style: TextStyles.subheading,
+                  ),
+                  SizedBox(height: 2.h),
+                  _buildBenefitItem(
+                    Icons.trending_up,
+                    'Increased Visibility',
+                    'Your event appears in the Ads section and gets more exposure',
+                  ),
+                  _buildBenefitItem(
+                    Icons.verified,
+                    'Promoted Badge',
+                    'Get a special "Promoted" badge on your event',
+                  ),
+                  _buildBenefitItem(
+                    Icons.home,
+                    'Homepage Featured',
+                    'Featured section on the homepage',
+                  ),
+                  _buildBenefitItem(
+                    Icons.people,
+                    'Reach More People',
+                    'Your event will be seen by more users browsing the app',
+                  ),
+                  SizedBox(height: 4.h),
+
+                  // Single Boost Package Card
+                  if (_boostPackage != null) ...[
+                    Text(
+                      'Boost Package',
+                      style: TextStyles.subheading,
+                    ),
+                    SizedBox(height: 2.h),
+                    _buildBoostCard(_boostPackage!),
+                    SizedBox(height: 4.h),
+                  ],
+
+                  // Purchase Button
+                  ButtonWidget(
+                    text: _isLoading
+                        ? 'Processing...'
+                        : 'Boost Event for \$${_boostPackage?['price']?.toStringAsFixed(0) ?? BOOST_PRICE.toStringAsFixed(0)}',
+                    onPressed: _isLoading ? null : _purchaseBoost,
+                    backgroundColor: AppColors.blueColor,
+                    textColor: Colors.white,
+                    borderRadius: 4.h,
+                  ),
+
+                  SizedBox(height: 2.h),
+
+                  // Info Text
+                  Container(
+                    padding: EdgeInsets.all(3.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.blueColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(2.h),
+                      border: Border.all(
+                        color: AppColors.blueColor.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: AppColors.blueColor,
+                          size: 18.sp,
+                        ),
+                        SizedBox(width: 2.w),
+                        Expanded(
+                          child: Text(
+                            'Your event will be boosted for ${_boostPackage?['durationDays'] ?? BOOST_DURATION_DAYS} days. You can boost again after it expires.',
+                            style: TextStyles.regularwhite.copyWith(
+                              fontSize: 11.sp,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  if (_error != null) ...[
+                    SizedBox(height: 2.h),
+                    Container(
+                      padding: EdgeInsets.all(2.w),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(1.h),
+                      ),
+                      child: Text(
+                        _error!,
+                        style: TextStyles.regularwhite
+                            .copyWith(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
     );
   }
 
@@ -330,77 +327,124 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
     );
   }
 
-  Widget _buildPackageCard(
-    String packageName,
-    Map<String, dynamic> packageData,
-    String packageKey,
-    Color accentColor,
-  ) {
-    final isSelected = _selectedPackage == packageKey;
-    final price = packageData['price']?.toString() ?? '0';
-    final durationDays = packageData['durationDays']?.toString() ?? '0';
+  Widget _buildBoostCard(Map<String, dynamic> boostData) {
+    final price = boostData['price']?.toStringAsFixed(2) ?? BOOST_PRICE.toStringAsFixed(2);
+    final durationDays = boostData['durationDays']?.toString() ?? BOOST_DURATION_DAYS.toString();
+    final name = boostData['name']?.toString() ?? 'Event Go-Live Boost';
+    final description = boostData['description']?.toString() ?? 'Boost your event for 10 days to increase visibility';
 
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedPackage = packageKey;
-        });
-      },
-      child: Container(
-        padding: EdgeInsets.all(3.w),
-        decoration: BoxDecoration(
-          color: AppColors.signinoptioncolor,
-          borderRadius: BorderRadius.circular(2.h),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.blueColor
-                : Colors.white.withOpacity(0.1),
-            width: isSelected ? 2 : 1,
-          ),
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.blueColor,
+            AppColors.blueColor.withOpacity(0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: EdgeInsets.all(2.w),
-              decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(1.h),
+        borderRadius: BorderRadius.circular(2.5.h),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.blueColor.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(2.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(1.h),
+                ),
+                child: Icon(
+                  Icons.rocket_launch,
+                  color: Colors.white,
+                  size: 24.sp,
+                ),
               ),
-              child: Icon(
-                isSelected ? Icons.check_circle : Icons.circle_outlined,
-                color: isSelected ? accentColor : Colors.white70,
-                size: 24.sp,
+              SizedBox(width: 3.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyles.homeheadingtext.copyWith(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 0.5.h),
+                    Text(
+                      description,
+                      style: TextStyles.regularwhite.copyWith(
+                        fontSize: 11.sp,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(width: 3.w),
-            Expanded(
-              child: Column(
+            ],
+          ),
+          SizedBox(height: 3.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    packageName,
-                    style: TextStyles.homeheadingtext.copyWith(
-                      fontSize: 15.sp,
-                      color: accentColor,
+                    'Duration',
+                    style: TextStyles.regularwhite.copyWith(
+                      fontSize: 10.sp,
+                      color: Colors.white70,
                     ),
                   ),
                   SizedBox(height: 0.5.h),
                   Text(
-                    '\$$price for $durationDays days',
-                    style: TextStyles.regularwhite.copyWith(fontSize: 12.sp),
+                    '$durationDays Days',
+                    style: TextStyles.homeheadingtext.copyWith(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
-            ),
-            Text(
-              '\$$price',
-              style: TextStyles.heading.copyWith(
-                fontSize: 18.sp,
-                color: accentColor,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Price',
+                    style: TextStyles.regularwhite.copyWith(
+                      fontSize: 10.sp,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  SizedBox(height: 0.5.h),
+                  Text(
+                    '\$$price',
+                    style: TextStyles.heading.copyWith(
+                      fontSize: 28.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

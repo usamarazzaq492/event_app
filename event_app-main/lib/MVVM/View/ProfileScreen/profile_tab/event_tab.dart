@@ -112,13 +112,12 @@ class EventTab extends StatelessWidget {
                       ),
                     ),
                     Spacer(),
-                    Icon(Icons.attach_money,
-                        color: AppColors.blueColor, size: 12.sp),
-                    SizedBox(width: 1.w),
                     Text(
-                      event.eventPrice ?? '',
+                      event.eventPrice != null ? '\$${event.eventPrice}' : '',
                       style: TextStyles.regularwhite.copyWith(
-                        color: Colors.grey[300],
+                        fontSize: 14.sp,
+                        color: Colors.green,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],

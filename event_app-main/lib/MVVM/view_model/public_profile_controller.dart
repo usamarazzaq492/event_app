@@ -36,15 +36,25 @@ class PublicProfileController extends GetxController {
 
     try {
       isLoading.value = true;
+      error.value = ''; // Clear previous errors
+      
+      // Force fresh fetch by clearing cached profile if ID changed
+      if (profile.value?.userId != id) {
+        profile.value = null;
+      }
+      
       final result = await _userService.fetchPublicProfile(id);
       if (result != null) {
         profile.value = result;
         error.value = '';
+        print('🔷 Profile loaded successfully - isFollowing: ${result.isFollowing}, followersCount: ${result.followersCount}');
       } else {
         error.value = 'Failed to load profile';
+        print('❌ Profile result is null');
       }
     } catch (e) {
       error.value = e.toString();
+      print('❌ Error loading profile: $e');
     } finally {
       isLoading.value = false;
     }

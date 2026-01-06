@@ -14,27 +14,45 @@ class DataService {
   }) async {
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
-    print('token $token');
+    
+    if (token == null || token.isEmpty) {
+      throw Exception('Authentication token not found. Please log in again.');
+    }
 
     final url = isFollowing
         ? "https://eventgo-live.com/api/v1/user/$userId/unfollow"
         : "https://eventgo-live.com/api/v1/user/$userId/follow";
+
+    print('🔷 ${isFollowing ? 'Unfollow' : 'Follow'} Request: $url');
+    print('🔷 Token: ${token.substring(0, 20)}...');
 
     final response = await http.post(
       Uri.parse(url),
       headers: {
         "Accept": "application/json",
         "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
       },
     );
 
-    print("${isFollowing ? 'Unfollow' : 'Follow'} Status: ${response.statusCode}");
-    print("Response: ${response.body}");
+    print("🔷 ${isFollowing ? 'Unfollow' : 'Follow'} Status: ${response.statusCode}");
+    print("🔷 Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final responseData = jsonDecode(response.body);
+      print("🔷 Response Data: $responseData");
+      
+      // Check if response indicates success
+      if (responseData['success'] == false) {
+        throw Exception(responseData['error'] ?? 'Failed to ${isFollowing ? 'unfollow' : 'follow'} user');
+      }
+      
+      return responseData;
     } else {
-      throw Exception("Failed to ${isFollowing ? 'unfollow' : 'follow'}: ${response.body}");
+      final errorBody = response.body.isNotEmpty 
+          ? jsonDecode(response.body) 
+          : {'error': 'Unknown error'};
+      throw Exception(errorBody['error'] ?? "Failed to ${isFollowing ? 'unfollow' : 'follow'}: ${response.statusCode}");
     }
   }
 

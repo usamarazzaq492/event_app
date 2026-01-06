@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use App\Models\Event;
 use App\Models\Booking;
 
@@ -79,9 +80,9 @@ class EventController extends Controller
         $query = DB::table('events')
             ->where('isActive', 1)
             ->orderByRaw('
-                CASE 
-                    WHEN isPromoted = 1 AND promotionEndDate >= NOW() THEN 0 
-                    ELSE 1 
+                CASE
+                    WHEN isPromoted = 1 AND promotionEndDate >= NOW() THEN 0
+                    ELSE 1
                 END ASC,
                 startDate ASC
             ');
@@ -137,6 +138,99 @@ class EventController extends Controller
             ->get();
 
         return response()->json($events);
+    }
+
+    /**
+     * Get timeline events - events from users the current user follows
+     * Similar to social media feed: shows events from followed users
+     */
+    public function getTimelineEvents(Request $request)
+    {
+        try {
+            $userId = $request->user()->userId;
+
+            // Get list of user IDs that the current user follows
+            $followingIds = DB::table('follows')
+                ->where('follower_id', $userId)
+                ->pluck('followee_id')
+                ->toArray();
+
+            // Debug logging
+            Log::info('Timeline Events Request', [
+                'user_id' => $userId,
+                'following_count' => count($followingIds),
+                'following_ids' => $followingIds
+            ]);
+
+            // If user is not following anyone, return empty array
+            if (empty($followingIds)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'message' => 'Follow users to see their events in your timeline'
+                ]);
+            }
+
+            // Get events from followed users with user information (like social media feed)
+            // Use whereDate for proper date comparison (ignores time)
+            $events = DB::table('events')
+                ->join('mstuser', 'events.userId', '=', 'mstuser.userId')
+                ->whereIn('events.userId', $followingIds)
+                ->where('events.isActive', 1)
+                ->whereDate('events.startDate', '>=', now()->toDateString()) // Only upcoming events (including today)
+                ->orderByRaw('
+                    CASE
+                        WHEN events.isPromoted = 1 AND events.promotionEndDate >= NOW() THEN 0
+                        ELSE 1
+                    END ASC,
+                    events.startDate ASC
+                ')
+                ->select([
+                    'events.eventId',
+                    'events.userId',
+                    'events.eventTitle',
+                    'events.startDate',
+                    'events.endDate',
+                    'events.startTime',
+                    'events.endTime',
+                    'events.eventPrice',
+                    'events.description',
+                    'events.category',
+                    'events.address',
+                    'events.city',
+                    'events.eventImage',
+                    'events.latitude',
+                    'events.longitude',
+                    'events.isPromoted',
+                    'events.promotionStartDate',
+                    'events.promotionEndDate',
+                    'events.promotionPackage',
+                    'events.addDate',
+                    'mstuser.name as userName',
+                    'mstuser.profileImageUrl as userProfileImage'
+                ])
+                ->get();
+
+            // Debug logging
+            Log::info('Timeline Events Found', [
+                'user_id' => $userId,
+                'events_count' => $events->count(),
+                'event_ids' => $events->pluck('eventId')->toArray()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $events,
+                'message' => 'Timeline events retrieved successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch timeline events',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
    public function show(Request $request, $id)

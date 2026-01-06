@@ -311,6 +311,32 @@ class EventService {
     }
   }
 
+  /// 🔷 Fetch Timeline Events - Events from users you follow
+  Future<List<EventModel>> fetchTimelineEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/timeline'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      if (body['success'] == true && body['data'] != null) {
+        final List data = body['data'];
+        return data.map((e) => EventModel.fromJson(e)).toList();
+      } else {
+        return []; // Return empty list if no events or not following anyone
+      }
+    } else {
+      throw Exception('Failed to load timeline events. Status: ${response.statusCode}');
+    }
+  }
+
   /// 🔷 Delete Event
   Future<http.Response> deleteEvent(String id) async {
     final prefs = await SharedPreferences.getInstance();

@@ -5,6 +5,9 @@ class AdsModel {
   String? imageUrl;
   String? description;
   String? amount;
+  String? city;
+  String? state;
+  String? zipcode;
   int? isActive;
   String? addDate;
   String? updatedAt;
@@ -16,6 +19,9 @@ class AdsModel {
       this.imageUrl,
       this.description,
       this.amount,
+      this.city,
+      this.state,
+      this.zipcode,
       this.isActive,
       this.addDate,
       this.updatedAt});
@@ -31,6 +37,9 @@ class AdsModel {
     imageUrl = json['imageUrl'];
     description = json['description'];
     amount = json['amount']?.toString();
+    city = json['city'];
+    state = json['state'];
+    zipcode = json['zipcode'];
     isActive = json['isActive'] is int
         ? json['isActive']
         : int.tryParse(json['isActive']?.toString() ?? '');
@@ -46,6 +55,9 @@ class AdsModel {
     data['imageUrl'] = this.imageUrl;
     data['description'] = this.description;
     data['amount'] = this.amount;
+    data['city'] = this.city;
+    data['state'] = this.state;
+    data['zipcode'] = this.zipcode;
     data['isActive'] = this.isActive;
     data['addDate'] = this.addDate;
     data['updated_at'] = this.updatedAt;

@@ -14,18 +14,22 @@ use Illuminate\Support\Str;
 
 class PromotionController extends Controller
 {
-    const BASIC_PACKAGE_PRICE = 35.00;
-    const PREMIUM_PACKAGE_PRICE = 75.00;
-    const BASIC_DURATION_DAYS = 10;
-    const PREMIUM_DURATION_DAYS = 30;
+    // Single boost option: $35 for 10 days
+    const BOOST_PRICE = 35.00;
+    const BOOST_DURATION_DAYS = 10;
 
     private $squareClient;
 
     public function __construct()
     {
+        $accessToken = config('square.access_token') ?: env('SQUARE_ACCESS_TOKEN') ?: env('SQUARE_TOKEN');
+        $environment = config('square.environment', 'sandbox');
+
         $square = new SquareClient(options: [
-            'accessToken' => env('SQUARE_TOKEN'),
-            'baseUrl' => Environments::Sandbox->value, // Change to Production when ready
+            'accessToken' => $accessToken,
+            'baseUrl' => $environment === 'production'
+                ? Environments::Production->value
+                : Environments::Sandbox->value,
         ]);
         $this->squareClient = $square;
     }
@@ -36,7 +40,7 @@ class PromotionController extends Controller
     public function purchasePromotion(Request $request, $eventId)
     {
         $validator = Validator::make($request->all(), [
-            'package' => 'required|in:basic,premium',
+            'package' => 'required|in:boost',
             'payment_nonce' => 'required|string',
         ]);
 
@@ -81,10 +85,10 @@ class PromotionController extends Controller
                 ], 400);
             }
 
-            // Determine package details
-            $package = $request->package;
-            $amount = $package === 'premium' ? self::PREMIUM_PACKAGE_PRICE : self::BASIC_PACKAGE_PRICE;
-            $durationDays = $package === 'premium' ? self::PREMIUM_DURATION_DAYS : self::BASIC_DURATION_DAYS;
+            // Single boost option: $35 for 10 days
+            $package = 'boost'; // Always 'boost' for new system
+            $amount = self::BOOST_PRICE;
+            $durationDays = self::BOOST_DURATION_DAYS;
 
             // Process Square payment
             $paymentResponse = $this->processSquarePayment(
@@ -185,22 +189,18 @@ class PromotionController extends Controller
     }
 
     /**
-     * Get promotion packages pricing
+     * Get boost package pricing (single option: $35 for 10 days)
      */
     public function getPackages()
     {
         return response()->json([
             'success' => true,
             'data' => [
-                'basic' => [
-                    'price' => self::BASIC_PACKAGE_PRICE,
-                    'durationDays' => self::BASIC_DURATION_DAYS,
-                    'name' => 'Basic Package',
-                ],
-                'premium' => [
-                    'price' => self::PREMIUM_PACKAGE_PRICE,
-                    'durationDays' => self::PREMIUM_DURATION_DAYS,
-                    'name' => 'Premium Package',
+                'boost' => [
+                    'price' => self::BOOST_PRICE,
+                    'durationDays' => self::BOOST_DURATION_DAYS,
+                    'name' => 'Event Go-Live Boost',
+                    'description' => 'Boost your event for 10 days to increase visibility',
                 ],
             ]
         ]);

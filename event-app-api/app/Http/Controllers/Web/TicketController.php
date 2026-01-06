@@ -36,25 +36,46 @@ class TicketController extends Controller
             abort(404, 'Booking not found');
         }
 
-        // Generate QR code data
-        $qrData = json_encode([
-            'booking_id' => $booking->bookingId,
-            'event_id' => $booking->eventId,
-            'user_id' => $booking->userId,
-            'ticket_type' => $booking->ticketType,
-            'quantity' => $booking->quantity
-        ]);
+        // Get actual tickets from database (they have proper QR code data with hash)
+        $ticketRecords = DB::table('tickets')
+            ->where('bookingId', $bookingId)
+            ->orderBy('ticketNumber')
+            ->get();
 
-        // Generate tickets based on quantity
-        $tickets = [];
-        for ($i = 1; $i <= $booking->quantity; $i++) {
-            $tickets[] = [
-                'ticket_number' => $booking->bookingId . '-' . str_pad($i, 3, '0', STR_PAD_LEFT),
-                'qr_data' => $qrData,
+        // If tickets don't exist in database, generate them (fallback for old bookings)
+        if ($ticketRecords->isEmpty()) {
+            // Generate QR code data (without hash for old tickets)
+            $qrData = json_encode([
+                'booking_id' => $booking->bookingId,
+                'event_id' => $booking->eventId,
+                'user_id' => $booking->userId,
                 'ticket_type' => $booking->ticketType,
-                'price' => $booking->basePrice,
-                'total_amount' => $booking->totalAmount / $booking->quantity
-            ];
+                'quantity' => $booking->quantity
+            ]);
+
+            // Generate tickets based on quantity
+            $tickets = [];
+            for ($i = 1; $i <= $booking->quantity; $i++) {
+                $tickets[] = [
+                    'ticket_number' => $booking->bookingId . '-' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                    'qr_data' => $qrData,
+                    'ticket_type' => $booking->ticketType,
+                    'price' => $booking->basePrice,
+                    'total_amount' => $booking->totalAmount / $booking->quantity
+                ];
+            }
+        } else {
+            // Use actual tickets from database with proper QR code data
+            $tickets = [];
+            foreach ($ticketRecords as $ticketRecord) {
+                $tickets[] = [
+                    'ticket_number' => $ticketRecord->ticketNumber,
+                    'qr_data' => $ticketRecord->qrCodeData, // This has the hash for check-in
+                    'ticket_type' => $booking->ticketType,
+                    'price' => $booking->basePrice,
+                    'total_amount' => $booking->totalAmount / $booking->quantity
+                ];
+            }
         }
 
         // Return HTML that can be printed as PDF

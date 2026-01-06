@@ -150,7 +150,6 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
 
   void _applyFilters() {
     setState(() {
-      final now = DateTime.now();
       _filteredEvents = controller.events.where((event) {
         // Search by title, category, and location (city + address)
         bool matchesSearch = _searchController.text.isEmpty ||
@@ -987,22 +986,13 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                       // Price
                       if (event.eventPrice != null &&
                           event.eventPrice != '0.00')
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.attach_money,
-                              size: 12.sp,
-                              color: Colors.green,
-                            ),
-                            SizedBox(width: 1.w),
-                            Text(
-                              '\$${event.eventPrice}',
-                              style: TextStyles.regularwhite.copyWith(
-                                color: Colors.green,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          '\$${event.eventPrice}',
+                          style: TextStyles.regularwhite.copyWith(
+                            fontSize: 14.sp,
+                            color: Colors.green,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                     ],
                   ),

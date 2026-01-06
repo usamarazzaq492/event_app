@@ -19,10 +19,12 @@ class EventController extends GetxController {
   var upcomingEvents = <EventModel>[].obs;
   var pastEvents = <EventModel>[].obs;
   var myEvents = <MyEventModel>[].obs;
+  var timelineEvents = <EventModel>[].obs; // Timeline: events from followed users
   var eventDetail = Rxn<EventDetailModel>();
 
   var isLoading = false.obs;
   var isDeleting = false.obs;
+  var isTimelineLoading = false.obs;
 
   final RxString error = ''.obs;
   var errorMessage = ''.obs;
@@ -33,6 +35,7 @@ class EventController extends GetxController {
     fetchUpcomingEventsForHome();
     fetchAllEvents();
     getMyEvents();
+    fetchTimelineEvents();
   }
 
   /// 🔷 Fetch all events and separate into upcoming & past
@@ -80,6 +83,20 @@ class EventController extends GetxController {
       errorMessage.value = e.toString();
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// 🔷 Fetch Timeline Events - Events from users you follow
+  Future<void> fetchTimelineEvents() async {
+    try {
+      isTimelineLoading.value = true;
+      final result = await _eventService.fetchTimelineEvents();
+      timelineEvents.assignAll(result);
+    } catch (e) {
+      errorMessage.value = e.toString();
+      timelineEvents.clear(); // Clear on error
+    } finally {
+      isTimelineLoading.value = false;
     }
   }
 

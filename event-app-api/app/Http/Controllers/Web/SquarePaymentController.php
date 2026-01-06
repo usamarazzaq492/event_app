@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Crypt;
 
 class SquarePaymentController extends Controller
 {
@@ -19,12 +20,16 @@ class SquarePaymentController extends Controller
 
     public function __construct()
     {
-        $this->accessToken = env('SQUARE_ACCESS_TOKEN') ?: env('SQUARE_TOKEN');
-        $this->applicationId = env('SQUARE_APPLICATION_ID');
-        $this->locationId = env('SQUARE_LOCATION_ID');
+        // Use config() which works even when cached, with fallback to env()
+        $this->accessToken = config('square.access_token', '')
+            ?: env('SQUARE_ACCESS_TOKEN', '')
+            ?: env('SQUARE_TOKEN', '');
+
+        $this->applicationId = config('square.application_id', env('SQUARE_APPLICATION_ID', ''));
+        $this->locationId = config('square.location_id', env('SQUARE_LOCATION_ID', ''));
 
         // Set API URL based on environment
-        $environment = env('SQUARE_ENVIRONMENT', 'sandbox');
+        $environment = config('square.environment', env('SQUARE_ENVIRONMENT', 'sandbox'));
         $this->squareApiUrl = $environment === 'production'
             ? 'https://connect.squareup.com/v2'
             : 'https://connect.squareupsandbox.com/v2';
@@ -99,37 +104,113 @@ class SquarePaymentController extends Controller
         }
     }
 
-    private function processSquarePayment($paymentData)
+    private function processSquarePayment($paymentData, $event = null, $commission = 0)
     {
         try {
+            // Determine if we should use split payment
+            $useSplitPayment = false;
+            $accessToken = $this->accessToken;
+            $locationId = $this->locationId;
+            $applicationId = $this->applicationId;
+
+            // Check if organizer has Square connected (for split payments)
+            if ($event) {
+                $organizerSquareAccount = DB::table('organizer_square_accounts')
+                    ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+                    ->where('organizers.userId', $event->userId)
+                    ->where('organizer_square_accounts.status', 'connected')
+                    ->select('organizer_square_accounts.*')
+                    ->first();
+
+                if ($organizerSquareAccount && $commission > 0) {
+                    try {
+                        // Decrypt organizer's access token
+                        $accessToken = Crypt::decryptString($organizerSquareAccount->accessToken);
+                        $locationId = $organizerSquareAccount->squareLocationId;
+                        $useSplitPayment = true;
+
+                        // Application ID is required for split payments
+                        if (empty($this->applicationId)) {
+                            throw new \RuntimeException('Square Application ID is required for split payments. Please set SQUARE_APPLICATION_ID in your .env file.');
+                        }
+                        $applicationId = $this->applicationId;
+
+                        Log::info('Using split payment for web', [
+                            'organizer_id' => $event->userId,
+                            'merchant_id' => $organizerSquareAccount->squareMerchantId,
+                            'commission' => $commission
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to use organizer Square account for web payment, falling back to direct', [
+                            'error' => $e->getMessage(),
+                            'organizer_id' => $event->userId
+                        ]);
+                        // Fall back to direct payment
+                    }
+                }
+            }
+
             // Validate required credentials
-            if (!$this->accessToken) {
+            if (empty($accessToken)) {
+                Log::error('Square access token not configured', [
+                    'config_value' => config('square.access_token'),
+                    'env_square_access_token' => env('SQUARE_ACCESS_TOKEN'),
+                    'env_square_token' => env('SQUARE_TOKEN'),
+                    'config_cached' => app()->configurationIsCached(),
+                ]);
                 return [
                     'success' => false,
-                    'error' => 'Square access token not configured'
+                    'error' => 'Square access token not configured. Please set SQUARE_ACCESS_TOKEN or SQUARE_TOKEN in your .env file.'
                 ];
             }
 
-            if (!$this->locationId) {
+            if (empty($locationId)) {
+                Log::error('Square location ID not configured', [
+                    'config_value' => config('square.location_id'),
+                    'env_value' => env('SQUARE_LOCATION_ID'),
+                    'config_cached' => app()->configurationIsCached(),
+                ]);
                 return [
                     'success' => false,
-                    'error' => 'Square location ID not configured'
+                    'error' => 'Square location ID not configured. Please set SQUARE_LOCATION_ID in your .env file.'
                 ];
             }
 
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->accessToken,
-                'Content-Type' => 'application/json',
-                'Square-Version' => '2023-10-18'
-            ])->post($this->squareApiUrl . '/payments', [
+            // Build payment request payload
+            $paymentPayload = [
                 'source_id' => $paymentData['sourceId'],
                 'amount_money' => [
                     'amount' => $paymentData['amount'],
                     'currency' => $paymentData['currency']
                 ],
                 'idempotency_key' => $paymentData['idempotencyKey'],
-                'location_id' => $this->locationId
-            ]);
+                'location_id' => $locationId
+            ];
+
+            // Add application fee for split payments
+            if ($useSplitPayment && $commission > 0) {
+                $commissionCents = (int)round($commission * 100);
+                $paymentPayload['application_fee_money'] = [
+                    'amount' => $commissionCents,
+                    'currency' => 'USD'
+                ];
+
+                // Application ID is required when using application_fee_money
+                // Note: Square API v2 requires this in the request, not headers
+                // But actually, applicationId should be set in SquareClient, not in HTTP request
+                // For HTTP requests, we need to ensure the access token is from the platform app
+                Log::debug('Split payment with application fee', [
+                    'commission' => $commission,
+                    'commission_cents' => $commissionCents,
+                    'application_id' => $applicationId
+                ]);
+            }
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+                'Square-Version' => '2023-10-18'
+            ])->post($this->squareApiUrl . '/payments', $paymentPayload);
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -178,8 +259,7 @@ class SquarePaymentController extends Controller
 
         // Calculate pricing based on ticket type
         $typeMultipliers = [
-            'gold' => 1.5,
-            'silver' => 1.2,
+            'vip' => 1.5,
             'general' => 1.0
         ];
 
@@ -187,10 +267,10 @@ class SquarePaymentController extends Controller
         $adjustedPrice = $basePrice * $typeMultipliers[$ticketType];
         $subtotal = $adjustedPrice * $quantity;
 
-        // Calculate fees (same as BookingController)
-        $serviceFee = ($subtotal * 1.5 / 100) + (0.99 * $quantity);
-        $processingFee = ($subtotal + $serviceFee) * 2.9 / 100 + 0.30;
-        $totalAmount = $subtotal + $serviceFee + $processingFee;
+        // Calculate fees (service fee removed, only Square's processing fee)
+        $serviceFee = 0; // Service fee removed
+        $processingFee = ($subtotal * 2.9 / 100) + 0.30; // Square's actual fee
+        $totalAmount = $subtotal + $processingFee;
 
         return view('square-payment', [
             'eventName' => $event->eventTitle ?? 'Event',
@@ -236,8 +316,7 @@ class SquarePaymentController extends Controller
 
             // Calculate pricing based on ticket type (same as showEventPayment)
             $typeMultipliers = [
-                'gold' => 1.5,
-                'silver' => 1.2,
+                'vip' => 1.5,
                 'general' => 1.0
             ];
 
@@ -245,10 +324,15 @@ class SquarePaymentController extends Controller
             $adjustedPrice = $basePrice * $typeMultipliers[$ticketType];
             $subtotal = $adjustedPrice * $quantity;
 
-            // Calculate fees
-            $serviceFee = ($subtotal * 1.5 / 100) + (0.99 * $quantity);
-            $processingFee = ($subtotal + $serviceFee) * 2.9 / 100 + 0.30;
-            $totalAmount = $subtotal + $serviceFee + $processingFee;
+            // Calculate fees (service fee removed, only Square's processing fee)
+            $serviceFee = 0; // Service fee removed
+            $processingFee = ($subtotal * 2.9 / 100) + 0.30; // Square's actual fee
+            $totalAmount = $subtotal + $processingFee;
+
+            // Calculate commission and payout
+            $commissionRate = config('square.commission_rate', 10.0);
+            $commission = $subtotal * ($commissionRate / 100);
+            $organizerPayout = ($subtotal - $commission) + $processingFee;
 
             // Log payment details before processing
             Log::info('Payment details calculated', [
@@ -262,13 +346,13 @@ class SquarePaymentController extends Controller
                 'amountInCents' => (int)round($totalAmount * 100)
             ]);
 
-            // Process payment with Square
+            // Process payment with Square (pass event and commission for split payments)
             $paymentResult = $this->processSquarePayment([
                 'sourceId' => $request->sourceId,
                 'amount' => (int)round($totalAmount * 100), // Convert to cents and ensure integer
                 'currency' => 'USD',
                 'idempotencyKey' => Str::uuid()->toString(),
-            ]);
+            ], $event, $commission);
 
             Log::info('Square payment result', ['result' => $paymentResult]);
 
@@ -282,6 +366,14 @@ class SquarePaymentController extends Controller
                     'totalAmount' => $totalAmount
                 ]);
 
+                // Get organizer's Square account info (if connected)
+                $organizerSquareAccount = DB::table('organizer_square_accounts')
+                    ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+                    ->where('organizers.userId', $event->userId)
+                    ->where('organizer_square_accounts.status', 'connected')
+                    ->select('organizer_square_accounts.squareMerchantId', 'organizer_square_accounts.squareLocationId')
+                    ->first();
+
                 // Create booking record with detailed fee breakdown
                 $bookingId = DB::table('booking')->insertGetId([
                     'eventId' => (int)$eventId,
@@ -290,17 +382,30 @@ class SquarePaymentController extends Controller
                     'quantity' => $quantity,
                     'basePrice' => $basePrice,
                     'subtotal' => $subtotal,
-                    'serviceFee' => $serviceFee,
+                    'serviceFee' => 0, // Service fee removed
                     'processingFee' => $processingFee,
                     'totalAmount' => $totalAmount,
                     'squarePaymentId' => $paymentResult['paymentId'],
+                    'appOwnerCommission' => $commission,
+                    'organizerPayout' => $organizerPayout,
+                    'organizerSquareMerchantId' => $organizerSquareAccount->squareMerchantId ?? null,
+                    'organizerSquareLocationId' => $organizerSquareAccount->squareLocationId ?? null,
+                    'paymentType' => $organizerSquareAccount ? 'split' : 'direct',
+                    'splitPaymentDetails' => json_encode([
+                        'commission_rate' => $commissionRate,
+                        'commission_amount' => $commission,
+                        'organizer_payout_amount' => $organizerPayout,
+                        'organizer_has_square' => $organizerSquareAccount ? true : false,
+                    ]),
                     'feeBreakdown' => json_encode([
                         'base_price' => $basePrice,
                         'ticket_type_multiplier' => $typeMultipliers[$ticketType],
-                        'per_ticket_fee' => 0.99,
-                        'service_fee_percentage' => 1.5,
+                        'service_fee' => 0, // Removed
                         'processing_fee_percentage' => 2.9,
-                        'fixed_processing_fee' => 0.30
+                        'fixed_processing_fee' => 0.30,
+                        'commission_rate' => $commissionRate,
+                        'commission_amount' => $commission,
+                        'organizer_payout_amount' => $organizerPayout
                     ]),
                     'bookingDate' => now(),
                     'status' => 'confirmed'

@@ -98,6 +98,8 @@ class NavigationUtils {
     bool fullscreenDialog = false,
     TransitionType transition = TransitionType.slide,
   }) {
+    // Unfocus inputs when navigating away
+    FocusScope.of(context).unfocus();
     return Navigator.of(context).push<T>(
       PageRouteBuilder<T>(
         pageBuilder: (context, animation, secondaryAnimation) => page,
@@ -120,6 +122,11 @@ class NavigationUtils {
     Duration? duration,
     bool fullscreenDialog = false,
   }) {
+    // Unfocus inputs when navigating away
+    final context = Get.context;
+    if (context != null) {
+      FocusScope.of(context).unfocus();
+    }
     return Get.to<T>(
           () => page,
           routeName: routeName,

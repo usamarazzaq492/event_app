@@ -20,6 +20,8 @@ class UserService {
     String? token = prefs.getString('token');
 
     final uri = Uri.parse('$baseUrl/user/$id');
+    print('🔷 Fetching public profile: $uri');
+    
     final response = await http.get(
       uri,
       headers: {
@@ -28,9 +30,17 @@ class UserService {
       },
     );
 
+    print('🔷 Profile API Response Status: ${response.statusCode}');
+    print('🔷 Profile API Response Body: ${response.body}');
+
     if (response.statusCode == 200) {
-      return ViewPublicProfileModel.fromJson(json.decode(response.body));
+      final jsonData = json.decode(response.body);
+      print('🔷 Parsed JSON: $jsonData');
+      final profile = ViewPublicProfileModel.fromJson(jsonData);
+      print('🔷 Parsed Profile - isFollowing: ${profile.isFollowing}, followersCount: ${profile.followersCount}');
+      return profile;
     } else {
+      print('❌ Failed to fetch profile: ${response.statusCode} - ${response.body}');
       return null;
     }
   }

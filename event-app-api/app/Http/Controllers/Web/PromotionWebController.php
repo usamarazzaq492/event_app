@@ -41,7 +41,7 @@ class PromotionWebController extends Controller
 
         // Check if user is authenticated and owns the event
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to promote your event.');
+            return redirect()->guest(route('login'))->with('error', 'Please login to promote your event.');
         }
 
         if ($event->userId != Auth::user()->userId) {
@@ -62,17 +62,13 @@ class PromotionWebController extends Controller
                 ->with('info', 'Your event is already promoted. You can promote again after the current promotion expires.');
         }
 
-        // Get promotion packages
+        // Single boost package: $35 for 10 days
         $packages = [
-            'basic' => [
-                'price' => PromotionController::BASIC_PACKAGE_PRICE,
-                'durationDays' => PromotionController::BASIC_DURATION_DAYS,
-                'name' => 'Basic Package',
-            ],
-            'premium' => [
-                'price' => PromotionController::PREMIUM_PACKAGE_PRICE,
-                'durationDays' => PromotionController::PREMIUM_DURATION_DAYS,
-                'name' => 'Premium Package',
+            'boost' => [
+                'price' => PromotionController::BOOST_PRICE,
+                'durationDays' => PromotionController::BOOST_DURATION_DAYS,
+                'name' => 'Event Go-Live Boost',
+                'description' => 'Boost your event for 10 days to increase visibility',
             ],
         ];
 
@@ -105,7 +101,7 @@ class PromotionWebController extends Controller
 
         try {
             $request->validate([
-                'package' => 'required|in:basic,premium',
+                'package' => 'required|in:boost',
                 'sourceId' => 'required|string',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -126,9 +122,9 @@ class PromotionWebController extends Controller
             ], 403);
         }
 
-        // Determine package details
-        $package = $request->package;
-        $amount = $package === 'premium' ? PromotionController::PREMIUM_PACKAGE_PRICE : PromotionController::BASIC_PACKAGE_PRICE;
+        // Single boost option: $35 for 10 days
+        $package = 'boost'; // Always 'boost' for new system
+        $amount = PromotionController::BOOST_PRICE;
 
         try {
             // Process payment with Square
@@ -141,7 +137,7 @@ class PromotionWebController extends Controller
 
             if ($paymentResult['success']) {
                 // Payment successful, now create promotion record directly
-                $durationDays = $package === 'premium' ? PromotionController::PREMIUM_DURATION_DAYS : PromotionController::BASIC_DURATION_DAYS;
+                $durationDays = PromotionController::BOOST_DURATION_DAYS;
 
                 // Calculate promotion dates
                 $startDate = now();
