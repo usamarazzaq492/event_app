@@ -8,6 +8,7 @@ import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:event_app/utils/navigation_utils.dart';
+import 'package:event_app/utils/refresh_on_navigation_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -23,7 +24,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, RefreshOnNavigation {
   int _activeIndex = 0;
   late TabController _tabController;
   final controller = Get.put(PublicProfileController());
@@ -46,14 +47,14 @@ class _ProfileScreenState extends State<ProfileScreen>
         });
       }
     });
+  }
 
-    /// ✅ Fetch user profile whenever this screen is initialized
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        controller.fetchUserProfile();
-        adVM.fetchAds();
-      }
-    });
+  @override
+  void refreshData() {
+    if (mounted) {
+      controller.fetchUserProfile();
+      adVM.fetchAds();
+    }
   }
 
   @override

@@ -253,6 +253,29 @@ class SquarePaymentController extends Controller
             abort(404, 'Event not found');
         }
 
+        // Check if this is a promotion payment
+        $isPromotion = $request->get('is_promotion', false) == true || $request->get('is_promotion') === 'true';
+        $package = $request->get('package', 'boost');
+
+        if ($isPromotion) {
+            // Promotion payment: $35 for boost package
+            $promotionPrice = 35.00;
+            $processingFee = ($promotionPrice * 2.9 / 100) + 0.30; // Square's processing fee
+            $totalAmount = $promotionPrice + $processingFee;
+
+            return view('square-payment', [
+                'eventName' => $event->eventTitle ?? 'Event',
+                'amount' => '$' . number_format($totalAmount, 2),
+                'eventId' => (int)$eventId,
+                'isPromotion' => true,
+                'package' => $package,
+                'promotionPrice' => $promotionPrice,
+                'processingFee' => $processingFee,
+                'totalAmount' => $totalAmount,
+            ]);
+        }
+
+        // Regular booking payment
         // Get booking details from URL parameters (for mobile app) or session (for web)
         $quantity = $request->get('quantity', session('quantity', 1));
         $ticketType = $request->get('ticket_type', session('ticket_type', 'general'));
@@ -283,6 +306,7 @@ class SquarePaymentController extends Controller
             'serviceFee' => $serviceFee,
             'processingFee' => $processingFee,
             'totalAmount' => $totalAmount,
+            'isPromotion' => false,
         ]);
     }
 

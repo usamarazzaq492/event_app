@@ -6,6 +6,7 @@ import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:event_app/utils/navigation_utils.dart';
+import 'package:event_app/utils/refresh_on_navigation_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -18,15 +19,12 @@ class NotificationScreen extends StatefulWidget {
   State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> {
+class _NotificationScreenState extends State<NotificationScreen> with RefreshOnNavigation {
   final NotificationViewModel viewModel = Get.put(NotificationViewModel());
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      viewModel.fetchNotifications();
-    });
+  void refreshData() {
+    viewModel.fetchNotifications();
   }
 
   String getTimeAgo(String? dateString) {

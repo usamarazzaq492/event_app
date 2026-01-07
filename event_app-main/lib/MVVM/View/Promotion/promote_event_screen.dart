@@ -226,7 +226,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                   ButtonWidget(
                     text: _isLoading
                         ? 'Processing...'
-                        : 'Boost Event for \$${_boostPackage?['price']?.toStringAsFixed(0) ?? BOOST_PRICE.toStringAsFixed(0)}',
+                        : 'Promote Event - \$${_boostPackage?['price']?.toStringAsFixed(0) ?? BOOST_PRICE.toStringAsFixed(0)}',
                     onPressed: _isLoading ? null : _purchaseBoost,
                     backgroundColor: AppColors.blueColor,
                     textColor: Colors.white,

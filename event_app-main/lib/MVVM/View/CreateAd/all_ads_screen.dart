@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:event_app/MVVM/View/CreateAd/create_ad.dart';
 import 'package:event_app/MVVM/View/EventDetailScreen/event_detail_screen.dart';
+import 'package:event_app/MVVM/View/Promotion/select_event_to_promote_screen.dart';
 import 'package:event_app/MVVM/body_model/ads_model.dart';
 import 'package:event_app/MVVM/view_model/ad_view_model.dart';
 import 'package:event_app/app/config/app_asset.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
+import 'package:event_app/utils/refresh_on_navigation_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -15,178 +16,167 @@ class AllAdsScreen extends StatefulWidget {
   State<AllAdsScreen> createState() => _AllAdsScreenState();
 }
 
-class _AllAdsScreenState extends State<AllAdsScreen> {
+class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
   final adVM = Get.put(AdViewModel());
 
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _stateController = TextEditingController();
-  final TextEditingController _zipController = TextEditingController();
-
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      adVM.fetchAds();
-    });
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _cityController.dispose();
-    _stateController.dispose();
-    _zipController.dispose();
-    super.dispose();
+  void refreshData() {
+    adVM.fetchAds();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      floatingActionButton: FloatingActionButton(
-        heroTag: "ads_fab",
-        backgroundColor: AppColors.blueColor,
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (_) => CreateAd()));
-        },
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              SizedBox(height: 2.h),
-              _buildLocationSearch(),
-              Expanded(child: _buildAdsList()),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLocationSearch() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Search by title, city, state, or zip",
-          style: TextStyles.regularwhite.copyWith(
-            fontSize: 10.sp,
-            color: Colors.white70,
-          ),
-        ),
-        SizedBox(height: 1.h),
-        _buildSearchField(
-          controller: _titleController,
-          hint: 'Search title',
-          onChanged: (_) => setState(() {}),
-        ),
-        SizedBox(height: 1.h),
-        Row(
+        child: Column(
           children: [
-            Expanded(
-              child: _buildSearchField(
-                controller: _cityController,
-                hint: 'City',
-                onChanged: (_) => setState(() {}),
-              ),
-            ),
-            SizedBox(width: 2.w),
-            Expanded(
-              child: _buildSearchField(
-                controller: _stateController,
-                hint: 'State',
-                onChanged: (_) => setState(() {}),
-              ),
-            ),
-            SizedBox(width: 2.w),
-            Expanded(
-              child: _buildSearchField(
-                controller: _zipController,
-                hint: 'Zip Code',
-                keyboardType: TextInputType.number,
-                onChanged: (_) => setState(() {}),
-              ),
-            ),
+            // Header Section
+            _buildHeader(),
+
+            // Promoted Events List
+            Expanded(child: _buildPromotedEventsList()),
+
+            // Promote Event Button (Fixed at bottom)
+            _buildPromoteButton(),
           ],
         ),
-        SizedBox(height: 2.h),
-      ],
+      ),
     );
   }
 
-  Widget _buildSearchField({
-    required TextEditingController controller,
-    required String hint,
-    TextInputType keyboardType = TextInputType.text,
-    required ValueChanged<String> onChanged,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.grey),
-        filled: true,
-        fillColor: AppColors.signinoptioncolor,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: Colors.transparent),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
-          borderSide: const BorderSide(color: AppColors.blueColor, width: 1),
+  Widget _buildPromoteButton() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const SelectEventToPromoteScreen(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.blueColor,
+              padding: EdgeInsets.symmetric(vertical: 2.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2.h),
+              ),
+              elevation: 0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.rocket_launch,
+                  color: Colors.white,
+                  size: 20.sp,
+                ),
+                SizedBox(width: 2.w),
+                Text(
+                  "Promote Your Event",
+                  style: TextStyles.regularwhite.copyWith(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      onChanged: onChanged,
     );
   }
 
   Widget _buildHeader() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Text(
-              "All Ads",
-              style: TextStyles.heading,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor,
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.white.withValues(alpha: 0.08),
+            width: 1,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Icon and Title
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(1.5.w),
+                decoration: BoxDecoration(
+                  color: AppColors.blueColor.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(1.5.h),
+                ),
+                child: Icon(
+                  Icons.trending_up,
+                  color: AppColors.blueColor,
+                  size: 20.sp,
+                ),
+              ),
+              SizedBox(width: 3.w),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Promoted Events",
+                    style: TextStyles.heading.copyWith(
+                      fontSize: 18.sp,
+                    ),
+                  ),
+                  SizedBox(height: 0.3.h),
+                  Obx(() => Text(
+                        "${adVM.ads.length} active promotion${adVM.ads.length != 1 ? 's' : ''}",
+                        style: TextStyles.regularwhite.copyWith(
+                          fontSize: 11.sp,
+                          color: Colors.white60,
+                        ),
+                      )),
+                ],
+              ),
+            ],
+          ),
+          const Spacer(),
+          // Refresh Button
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.signinoptioncolor,
+              borderRadius: BorderRadius.circular(1.5.h),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
             ),
-            const Spacer(),
-            IconButton(
+            child: IconButton(
               icon: const Icon(Icons.refresh, color: Colors.white),
               onPressed: () => adVM.fetchAds(),
               tooltip: 'Refresh',
-            )
-          ],
-        ),
-        SizedBox(height: 1.h),
-        Container(
-          height: 1,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.06),
-                Colors.white.withValues(alpha: 0.02),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+              iconSize: 20.sp,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildAdsList() {
+  Widget _buildPromotedEventsList() {
     return RefreshIndicator(
       onRefresh: adVM.fetchAds,
       color: AppColors.blueColor,
@@ -194,85 +184,35 @@ class _AllAdsScreenState extends State<AllAdsScreen> {
       child: Obx(() {
         if (adVM.isLoading.value && adVM.ads.isEmpty) {
           return const Center(
-              child: CircularProgressIndicator(color: Colors.white));
+            child: CircularProgressIndicator(color: Colors.white),
+          );
         } else if (adVM.error.isNotEmpty) {
           return ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
               SizedBox(height: 20.h),
               Center(
-                child: Text(adVM.error.value,
-                    style: const TextStyle(color: Colors.red)),
+                child: Text(
+                  adVM.error.value,
+                  style: const TextStyle(color: Colors.red),
+                ),
               ),
             ],
           );
         } else if (adVM.ads.isEmpty) {
           return _buildEmptyState();
         } else {
-          final filteredAds = _filterAds(adVM.ads);
-          if (filteredAds.isEmpty) {
-            return _buildNoResultsState();
-          }
           return ListView.separated(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.zero,
-            itemCount: filteredAds.length,
+            itemCount: adVM.ads.length,
             separatorBuilder: (_, __) => SizedBox(height: 2.h),
-            itemBuilder: (context, index) => _buildAdCard(filteredAds[index]),
+            itemBuilder: (context, index) =>
+                _buildPromotedEventCard(adVM.ads[index]),
           );
         }
       }),
     );
-  }
-
-  List<AdsModel> _filterAds(List<AdsModel> ads) {
-    final titleQuery = _titleController.text.trim().toLowerCase();
-    final city = _cityController.text.trim().toLowerCase();
-    final state = _stateController.text.trim().toLowerCase();
-    final zip = _zipController.text.trim().toLowerCase();
-
-    if (titleQuery.isEmpty && city.isEmpty && state.isEmpty && zip.isEmpty) {
-      return ads;
-    }
-
-    return ads.where((ad) {
-      final title = (ad.title ?? '').toLowerCase();
-      final description = (ad.description ?? '').toLowerCase();
-      final cityField = (ad.city ?? '').toLowerCase();
-      final stateField = (ad.state ?? '').toLowerCase();
-      final zipField = (ad.zipcode ?? '').toLowerCase();
-
-      // Title / keyword search
-      if (titleQuery.isNotEmpty) {
-        final matchesTitleOrDesc =
-            title.contains(titleQuery) || description.contains(titleQuery);
-        if (!matchesTitleOrDesc) return false;
-      }
-
-      // City / state / zip filters
-      if (city.isNotEmpty) {
-        final matchesCity = title.contains(city) ||
-            description.contains(city) ||
-            cityField.contains(city);
-        if (!matchesCity) return false;
-      }
-
-      if (state.isNotEmpty) {
-        final matchesState = title.contains(state) ||
-            description.contains(state) ||
-            stateField.contains(state);
-        if (!matchesState) return false;
-      }
-
-      if (zip.isNotEmpty) {
-        final matchesZip = title.contains(zip) ||
-            description.contains(zip) ||
-            zipField.contains(zip);
-        if (!matchesZip) return false;
-      }
-
-      return true;
-    }).toList();
   }
 
   Widget _buildEmptyState() {
@@ -286,12 +226,12 @@ class _AllAdsScreenState extends State<AllAdsScreen> {
               Image.asset(AppImages.emptyImg, height: 25.h),
               SizedBox(height: 2.h),
               Text(
-                "No Ads Available",
+                "No Promoted Events",
                 style: TextStyles.homeheadingtext,
               ),
               SizedBox(height: 1.h),
               Text(
-                "Tap the + button below to create your first ad!",
+                "Be the first to promote your event!",
                 textAlign: TextAlign.center,
                 style: TextStyles.regularwhite.copyWith(color: Colors.grey),
               ),
@@ -302,34 +242,7 @@ class _AllAdsScreenState extends State<AllAdsScreen> {
     );
   }
 
-  Widget _buildNoResultsState() {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        SizedBox(height: 10.h),
-        Center(
-          child: Column(
-            children: [
-              Icon(Icons.search_off, size: 32.sp, color: Colors.white54),
-              SizedBox(height: 2.h),
-              Text(
-                "No ads match your search",
-                style: TextStyles.homeheadingtext,
-              ),
-              SizedBox(height: 1.h),
-              Text(
-                "Try adjusting the city, state, or zip code filters.",
-                textAlign: TextAlign.center,
-                style: TextStyles.regularwhite.copyWith(color: Colors.grey),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAdCard(ad) {
+  Widget _buildPromotedEventCard(AdsModel ad) {
     final String title = (ad.title ?? '').toString();
     final String description = (ad.description ?? '').toString();
     final String imagePath = (ad.imageUrl ?? '').toString();
@@ -339,21 +252,26 @@ class _AllAdsScreenState extends State<AllAdsScreen> {
 
     return InkWell(
       onTap: () {
-        // Ads section now shows boosted events, so navigate to event detail
-        // donationId is mapped from eventId in the API response
+        // Navigate to event detail (use eventId if available, otherwise donationId)
+        final eventId = ad.eventId ?? ad.donationId;
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (_) => EventDetailScreen(
-                    eventId: ad.donationId?.toString() ?? '')));
+          context,
+          MaterialPageRoute(
+            builder: (_) => EventDetailScreen(
+              eventId: eventId?.toString() ?? '',
+            ),
+          ),
+        );
       },
       borderRadius: BorderRadius.circular(2.h),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.signinoptioncolor,
           borderRadius: BorderRadius.circular(2.h),
-          border:
-              Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.08),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.12),
@@ -378,7 +296,8 @@ class _AllAdsScreenState extends State<AllAdsScreen> {
                 placeholder: (context, url) => Container(
                   color: Colors.grey.shade800,
                   child: const Center(
-                      child: CircularProgressIndicator(strokeWidth: 2)),
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                 ),
                 errorWidget: (context, url, error) => Container(
                   color: Colors.grey.shade800,
@@ -408,20 +327,32 @@ class _AllAdsScreenState extends State<AllAdsScreen> {
                         ),
                         Container(
                           padding: EdgeInsets.symmetric(
-                              horizontal: 2.w, vertical: 0.5.h),
+                            horizontal: 2.w,
+                            vertical: 0.5.h,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.blueColor.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                                color: AppColors.blueColor
-                                    .withValues(alpha: 0.35)),
+                              color:
+                                  AppColors.blueColor.withValues(alpha: 0.35),
+                            ),
                           ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.campaign,
-                                  size: 12.sp, color: Colors.white),
+                              Icon(
+                                Icons.rocket_launch,
+                                size: 12.sp,
+                                color: Colors.white,
+                              ),
                               SizedBox(width: 1.w),
-                              Text('Ad', style: TextStyles.regularwhite),
+                              Text(
+                                'Promoted',
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 9.sp,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -434,8 +365,9 @@ class _AllAdsScreenState extends State<AllAdsScreen> {
                               ? '${description.substring(0, 100)}…'
                               : description)
                           : 'No description provided',
-                      style: TextStyles.regularwhite
-                          .copyWith(color: Colors.white70),
+                      style: TextStyles.regularwhite.copyWith(
+                        color: Colors.white70,
+                      ),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),

@@ -5,6 +5,7 @@ import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:event_app/utils/navigation_utils.dart';
+import 'package:event_app/utils/refresh_on_navigation_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -19,7 +20,7 @@ class PublicProfileScreen extends StatefulWidget {
   State<PublicProfileScreen> createState() => _PublicProfileScreenState();
 }
 
-class _PublicProfileScreenState extends State<PublicProfileScreen> {
+class _PublicProfileScreenState extends State<PublicProfileScreen> with RefreshOnNavigation {
   final PublicProfileController controller = Get.put(PublicProfileController());
   final DataViewModel dataViewModel = Get.put(DataViewModel());
 
@@ -44,12 +45,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    // Always reload profile when screen opens to get fresh data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      loadProfile();
-    });
+  void refreshData() {
+    loadProfile();
   }
 
   Future<void> loadProfile() async {

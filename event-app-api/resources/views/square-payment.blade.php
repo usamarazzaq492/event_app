@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Pay for {{ $eventName ?? 'Event' }} - EventGo</title>
+  <title>@if(isset($isPromotion) && $isPromotion)Promote {{ $eventName ?? 'Event' }}@elsePay for {{ $eventName ?? 'Event' }}@endif - EventGo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <link rel="icon" href="{{ asset('fav.png') }}" type="image/png">
@@ -117,6 +117,20 @@
     <div class="logo">
       <img src="{{ asset('fav.png') }}" alt="EventGo Logo">
     </div>
+    @if(isset($isPromotion) && $isPromotion)
+    <h2>Promote {{ $eventName ?? 'Your Event' }}</h2>
+    <p class="intro">Boost your event's visibility for {{ $amount ?? '$35.00' }} using your card below.</p>
+
+    <div class="booking-details">
+      <h3>Promotion Details</h3>
+      <p><strong>Package:</strong> Event Boost (10 days)</p>
+      @if(isset($promotionPrice))
+      <p><strong>Boost Price:</strong> ${{ number_format($promotionPrice, 2) }}</p>
+      <p><strong>Processing Fee:</strong> ${{ number_format($processingFee, 2) }}</p>
+      <p><strong>Total:</strong> ${{ number_format($totalAmount, 2) }}</p>
+      @endif
+    </div>
+    @else
     <h2>Pay for {{ $eventName ?? 'Your Event' }}</h2>
     <p class="intro">Securely pay {{ $amount ?? '$0.00' }} using your card below.</p>
 
@@ -132,9 +146,10 @@
       @endif
     </div>
     @endif
+    @endif
 
     <div id="card-container"></div>
-    <button id="pay-button">Pay Now</button>
+    <button id="pay-button">{{ isset($isPromotion) && $isPromotion ? 'Promote Event' : 'Pay Now' }}</button>
     <div id="error-message"></div>
     <div id="success-message"></div>
   </div>
@@ -176,6 +191,8 @@
               // This is a web browser - send to backend
               try {
                 const urlParams = new URLSearchParams(window.location.search);
+                const isPromotion = urlParams.get('is_promotion') === 'true' || {{ isset($isPromotion) && $isPromotion ? 'true' : 'false' }};
+                const package = urlParams.get('package') || '{{ $package ?? 'boost' }}';
                 const quantity = urlParams.get('quantity') || {{ $quantity ?? 1 }};
                 const ticketType = urlParams.get('ticket_type') || '{{ $ticketType ?? 'general' }}';
 
@@ -183,23 +200,42 @@
                 console.log('Payment Debug Info:', {
                   eventId: {{ $eventId ?? 'null' }},
                   eventId_type: typeof {{ $eventId ?? 'null' }},
+                  isPromotion: isPromotion,
+                  package: package,
                   quantity: quantity,
                   ticketType: ticketType,
                   totalAmount: {{ $totalAmount ?? 0 }},
                   sourceId: nonce,
-                  route: '{{ route("square.payment.process", $eventId) }}'
+                  route: isPromotion ? '{{ url("/api/v1/events") }}/{{ $eventId }}/promote' : '{{ route("square.payment.process", $eventId) }}'
                 });
 
-                const response = await fetch('{{ route("square.payment.process", $eventId) }}?quantity=' + quantity + '&ticket_type=' + ticketType, {
+                let apiUrl;
+                let requestBody;
+
+                if (isPromotion) {
+                  // Promotion payment
+                  apiUrl = '{{ url("/api/v1/events") }}/{{ $eventId }}/promote';
+                  requestBody = {
+                    package: package,
+                    payment_nonce: nonce
+                  };
+                } else {
+                  // Booking payment
+                  apiUrl = '{{ route("square.payment.process", $eventId) }}?quantity=' + quantity + '&ticket_type=' + ticketType;
+                  requestBody = {
+                    sourceId: nonce,
+                    amount: {{ $totalAmount ?? 0 }}
+                  };
+                }
+
+                const response = await fetch(apiUrl, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'Accept': 'application/json'
                   },
-                  body: JSON.stringify({
-                    sourceId: nonce,
-                    amount: {{ $totalAmount ?? 0 }}
-                  })
+                  body: JSON.stringify(requestBody)
                 });
 
                 const data = await response.json();

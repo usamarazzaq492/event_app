@@ -148,35 +148,38 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
                 ),
               ),
               const SizedBox(height: 25),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.blueColor,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => TicketScreen(),
+              if (!widget.isPromotion)
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.blueColor,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  );
-                },
-                child: const Text("View E-Ticket",
-                    style: TextStyle(color: AppColors.whiteColor)),
-              ),
-              const SizedBox(height: 10),
+                  ),
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TicketScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text("View E-Ticket",
+                      style: TextStyle(color: AppColors.whiteColor)),
+                ),
+              if (!widget.isPromotion) const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  Navigator.pop(context, false);
+                  if (!widget.isPromotion) {
+                    Navigator.pop(context, false);
+                  }
                 },
-                child: const Text(
-                  "Cancel",
-                  style: TextStyle(color: Colors.white60),
+                child: Text(
+                  widget.isPromotion ? "Done" : "Cancel",
+                  style: const TextStyle(color: Colors.white60),
                 ),
               )
             ],
@@ -191,7 +194,7 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: const Text('Complete Payment'),
+        title: Text(widget.isPromotion ? 'Promote Event' : 'Complete Payment'),
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
       ),

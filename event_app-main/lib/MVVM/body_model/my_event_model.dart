@@ -15,6 +15,10 @@ class MyEventModel {
   int? isActive;
   String? addDate;
   String? editDate;
+  int? isPromoted;
+  String? promotionStartDate;
+  String? promotionEndDate;
+  String? promotionPackage;
 
   MyEventModel(
       {this.eventId,
@@ -32,7 +36,11 @@ class MyEventModel {
         this.eventImage,
         this.isActive,
         this.addDate,
-        this.editDate});
+        this.editDate,
+        this.isPromoted,
+        this.promotionStartDate,
+        this.promotionEndDate,
+        this.promotionPackage});
 
   MyEventModel.fromJson(Map<String, dynamic> json) {
     eventId = json['eventId'];
@@ -51,6 +59,10 @@ class MyEventModel {
     isActive = json['isActive'];
     addDate = json['addDate'];
     editDate = json['editDate'];
+    isPromoted = json['isPromoted'];
+    promotionStartDate = json['promotionStartDate'];
+    promotionEndDate = json['promotionEndDate'];
+    promotionPackage = json['promotionPackage'];
   }
 
   Map<String, dynamic> toJson() {
@@ -71,6 +83,57 @@ class MyEventModel {
     data['isActive'] = this.isActive;
     data['addDate'] = this.addDate;
     data['editDate'] = this.editDate;
+    data['isPromoted'] = this.isPromoted;
+    data['promotionStartDate'] = this.promotionStartDate;
+    data['promotionEndDate'] = this.promotionEndDate;
+    data['promotionPackage'] = this.promotionPackage;
     return data;
+  }
+
+  /// Parse date from server (handles both ISO 8601 with timezone and MySQL datetime format)
+  DateTime? _parseServerDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return null;
+    try {
+      // Check if date has timezone info (ISO 8601 format)
+      if (dateString.endsWith('Z') || 
+          dateString.contains('+') || 
+          (dateString.length > 10 && (dateString[dateString.length - 6] == '+' || dateString[dateString.length - 6] == '-'))) {
+        // Has timezone info, parse directly
+        return DateTime.parse(dateString).toUtc();
+      } else {
+        // No timezone info (MySQL datetime format like "2024-01-15 10:30:00")
+        // Assume UTC since server stores in UTC
+        return DateTime.parse('${dateString.replaceAll(' ', 'T')}Z').toUtc();
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Check if promotion is currently active
+  bool get isPromotionActive {
+    if (isPromoted == null || isPromoted == 0) return false;
+    if (promotionEndDate == null || promotionEndDate!.isEmpty) return false;
+    try {
+      final endDate = _parseServerDate(promotionEndDate);
+      if (endDate == null) return false;
+      return DateTime.now().toUtc().isBefore(endDate);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Get remaining promotion days
+  int? get remainingPromotionDays {
+    if (!isPromotionActive) return null;
+    try {
+      final endDate = _parseServerDate(promotionEndDate);
+      if (endDate == null) return null;
+      final now = DateTime.now().toUtc();
+      final difference = endDate.difference(now);
+      return difference.inDays;
+    } catch (e) {
+      return null;
+    }
   }
 }

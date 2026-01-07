@@ -1,5 +1,6 @@
 class AdsModel {
   int? donationId;
+  int? eventId; // Added for promoted events (same as donationId when mapped from eventId)
   int? userId;
   String? title;
   String? imageUrl;
@@ -14,6 +15,7 @@ class AdsModel {
 
   AdsModel(
       {this.donationId,
+      this.eventId,
       this.userId,
       this.title,
       this.imageUrl,
@@ -30,6 +32,10 @@ class AdsModel {
     donationId = json['donationId'] is int
         ? json['donationId']
         : int.tryParse(json['donationId']?.toString() ?? '');
+    // eventId is also returned for promoted events
+    eventId = json['eventId'] is int
+        ? json['eventId']
+        : (json['eventId'] != null ? int.tryParse(json['eventId']?.toString() ?? '') : donationId);
     userId = json['userId'] is int
         ? json['userId']
         : int.tryParse(json['userId']?.toString() ?? '');
@@ -50,6 +56,7 @@ class AdsModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['donationId'] = this.donationId;
+    data['eventId'] = this.eventId;
     data['userId'] = this.userId;
     data['title'] = this.title;
     data['imageUrl'] = this.imageUrl;

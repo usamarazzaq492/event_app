@@ -20,18 +20,66 @@ class PromotionController extends Controller
 
     private $squareClient;
 
-    public function __construct()
+    /**
+     * Get or initialize SquareClient (lazy initialization)
+     */
+    private function getSquareClient(): SquareClient
     {
-        $accessToken = config('square.access_token') ?: env('SQUARE_ACCESS_TOKEN') ?: env('SQUARE_TOKEN');
-        $environment = config('square.environment', 'sandbox');
+        if ($this->squareClient === null) {
+            // Use config() with fallbacks for better compatibility with cached configurations
+            $accessToken = config('square.access_token', '') ?: env('SQUARE_ACCESS_TOKEN', '') ?: env('SQUARE_TOKEN', '');
+            $environment = config('square.environment', '') ?: env('SQUARE_ENVIRONMENT', 'sandbox');
 
-        $square = new SquareClient(options: [
-            'accessToken' => $accessToken,
-            'baseUrl' => $environment === 'production'
-                ? Environments::Production->value
-                : Environments::Sandbox->value,
-        ]);
-        $this->squareClient = $square;
+            // Log for debugging (remove sensitive data in production)
+            Log::debug('Initializing SquareClient', [
+                'has_access_token' => !empty($accessToken),
+                'access_token_length' => strlen($accessToken ?? ''),
+                'environment' => $environment,
+                'config_cached' => app()->configurationIsCached(),
+            ]);
+
+            if (empty($accessToken)) {
+                Log::error('Square access token not found', [
+                    'config_square_access_token' => config('square.access_token'),
+                    'env_square_access_token' => env('SQUARE_ACCESS_TOKEN'),
+                    'env_square_token' => env('SQUARE_TOKEN'),
+                ]);
+                throw new \Exception('Square access token not configured. Please set SQUARE_ACCESS_TOKEN or SQUARE_TOKEN in your .env file.');
+            }
+
+            try {
+                // Temporarily set environment variable if not set (Square SDK checks this)
+                $originalToken = getenv('SQUARE_TOKEN');
+                if (empty($originalToken) && !empty($accessToken)) {
+                    putenv("SQUARE_TOKEN={$accessToken}");
+                }
+
+                $this->squareClient = new SquareClient(options: [
+                    'accessToken' => $accessToken,
+                    'baseUrl' => $environment === 'production'
+                        ? Environments::Production->value
+                        : Environments::Sandbox->value,
+                ]);
+
+                // Restore original value if we set it
+                if (empty($originalToken) && !empty($accessToken)) {
+                    if ($originalToken === false) {
+                        putenv('SQUARE_TOKEN');
+                    } else {
+                        putenv("SQUARE_TOKEN={$originalToken}");
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error('Failed to initialize SquareClient', [
+                    'error' => $e->getMessage(),
+                    'has_token' => !empty($accessToken),
+                    'token_length' => strlen($accessToken ?? ''),
+                ]);
+                throw $e;
+            }
+        }
+
+        return $this->squareClient;
     }
 
     /**
@@ -104,9 +152,9 @@ class PromotionController extends Controller
 
             $paymentId = $paymentResponse->getPayment()->getId();
 
-            // Calculate promotion dates
-            $startDate = now();
-            $endDate = now()->addDays($durationDays);
+            // Calculate promotion dates (store in UTC for consistency across timezones)
+            $startDate = now()->utc();
+            $endDate = now()->utc()->addDays($durationDays);
 
             // Create promotion transaction record
             $transactionId = DB::table('promotion_transactions')->insertGetId([
@@ -140,7 +188,7 @@ class PromotionController extends Controller
                     'eventId' => $eventId,
                     'package' => $package,
                     'durationDays' => $durationDays,
-                    'promotionEndDate' => $endDate->format('Y-m-d H:i:s'),
+                    'promotionEndDate' => $endDate->toIso8601String(), // ISO 8601 format with UTC timezone
                 ]
             ]);
         });
@@ -225,10 +273,10 @@ class PromotionController extends Controller
             $amountMoney->setAmount($amountCents);
             $amountMoney->setCurrency('USD');
 
-            // Verify location ID
-            $locationId = env('SQUARE_LOCATION_ID');
+            // Verify location ID - use config() with fallbacks for better compatibility with cached configurations
+            $locationId = config('square.location_id', '') ?: env('SQUARE_LOCATION_ID', '');
             if (empty($locationId)) {
-                throw new \RuntimeException('Square location ID is not configured');
+                throw new \RuntimeException('Square location ID is not configured. Please set SQUARE_LOCATION_ID in your .env file.');
             }
 
             // Create payment request with newer SDK syntax
@@ -256,7 +304,7 @@ class PromotionController extends Controller
             ]);
 
             // Process payment using the Payments API - use create() not createPayment()
-            $paymentsApi = $this->squareClient->payments;
+            $paymentsApi = $this->getSquareClient()->payments;
             $response = $paymentsApi->create($paymentRequest);
 
             // Check for errors in response

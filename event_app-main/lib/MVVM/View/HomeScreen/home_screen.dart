@@ -19,6 +19,7 @@ import '../../../utils/navigation_utils.dart';
 import '../../../utils/accessibility_utils.dart';
 import '../../../utils/haptic_utils.dart';
 import '../../../utils/keyboard_utils.dart';
+import '../../../utils/refresh_on_navigation_mixin.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, RefreshOnNavigation {
   final EventController controller = Get.put(EventController());
   final authViewModel = Get.put(AuthViewModel());
   final BottomNavController navController =
@@ -54,12 +55,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     _initializeAnimations();
     _setupScrollListener();
+  }
+
+  @override
+  void refreshData() {
     // Preload users so we can search people from Home
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      authViewModel.fetchUsers();
-      // Fetch timeline events on home screen load
-      controller.fetchTimelineEvents();
-    });
+    authViewModel.fetchUsers();
+    // Fetch timeline events on home screen load
+    controller.fetchTimelineEvents();
   }
 
   void _initializeAnimations() {
