@@ -19,6 +19,7 @@ class EventService {
     required String startTime,
     required String endTime,
     required String eventPrice,
+    required String vipPrice,
     required String eventdes,
     required String eventcategory,
     required String eventaddress,
@@ -45,6 +46,7 @@ class EventService {
     request.fields['startTime'] = startTime;
     request.fields['endTime'] = endTime;
     request.fields['eventPrice'] = eventPrice;
+    request.fields['vipPrice'] = vipPrice;
     request.fields['description'] = eventdes;
     request.fields['category'] = eventcategory;
     request.fields['address'] = eventaddress;
@@ -361,6 +363,7 @@ class EventService {
     required String startTime,
     required String endTime,
     required String eventPrice,
+    required String vipPrice,
     required String eventdes,
     required String eventcategory,
     required String eventaddress,
@@ -385,6 +388,7 @@ class EventService {
     request.fields['startTime'] = startTime;
     request.fields['endTime'] = endTime;
     request.fields['eventPrice'] = eventPrice;
+    request.fields['vipPrice'] = vipPrice;
     request.fields['description'] = eventdes;
     request.fields['category'] = eventcategory;
     request.fields['address'] = eventaddress;

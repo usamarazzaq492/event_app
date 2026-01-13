@@ -7,6 +7,7 @@ class MyEventModel {
   String? startTime;
   String? endTime;
   String? eventPrice;
+  String? vipPrice;
   String? description;
   String? category;
   String? address;
@@ -29,6 +30,7 @@ class MyEventModel {
         this.startTime,
         this.endTime,
         this.eventPrice,
+        this.vipPrice,
         this.description,
         this.category,
         this.address,
@@ -51,6 +53,7 @@ class MyEventModel {
     startTime = json['startTime'];
     endTime = json['endTime'];
     eventPrice = json['eventPrice'];
+    vipPrice = json['vipPrice'];
     description = json['description'];
     category = json['category'];
     address = json['address'];
@@ -75,6 +78,7 @@ class MyEventModel {
     data['startTime'] = this.startTime;
     data['endTime'] = this.endTime;
     data['eventPrice'] = this.eventPrice;
+    data['vipPrice'] = this.vipPrice;
     data['description'] = this.description;
     data['category'] = this.category;
     data['address'] = this.address;

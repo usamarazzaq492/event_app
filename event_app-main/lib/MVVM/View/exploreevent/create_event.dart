@@ -31,6 +31,7 @@ class _CreateEventState extends State<CreateEvent> {
   final addressController = TextEditingController();
   final categoryController = TextEditingController();
   final priceController = TextEditingController();
+  final vipPriceController = TextEditingController();
   final sdateController = TextEditingController();
   final edateController = TextEditingController();
   final liveStreamController = TextEditingController();
@@ -137,8 +138,12 @@ class _CreateEventState extends State<CreateEvent> {
                             maxLines: 5),
                         _buildInputField(
                             'Category', categoryController, 'Category'),
-                        _buildInputField(
-                            'Price', priceController, 'Price of Event',
+                        _buildInputField('General Admission Price',
+                            priceController, 'Price for General Admission',
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true)),
+                        _buildInputField('VIP Price', vipPriceController,
+                            'Price for VIP tickets',
                             keyboardType: const TextInputType.numberWithOptions(
                                 decimal: true)),
                         Padding(
@@ -643,9 +648,11 @@ class _CreateEventState extends State<CreateEvent> {
         _startTimeError == null &&
         _endTimeError == null &&
         imageFile != null) {
-      // Normalize price so backend always receives 2 decimal places
+      // Normalize prices so backend always receives 2 decimal places
       final normalizedPrice = _normalizePrice(priceController.text);
       priceController.text = normalizedPrice;
+      final normalizedVipPrice = _normalizePrice(vipPriceController.text);
+      vipPriceController.text = normalizedVipPrice;
       _showBanner('Submitting your event…', color: AppColors.blueColor);
       // Prefer picked coords; else geocode Address+City
       double lat;
@@ -682,6 +689,7 @@ class _CreateEventState extends State<CreateEvent> {
         startTime: _startTime,
         endTime: _endTime,
         eventPrice: normalizedPrice,
+        vipPrice: normalizedVipPrice,
         eventDescription: descController.text,
         eventCategory: categoryController.text,
         eventAddress: addressController.text,

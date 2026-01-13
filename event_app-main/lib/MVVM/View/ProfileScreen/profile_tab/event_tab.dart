@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../exploreevent/even_update_screen.dart';
+import '../../exploreevent/event_update_screen.dart';
 
 class EventTab extends StatelessWidget {
   EventTab({Key? key}) : super(key: key);

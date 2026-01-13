@@ -545,20 +545,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
                                           horizontal: 3.w,
                                         ),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Explore Now",
-                                            style:
-                                                TextStyles.profiletext.copyWith(
-                                              color: AppColors.blueColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12.sp,
-                                            ),
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          "Explore Now",
+                                          style:
+                                              TextStyles.profiletext.copyWith(
+                                            color: AppColors.blueColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12.sp,
                                           ),
-                                        ],
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -593,20 +591,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin, 
                                           horizontal: 3.w,
                                         ),
                                       ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Create Event",
-                                            style:
-                                                TextStyles.profiletext.copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12.sp,
-                                            ),
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          "Create Event",
+                                          style:
+                                              TextStyles.profiletext.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12.sp,
                                           ),
-                                        ],
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     ),
                                   ),
