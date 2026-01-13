@@ -72,13 +72,10 @@ class PaymentQrWebController extends Controller
             'web' => $webUrl
         ]);
 
-        // Calculate price
-        $typeMultipliers = [
-            'vip' => 1.5,
-            'general' => 1.0
-        ];
-        $basePrice = $event->eventPrice ?? 0;
-        $adjustedPrice = $basePrice * $typeMultipliers[$request->ticket_type];
+        // Get the correct price based on ticket type
+        $ticketPrice = $request->ticket_type === 'vip'
+            ? ($event->vipPrice ?? $event->eventPrice ?? 0)
+            : ($event->eventPrice ?? 0);
 
         // Insert QR code record
         $qrId = DB::table('payment_qr_codes')->insertGetId([
@@ -162,15 +159,12 @@ class PaymentQrWebController extends Controller
         // Get event details
         $event = Event::findOrFail($eventId);
 
-        // Calculate price
-        $typeMultipliers = [
-            'vip' => 1.5,
-            'general' => 1.0
-        ];
-        $basePrice = $event->eventPrice ?? 0;
-        $adjustedPrice = $basePrice * $typeMultipliers[$ticketType];
+        // Get the correct price based on ticket type
+        $ticketPrice = $ticketType === 'vip'
+            ? ($event->vipPrice ?? $event->eventPrice ?? 0)
+            : ($event->eventPrice ?? 0);
 
-        return view('payment-qr.payment', compact('event', 'ticketType', 'adjustedPrice', 'token'));
+        return view('payment-qr.payment', compact('event', 'ticketType', 'ticketPrice', 'token'));
     }
 }
 

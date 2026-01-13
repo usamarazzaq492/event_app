@@ -138,9 +138,9 @@
                         </div>
                         <div class="carousel-item">
                             <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=80"
-                                class="d-block w-100 rounded-4" alt="Conference" />
+                                class="d-block w-100 rounded-4" alt="Tech Event" />
                             <div class="carousel-caption d-none d-md-block text-start">
-                                <h5>Global Tech Conference</h5>
+                                <h5>Tech Community Event</h5>
                                 <p>Keynotes • Workshops • Networking</p>
                             </div>
                         </div>
@@ -323,9 +323,9 @@
                 <a href="{{ route('events.index') }}" class="text-decoration-none">
                     <div class="card rounded-3 border-0 shadow-sm">
                         <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80"
-                            class="card-img-top" alt="Conference" style="height: 200px; object-fit: cover;">
+                            class="card-img-top" alt="Tech Events" style="height: 200px; object-fit: cover;">
                         <div class="card-body">
-                            <h5 class="card-title text-dark">Conferences</h5>
+                            <h5 class="card-title text-dark">Tech Events</h5>
                             <p class="card-text text-muted small">Industry events, seminars, and professional gatherings.</p>
                         </div>
                     </div>
@@ -594,14 +594,14 @@
             <div class="col-md-6" data-aos="fade-up" data-aos-delay="140">
                 <div class="card p-3 h-100">
                     <h6>Secure Checkout</h6>
-                    <p class="small text-muted">A secure checkout flow with Stripe/PayPal integration for seamless payments.</p>
+                    <p class="small text-muted">A secure checkout flow with Square integration for seamless payments.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Messaging Section -->
-    <section id="messaging" class="my-5" data-aos="fade-up">
+    {{-- <section id="messaging" class="my-5" data-aos="fade-up">
         <div class="detail-hero p-4 mb-4">
             <h3>Real-time Messaging</h3>
             <p class="text-muted">Group chat for each event, private messages, and push notifications.</p>
@@ -629,7 +629,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <!-- Ads Section -->
     <section id="ads" class="mt-5 mb-5" data-aos="fade-up">

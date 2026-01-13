@@ -280,15 +280,12 @@ class SquarePaymentController extends Controller
         $quantity = $request->get('quantity', session('quantity', 1));
         $ticketType = $request->get('ticket_type', session('ticket_type', 'general'));
 
-        // Calculate pricing based on ticket type
-        $typeMultipliers = [
-            'vip' => 1.5,
-            'general' => 1.0
-        ];
+        // Get the correct price based on ticket type
+        $ticketPrice = $ticketType === 'vip'
+            ? ($event->vipPrice ?? $event->eventPrice ?? 0)
+            : ($event->eventPrice ?? 0);
 
-        $basePrice = $event->eventPrice ?? 0;
-        $adjustedPrice = $basePrice * $typeMultipliers[$ticketType];
-        $subtotal = $adjustedPrice * $quantity;
+        $subtotal = $ticketPrice * $quantity;
 
         // Calculate fees (service fee removed, only Square's processing fee)
         $serviceFee = 0; // Service fee removed
@@ -301,7 +298,7 @@ class SquarePaymentController extends Controller
             'eventId' => (int)$eventId,
             'quantity' => $quantity,
             'ticketType' => $ticketType,
-            'basePrice' => $basePrice,
+            'ticketPrice' => $ticketPrice,
             'subtotal' => $subtotal,
             'serviceFee' => $serviceFee,
             'processingFee' => $processingFee,
@@ -338,15 +335,12 @@ class SquarePaymentController extends Controller
             $quantity = $request->get('quantity', session('quantity', 1));
             $ticketType = $request->get('ticket_type', session('ticket_type', 'general'));
 
-            // Calculate pricing based on ticket type (same as showEventPayment)
-            $typeMultipliers = [
-                'vip' => 1.5,
-                'general' => 1.0
-            ];
+            // Get the correct price based on ticket type
+            $ticketPrice = $ticketType === 'vip'
+                ? ($event->vipPrice ?? $event->eventPrice ?? 0)
+                : ($event->eventPrice ?? 0);
 
-            $basePrice = $event->eventPrice ?? 0;
-            $adjustedPrice = $basePrice * $typeMultipliers[$ticketType];
-            $subtotal = $adjustedPrice * $quantity;
+            $subtotal = $ticketPrice * $quantity;
 
             // Calculate fees (service fee removed, only Square's processing fee)
             $serviceFee = 0; // Service fee removed
@@ -360,7 +354,7 @@ class SquarePaymentController extends Controller
 
             // Log payment details before processing
             Log::info('Payment details calculated', [
-                'basePrice' => $basePrice,
+                'ticketPrice' => $ticketPrice,
                 'ticketType' => $ticketType,
                 'quantity' => $quantity,
                 'subtotal' => $subtotal,
@@ -404,7 +398,7 @@ class SquarePaymentController extends Controller
                     'userId' => (int)Auth::id(),
                     'ticketType' => $ticketType,
                     'quantity' => $quantity,
-                    'basePrice' => $basePrice,
+                    'basePrice' => $ticketPrice,
                     'subtotal' => $subtotal,
                     'serviceFee' => 0, // Service fee removed
                     'processingFee' => $processingFee,
@@ -422,8 +416,8 @@ class SquarePaymentController extends Controller
                         'organizer_has_square' => $organizerSquareAccount ? true : false,
                     ]),
                     'feeBreakdown' => json_encode([
-                        'base_price' => $basePrice,
-                        'ticket_type_multiplier' => $typeMultipliers[$ticketType],
+                        'base_price' => $ticketPrice,
+                        'ticket_type' => $ticketType,
                         'service_fee' => 0, // Removed
                         'processing_fee_percentage' => 2.9,
                         'fixed_processing_fee' => 0.30,

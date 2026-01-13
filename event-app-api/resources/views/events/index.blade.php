@@ -183,9 +183,9 @@
                 <a href="{{ route('events.index') }}" class="text-decoration-none">
                     <div class="card rounded-3 border-0 shadow-sm">
                         <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80"
-                            class="card-img-top" alt="Conference" style="height: 200px; object-fit: cover;">
+                            class="card-img-top" alt="Tech Events" style="height: 200px; object-fit: cover;">
                         <div class="card-body">
-                            <h5 class="card-title text-dark">Conferences</h5>
+                            <h5 class="card-title text-dark">Tech Events</h5>
                             <p class="card-text text-muted small">Industry events, seminars, and professional gatherings.</p>
                         </div>
                     </div>

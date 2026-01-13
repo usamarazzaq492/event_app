@@ -29,22 +29,7 @@ class AdsController extends Controller
             ->orderBy('events.startDate', 'asc')
             ->paginate(12);
 
-        // Calculate stats for boosted events
-        $stats = [
-            'active_boosted_events' => DB::table('events')
-                ->where('isActive', 1)
-                ->where('isPromoted', 1)
-                ->where('promotionEndDate', '>', now())
-                ->count(),
-            'total_boost_revenue' => DB::table('promotion_transactions')
-                ->where('status', 'completed')
-                ->sum('amount'),
-            'total_boosts' => DB::table('promotion_transactions')
-                ->where('status', 'completed')
-                ->count(),
-        ];
-
-        return view('ads.index', compact('ads', 'stats'));
+        return view('ads.index', compact('ads'));
     }
 
     public function create()

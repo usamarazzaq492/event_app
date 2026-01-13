@@ -21,6 +21,7 @@ class EventController extends Controller
             'startTime' => 'required|date_format:H:i',
             'endTime' => 'required|date_format:H:i',
             'eventPrice' => 'nullable|numeric',
+            'vipPrice' => 'nullable|numeric',
             'description' => 'required|string|max:1000',
             'category' => 'required|string|max:50',
             'address' => 'required|string|max:500',
@@ -53,6 +54,7 @@ class EventController extends Controller
             'startTime' => $validated['startTime'],
             'endTime' => $validated['endTime'],
             'eventPrice' => $validated['eventPrice'],
+            'vipPrice' => $validated['vipPrice'] ?? null,
             'description' => $validated['description'],
             'category' => $validated['category'],
             'address' => $validated['address'],
@@ -295,6 +297,7 @@ class EventController extends Controller
             'startTime' => 'sometimes|required|date_format:H:i',
             'endTime' => 'sometimes|required|date_format:H:i',
             'eventPrice' => 'nullable|numeric',
+            'vipPrice' => 'nullable|numeric',
             'description' => 'sometimes|required|string|max:1000',
             'category' => 'sometimes|required|string|max:50',
             'address' => 'sometimes|required|string|max:500',
@@ -321,7 +324,10 @@ class EventController extends Controller
 
         if ($request->hasFile('eventImage')) {
             if ($event->eventImage) {
-                Storage::disk('public')->delete(str_replace('public/', '', $event->eventImage));
+                // Extract relative path from DB path: /storage/public/events/... -> events/...
+                $oldImagePath = str_replace('/storage/public/', '', $event->eventImage);
+                $oldImagePath = str_replace('/storage/', '', $oldImagePath);
+                Storage::disk('public')->delete($oldImagePath);
             }
             $path = $request->file('eventImage')->store('events', 'public');
             $dataToUpdate['eventImage'] = "/storage/public/$path";

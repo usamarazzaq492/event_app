@@ -18,6 +18,7 @@ class Event extends Model
         'startTime',
         'endTime',
         'eventPrice',
+        'vipPrice',
         'description',
         'category',
         'address',
@@ -37,6 +38,7 @@ class Event extends Model
         'startTime' => 'datetime:H:i:s',
         'endTime' => 'datetime:H:i:s',
         'eventPrice' => 'decimal:2',
+        'vipPrice' => 'decimal:2',
         'isActive' => 'boolean',
         'addDate' => 'datetime',
         'editDate' => 'datetime'

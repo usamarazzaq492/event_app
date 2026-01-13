@@ -20,9 +20,9 @@
                         </div>
                         <div class="carousel-item">
                             <img src="https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=80"
-                                class="d-block w-100 rounded-4" alt="Conference" />
+                                class="d-block w-100 rounded-4" alt="Tech Event" />
                             <div class="carousel-caption d-none d-md-block text-start">
-                                <h5>Global Tech Conference</h5>
+                                <h5>Tech Community Event</h5>
                                 <p>Keynotes • Workshops • Networking</p>
                             </div>
                         </div>

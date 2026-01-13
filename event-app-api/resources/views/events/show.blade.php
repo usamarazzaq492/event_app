@@ -90,7 +90,7 @@
                     alt="{{ $event->eventTitle }}">
             @endif
             <div class="banner-title">
-                <h3>{{ $event->eventTitle }}</h3>
+                <h3 class="text-white">{{ $event->eventTitle }}</h3>
                 <p>{{ $event->category ?? 'Event' }} {{ \Carbon\Carbon::parse($event->startDate)->format('Y') }}</p>
                 @if(isset($promotionStatus) && $promotionStatus['isActive'])
                     <span class="badge bg-warning text-dark ms-2">
@@ -113,7 +113,7 @@
                             class="rounded-circle bg-light p-2" alt="Logo" width="120" height="120">
                     @endif
                     <div>
-                        <h5 class="mb-2">Applications</h5>
+                        <h5 class="mb-2">{{ $event->eventTitle }}</h5>
                         <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ $event->city ?? 'Location TBA' }}</p>
                         <p class="mb-1">
                             <i class="bi bi-calendar-event"></i>
@@ -126,12 +126,6 @@
                         @if($event->bookings && $event->bookings->count() > 0)
                             <p class="mb-1"><i class="bi bi-people-fill"></i> {{ $event->bookings->count() }} Bookings</p>
                         @endif
-                        <div class="d-flex gap-2 mt-2">
-                            <a href="https://instagram.com" target="_blank"
-                                class="btn btn-outline-primary btn-sm"><i class="bi bi-instagram"></i></a>
-                            <a href="mailto:info@eventgo.com" class="btn btn-outline-primary btn-sm"><i
-                                    class="bi bi-envelope"></i></a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -189,7 +183,7 @@
                                         <label class="form-label small">Ticket Type</label>
                                         <select name="ticket_type" class="form-select form-select-sm" required>
                                             <option value="general">General Admission - ${{ number_format($event->eventPrice, 2) }}</option>
-                                            <option value="vip">VIP (Very Important Person) - ${{ number_format($event->eventPrice * 1.5, 2) }}</option>
+                                            <option value="vip">VIP (Very Important Person) - ${{ number_format($event->vipPrice ?? $event->eventPrice ?? 0, 2) }}</option>
                                         </select>
                                     </div>
 
@@ -234,7 +228,7 @@
         <!-- Inspire Section -->
         <div class="col-md-12 aos-init aos-animate" data-aos="fade-up" data-aos-delay="80">
             <div class="feature-card my-4">
-                <h5>{{ $event->eventTitle }}</h5>
+                <h5>Description</h5>
                 <p style="white-space: pre-wrap;">{{ $event->description }}</p>
             </div>
         </div>
@@ -291,7 +285,7 @@
                     <i class="bi bi-star text-muted"></i>
                 </div>
                 <p class="mb-0">
-                    After the conference, participants will be asked to leave a review. Once the first
+                    After the event, participants will be asked to leave a review. Once the first
                     one comes in, you will see it here.
                 </p>
             </div>

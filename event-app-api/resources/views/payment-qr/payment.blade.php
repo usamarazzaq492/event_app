@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     <div class="mb-3">
                         <strong>Price per ticket:</strong>
-                        <span class="h5 text-primary">${{ number_format($adjustedPrice, 2) }}</span>
+                        <span class="h5 text-primary">${{ number_format($ticketPrice, 2) }}</span>
                     </div>
 
                     @if(!Auth::check())

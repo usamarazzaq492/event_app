@@ -33,6 +33,7 @@ Route::put('/events/{id}', [EventWebController::class, 'update'])->name('events.
 Route::post('/events/{id}/book', [EventWebController::class, 'book'])->name('events.book')->middleware('auth');
 
 // Promotion routes
+Route::get('/promotion/select-event', [PromotionWebController::class, 'selectEvent'])->name('promotion.select-event')->middleware('auth');
 Route::get('/events/{id}/promote', [PromotionWebController::class, 'show'])->name('promotion.show')->middleware('auth');
 Route::post('/events/{id}/promote/process', [PromotionWebController::class, 'processPayment'])->name('promotion.process')->middleware('auth');
 

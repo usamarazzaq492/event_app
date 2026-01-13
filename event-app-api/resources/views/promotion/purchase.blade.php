@@ -150,8 +150,21 @@
 @push('scripts')
 <script type="text/javascript" src="https://sandbox.web.squarecdn.com/v1/square.js"></script>
 <script>
-    const appId = "{{ env('SQUARE_APPLICATION_ID') }}";
-    const locationId = "{{ env('SQUARE_LOCATION_ID') }}";
+    // Get application ID from config (works even when cached) - same as square-payment.blade.php
+    const appId = @json(config('square.application_id', env('SQUARE_APPLICATION_ID', '')));
+    const locationId = @json(config('square.location_id', env('SQUARE_LOCATION_ID', '')));
+
+    // Validate application ID before initializing
+    if (!appId || appId.trim() === '' || typeof appId !== 'string') {
+        document.getElementById('error-message').innerText = 'Square Application ID is not configured. Please contact support.';
+        console.error('Square Application ID is not configured or invalid:', appId);
+    }
+
+    if (!locationId || locationId.trim() === '' || typeof locationId !== 'string') {
+        document.getElementById('error-message').innerText = 'Square Location ID is not configured. Please contact support.';
+        console.error('Square Location ID is not configured or invalid:', locationId);
+    }
+
     let selectedPackage = null;
     let card = null;
 
@@ -181,7 +194,28 @@
 
     async function initializePayment() {
         try {
-            const payments = window.Square.payments(appId, locationId);
+            // Validate credentials before initializing
+            if (!appId || appId.trim() === '' || typeof appId !== 'string') {
+                throw new Error('Square Application ID is not configured or is invalid. Please contact support.');
+            }
+
+            if (!locationId || locationId.trim() === '' || typeof locationId !== 'string') {
+                throw new Error('Square Location ID is not configured or is invalid. Please contact support.');
+            }
+
+            // Ensure appId is a valid string (Square expects a non-empty string)
+            const validAppId = String(appId).trim();
+            const validLocationId = String(locationId).trim();
+
+            if (!validAppId || validAppId.length === 0) {
+                throw new Error('Square Application ID cannot be empty.');
+            }
+
+            if (!validLocationId || validLocationId.length === 0) {
+                throw new Error('Square Location ID cannot be empty.');
+            }
+
+            const payments = window.Square.payments(validAppId, validLocationId);
             card = await payments.card();
             await card.attach('#card-container');
 

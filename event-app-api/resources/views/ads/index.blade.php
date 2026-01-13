@@ -1,134 +1,134 @@
 @extends('layouts.app')
 
-@section('title', 'Ads & Donations - EventGo')
+@section('title', 'Promoted Events - EventGo')
 
 @section('content')
 <div class="container py-5">
     <!-- Header Section -->
     <div class="row mb-5" data-aos="fade-up">
         <div class="col-12 text-center">
-            <h1 class="display-4 fw-bold text-dark mb-3">Ads & Donations</h1>
-            <p class="lead text-muted mb-4">Support meaningful causes and campaigns in your community</p>
+            <h1 class="display-4 fw-bold text-dark mb-3">Promoted Events</h1>
+            <p class="lead text-muted mb-4">Discover events that are currently being promoted and boosted for maximum visibility</p>
             @auth
-                <a href="{{ route('ads.create') }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-plus me-2"></i>Create New Ad
+                <a href="{{ route('promotion.select-event') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket me-2"></i>Promote Your Event
                 </a>
             @else
-                <a href="{{ route('login') }}?redirect={{ urlencode(route('ads.create')) }}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-sign-in-alt me-2"></i>Login to Create Ad
+                <a href="{{ route('login') }}?redirect={{ urlencode(route('promotion.select-event')) }}" class="btn btn-primary btn-lg text-white">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login to Promote Event
                 </a>
             @endauth
         </div>
     </div>
 
-    <!-- Stats Section -->
-    <div class="row mb-5" data-aos="fade-up" data-aos-delay="100">
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-hand-holding-heart fa-3x text-primary mb-3"></i>
-                    <h3 class="fw-bold">{{ $stats['active_campaigns'] }}</h3>
-                    <p class="text-muted mb-0">Active Campaigns</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-dollar-sign fa-3x text-success mb-3"></i>
-                    <h3 class="fw-bold">${{ number_format($stats['total_raised'], 0) }}</h3>
-                    <p class="text-muted mb-0">Total Raised</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm text-center h-100">
-                <div class="card-body">
-                    <i class="fas fa-users fa-3x text-info mb-3"></i>
-                    <h3 class="fw-bold">{{ $stats['total_donations'] }}</h3>
-                    <p class="text-muted mb-0">Total Donations</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Ads Grid -->
+    <!-- Promoted Events Grid -->
     <div class="row">
-        @forelse($ads as $ad)
+        @forelse($ads as $event)
             <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                 <div class="card border-0 shadow-sm h-100 campaign-card">
                     <div class="position-relative overflow-hidden">
-                        @if($ad->imageUrl)
-                            <img src="{{ asset($ad->imageUrl) }}"
+                        @if($event->eventImage)
+                            <img src="{{ asset($event->eventImage) }}"
                                  class="card-img-top campaign-image"
-                                 alt="{{ $ad->title }}">
+                                 alt="{{ $event->eventTitle }}">
                         @else
                             <div class="card-img-top bg-light d-flex align-items-center justify-content-center campaign-placeholder">
-                                <i class="fas fa-image fa-3x text-muted"></i>
+                                <i class="fas fa-calendar-alt fa-3x text-muted"></i>
                             </div>
                         @endif
                         <div class="position-absolute top-0 end-0 m-2">
-                            <span class="badge bg-success pulse-animation">Active</span>
+                            <span class="badge bg-warning pulse-animation">
+                                <i class="fas fa-rocket me-1"></i>Promoted
+                            </span>
                         </div>
                         <div class="campaign-overlay">
-                            <a href="{{ route('ads.show', $ad->donationId) }}" class="btn btn-light btn-sm">
-                                <i class="fas fa-heart me-1"></i>Support
+                            <a href="{{ route('events.show', $event->eventId) }}" class="btn btn-light btn-sm">
+                                <i class="fas fa-eye me-1"></i>View Event
                             </a>
                         </div>
                     </div>
 
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold text-dark mb-2">{{ $ad->title }}</h5>
+                        <h5 class="card-title fw-bold text-dark mb-2">{{ $event->eventTitle }}</h5>
                         <p class="card-text text-muted flex-grow-1 small">
-                            {{ Str::limit($ad->description, 120) }}
+                            {{ Str::limit($event->description ?? 'No description available', 120) }}
                         </p>
 
                         <div class="mt-auto">
                             @php
-                                $totalRaised = DB::table('donation_transactions')
-                                    ->where('donationId', $ad->donationId)
-                                    ->sum('amount');
-                                $donationCount = DB::table('donation_transactions')
-                                    ->where('donationId', $ad->donationId)
-                                    ->count();
-                                $progress = $ad->amount > 0 ? min(($totalRaised / $ad->amount) * 100, 100) : 0;
+                                $startDate = \Carbon\Carbon::parse($event->startDate);
+                                $endDate = $event->promotionEndDate ? \Carbon\Carbon::parse($event->promotionEndDate) : null;
                             @endphp
 
-                            <!-- Progress -->
+                            <!-- Event Date -->
                             <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <small class="text-muted fw-bold">Progress</small>
-                                    <small class="text-muted fw-bold">{{ number_format($progress, 1) }}%</small>
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                    <small class="text-muted">
+                                        <strong>{{ $startDate->format('M d, Y') }}</strong>
+                                        @if($event->startTime)
+                                            at {{ \Carbon\Carbon::parse($event->startTime)->format('g:i A') }}
+                                        @endif
+                                    </small>
                                 </div>
-                                <div class="progress campaign-progress" style="height: 8px;">
-                                    <div class="progress-bar bg-gradient-primary"
-                                         style="width: {{ $progress }}%"
-                                         data-aos="fade-right"
-                                         data-aos-delay="300"></div>
+                                @if($event->city)
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                                    <small class="text-muted">{{ $event->city }}</small>
                                 </div>
+                                @endif
                             </div>
 
-                            <!-- Stats -->
+                            <!-- Promotion Status - Only show timer to event owner -->
+                            @if($endDate && $endDate->isFuture())
+                                @auth
+                                    @if(Auth::user()->userId == $event->userId)
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted fw-bold">Promotion Active</small>
+                                            <small class="text-warning fw-bold" id="timer-{{ $event->eventId }}" data-end-date="{{ $endDate->toIso8601String() }}">
+                                                Calculating...
+                                            </small>
+                                        </div>
+                                        <div class="progress campaign-progress" style="height: 8px;">
+                                            @php
+                                                $totalDays = 10; // BOOST_DURATION_DAYS
+                                                $daysRemaining = max(0, floor(now()->diffInDays($endDate, false)));
+                                                $daysUsed = max(0, $totalDays - $daysRemaining);
+                                                $progress = min(100, max(0, ($daysUsed / $totalDays) * 100));
+                                            @endphp
+                                            <div class="progress-bar bg-gradient-warning"
+                                                 style="width: {{ $progress }}%"
+                                                 data-aos="fade-right"
+                                                 data-aos-delay="300"></div>
+                                        </div>
+                                    </div>
+                                    @endif
+                                @endauth
+                            @endif
+
+                            <!-- Event Price -->
+                            @if($event->eventPrice && $event->eventPrice > 0)
                             <div class="row text-center mb-3">
-                                <div class="col-4">
-                                    <h6 class="fw-bold text-primary mb-0 small">${{ number_format($totalRaised, 0) }}</h6>
-                                    <small class="text-muted">Raised</small>
-                                </div>
-                                <div class="col-4">
-                                    <h6 class="fw-bold text-warning mb-0 small">${{ number_format($ad->amount, 0) }}</h6>
-                                    <small class="text-muted">Goal</small>
-                                </div>
-                                <div class="col-4">
-                                    <h6 class="fw-bold text-success mb-0 small">{{ $donationCount }}</h6>
-                                    <small class="text-muted">Donors</small>
+                                <div class="col-12">
+                                    <h6 class="fw-bold text-primary mb-0">${{ number_format($event->eventPrice, 2) }}</h6>
+                                    <small class="text-muted">Ticket Price</small>
                                 </div>
                             </div>
+                            @else
+                            <div class="row text-center mb-3">
+                                <div class="col-12">
+                                    <h6 class="fw-bold text-success mb-0">FREE</h6>
+                                    <small class="text-muted">Event</small>
+                                </div>
+                            </div>
+                            @endif
 
                             <!-- Creator Info -->
                             <div class="d-flex align-items-center mb-3">
                                 <div class="profile-avatar-tiny me-2">
                                     @php
-                                        $user = DB::table('mstuser')->where('userId', $ad->userId)->first();
+                                        $user = DB::table('mstuser')->where('userId', $event->userId)->first();
                                     @endphp
                                     @if($user && $user->profileImageUrl)
                                         <img src="{{ asset($user->profileImageUrl) }}"
@@ -141,15 +141,15 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <small class="text-muted">by <strong>{{ $ad->userName }}</strong></small>
+                                    <small class="text-muted">by <strong>{{ $event->userName }}</strong></small>
                                 </div>
                             </div>
 
                             <!-- Actions -->
                             <div class="d-grid">
-                                <a href="{{ route('ads.show', $ad->donationId) }}"
+                                <a href="{{ route('events.show', $event->eventId) }}"
                                    class="btn btn-primary btn-sm">
-                                    <i class="fas fa-heart me-2"></i>Support Campaign
+                                    <i class="fas fa-eye me-2"></i>View Event
                                 </a>
                             </div>
                         </div>
@@ -159,17 +159,17 @@
         @empty
             <div class="col-12 text-center py-5" data-aos="fade-up">
                 <div class="empty-state-icon mb-4">
-                    <i class="fas fa-hand-holding-heart"></i>
+                    <i class="fas fa-rocket"></i>
                 </div>
-                <h3 class="text-muted mb-3">No Active Campaigns</h3>
-                <p class="text-muted mb-4">Be the first to create a meaningful campaign and make a difference!</p>
+                <h3 class="text-muted mb-3">No Promoted Events</h3>
+                <p class="text-muted mb-4">There are currently no events being promoted. Be the first to promote your event and increase visibility!</p>
                 @auth
-                    <a href="{{ route('ads.create') }}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-plus me-2"></i>Create First Campaign
+                    <a href="{{ route('promotion.select-event') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-rocket me-2"></i>Promote Your Event
                     </a>
                 @else
-                    <a href="{{ route('login') }}?redirect={{ urlencode(route('ads.create')) }}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login to Create Campaign
+                    <a href="{{ route('login') }}?redirect={{ urlencode(route('promotion.select-event')) }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login to Promote Event
                     </a>
                 @endauth
             </div>
@@ -357,4 +357,51 @@
     }
 }
 </style>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all timer elements
+    const timerElements = document.querySelectorAll('[id^="timer-"]');
+
+    timerElements.forEach(function(timerElement) {
+        const endDateAttr = timerElement.getAttribute('data-end-date');
+
+        if (!endDateAttr) return;
+
+        const endDate = new Date(endDateAttr);
+
+        function updateTimer() {
+            const now = new Date();
+            const diff = endDate - now;
+
+            if (diff <= 0) {
+                timerElement.textContent = 'Expired';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            // Format: "X days HH:MM:SS"
+            const daysText = days + ' day' + (days !== 1 ? 's' : '');
+            const timeText = String(hours).padStart(2, '0') + ':' +
+                            String(minutes).padStart(2, '0') + ':' +
+                            String(seconds).padStart(2, '0');
+
+            timerElement.textContent = daysText + ' ' + timeText;
+        }
+
+        // Update immediately
+        updateTimer();
+
+        // Update every second
+        setInterval(updateTimer, 1000);
+    });
+});
+</script>
+@endpush
+
 @endsection

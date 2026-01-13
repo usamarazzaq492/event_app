@@ -80,8 +80,13 @@ class BookingController extends Controller
                 throw new \Exception('Event not found or inactive', 404);
             }
 
+            // Get the correct price based on ticket type
+            $ticketPrice = $request->ticket_type === 'vip'
+                ? ($event->vipPrice ?? $event->eventPrice)
+                : ($event->eventPrice ?? 0);
+
             $pricing = $this->calculatePricing(
-                $event->eventPrice,
+                $ticketPrice,
                 $request->ticket_type,
                 $request->quantity
             );
@@ -210,13 +215,8 @@ class BookingController extends Controller
 
     private function calculatePricing($basePrice, $ticketType, $quantity)
     {
-        $typeMultipliers = [
-            'vip' => 1.5,
-            'general' => 1.0
-        ];
-
-        $adjustedBasePrice = $basePrice * $typeMultipliers[$ticketType];
-        $subtotal = $adjustedBasePrice * $quantity;
+        // basePrice is already the correct price for the ticket type (no multiplier needed)
+        $subtotal = $basePrice * $quantity;
 
         // Service fee removed - no longer charged
         $serviceFee = 0;
@@ -238,7 +238,7 @@ class BookingController extends Controller
             'organizer_payout' => round($organizerPayout, 2),
             'fee_breakdown' => [
                 'base_price' => $basePrice,
-                'ticket_type_multiplier' => $typeMultipliers[$ticketType],
+                'ticket_type' => $ticketType,
                 'service_fee' => 0, // Removed
                 'processing_fee_percentage' => self::PROCESSING_FEE_PERCENT,
                 'fixed_processing_fee' => self::FIXED_PROCESSING_FEE,

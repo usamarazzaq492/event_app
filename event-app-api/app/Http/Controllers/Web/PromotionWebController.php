@@ -21,15 +21,36 @@ class PromotionWebController extends Controller
 
     public function __construct()
     {
-        $this->accessToken = env('SQUARE_ACCESS_TOKEN') ?: env('SQUARE_TOKEN');
-        $this->applicationId = env('SQUARE_APPLICATION_ID');
-        $this->locationId = env('SQUARE_LOCATION_ID');
+        // Use config() with fallbacks for better compatibility with cached configurations
+        $this->accessToken = config('square.access_token', '') ?: env('SQUARE_ACCESS_TOKEN', '') ?: env('SQUARE_TOKEN', '');
+        $this->applicationId = config('square.application_id', '') ?: env('SQUARE_APPLICATION_ID', '');
+        $this->locationId = config('square.location_id', '') ?: env('SQUARE_LOCATION_ID', '');
 
         // Set API URL based on environment
-        $environment = env('SQUARE_ENVIRONMENT', 'sandbox');
+        $environment = config('square.environment', '') ?: env('SQUARE_ENVIRONMENT', 'sandbox');
         $this->squareApiUrl = $environment === 'production'
             ? 'https://connect.squareup.com/v2'
             : 'https://connect.squareupsandbox.com/v2';
+    }
+
+    /**
+     * Show page to select event to promote (matches app flow)
+     */
+    public function selectEvent()
+    {
+        if (!Auth::check()) {
+            return redirect()->guest(route('login'))->with('error', 'Please login to promote your event.');
+        }
+
+        // Get user's active upcoming events
+        $events = DB::table('events')
+            ->where('userId', Auth::user()->userId)
+            ->where('isActive', 1)
+            ->where('startDate', '>=', now())
+            ->orderBy('startDate', 'asc')
+            ->get();
+
+        return view('promotion.select-event', compact('events'));
     }
 
     /**
@@ -139,9 +160,9 @@ class PromotionWebController extends Controller
                 // Payment successful, now create promotion record directly
                 $durationDays = PromotionController::BOOST_DURATION_DAYS;
 
-                // Calculate promotion dates
-                $startDate = now();
-                $endDate = now()->addDays($durationDays);
+                // Calculate promotion dates (store in UTC for consistency across timezones)
+                $startDate = now()->utc();
+                $endDate = now()->utc()->addDays($durationDays);
 
                 // Create promotion transaction record
                 $transactionId = DB::table('promotion_transactions')->insertGetId([
@@ -175,7 +196,7 @@ class PromotionWebController extends Controller
                         'eventId' => $eventId,
                         'package' => $package,
                         'durationDays' => $durationDays,
-                        'promotionEndDate' => $endDate->format('Y-m-d H:i:s'),
+                        'promotionEndDate' => $endDate->toIso8601String(), // ISO 8601 format with UTC timezone
                     ]
                 ]);
             } else {
@@ -204,23 +225,35 @@ class PromotionWebController extends Controller
     private function processSquarePayment($paymentData)
     {
         try {
-            // Validate required credentials
-            if (!$this->accessToken) {
+            // Validate required credentials - check at runtime to handle config cache issues
+            $accessToken = $this->accessToken ?: config('square.access_token', '') ?: env('SQUARE_ACCESS_TOKEN', '') ?: env('SQUARE_TOKEN', '');
+            $locationId = $this->locationId ?: config('square.location_id', '') ?: env('SQUARE_LOCATION_ID', '');
+
+            if (empty($accessToken)) {
+                Log::error('Square access token not configured', [
+                    'config_square_access_token' => config('square.access_token'),
+                    'env_square_access_token' => env('SQUARE_ACCESS_TOKEN'),
+                    'env_square_token' => env('SQUARE_TOKEN'),
+                ]);
                 return [
                     'success' => false,
-                    'error' => 'Square access token not configured'
+                    'error' => 'Square access token not configured. Please set SQUARE_ACCESS_TOKEN or SQUARE_TOKEN in your .env file.'
                 ];
             }
 
-            if (!$this->locationId) {
+            if (empty($locationId)) {
+                Log::error('Square location ID not configured', [
+                    'config_square_location_id' => config('square.location_id'),
+                    'env_square_location_id' => env('SQUARE_LOCATION_ID'),
+                ]);
                 return [
                     'success' => false,
-                    'error' => 'Square location ID not configured'
+                    'error' => 'Square location ID not configured. Please set SQUARE_LOCATION_ID in your .env file.'
                 ];
             }
 
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->accessToken,
+                'Authorization' => 'Bearer ' . $accessToken,
                 'Content-Type' => 'application/json',
                 'Square-Version' => '2023-10-18'
             ])->post($this->squareApiUrl . '/payments', [
@@ -230,7 +263,7 @@ class PromotionWebController extends Controller
                     'currency' => $paymentData['currency']
                 ],
                 'idempotency_key' => $paymentData['idempotencyKey'],
-                'location_id' => $this->locationId
+                'location_id' => $locationId
             ]);
 
             if ($response->successful()) {

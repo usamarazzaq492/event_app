@@ -141,11 +141,9 @@ class EventWebController extends Controller
         try {
             $user = Auth::user();
 
-            // Handle image upload
-            $image = $request->file('eventImage');
-            $imageName = 'event_' . $user->userId . '_' . time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = $image->storeAs('public/events', $imageName);
-            $imageUrl = '/storage/' . str_replace('public/', '', $imagePath);
+            // Handle image upload - match API controller format
+            $path = $request->file('eventImage')->store('events', 'public');
+            $imageUrl = "/storage/public/$path";
 
             // Create event
             $event = Event::create([
@@ -160,6 +158,7 @@ class EventWebController extends Controller
                 'endTime' => $request->endTime,
                 'address' => $request->address,
                 'eventPrice' => $request->eventPrice,
+                'vipPrice' => $request->vipPrice,
                 'eventImage' => $imageUrl,
                 'live_stream_url' => $request->live_stream_url,
                 'isActive' => 1,
@@ -221,6 +220,7 @@ class EventWebController extends Controller
             'endTime' => 'required',
             'address' => 'required|string|max:500',
             'eventPrice' => 'required|numeric|min:0',
+            'vipPrice' => 'required|numeric|min:0',
             'eventImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'live_stream_url' => 'nullable|url|max:500',
         ], [
@@ -244,24 +244,25 @@ class EventWebController extends Controller
                 'endTime' => $request->endTime,
                 'address' => $request->address,
                 'eventPrice' => $request->eventPrice,
+                'vipPrice' => $request->vipPrice,
                 'live_stream_url' => $request->live_stream_url,
                 'editDate' => now(),
             ];
 
-            // Handle image upload if new image provided
+            // Handle image upload if new image provided - match API controller format
             if ($request->hasFile('eventImage')) {
-                // Delete old image if exists
+                // Delete old image if exists - extract relative path from DB path
                 if ($event->eventImage) {
-                    $oldImagePath = str_replace('/storage/', 'public/', $event->eventImage);
-                    if (Storage::exists($oldImagePath)) {
-                        Storage::delete($oldImagePath);
+                    // Handle both path formats: /storage/public/events/... or /storage/events/...
+                    $oldImagePath = str_replace('/storage/public/', '', $event->eventImage);
+                    $oldImagePath = str_replace('/storage/', '', $oldImagePath);
+                    if (Storage::disk('public')->exists($oldImagePath)) {
+                        Storage::disk('public')->delete($oldImagePath);
                     }
                 }
 
-                $image = $request->file('eventImage');
-                $imageName = 'event_' . Auth::user()->userId . '_' . time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = $image->storeAs('public/events', $imageName);
-                $dataToUpdate['eventImage'] = '/storage/' . str_replace('public/', '', $imagePath);
+                $path = $request->file('eventImage')->store('events', 'public');
+                $dataToUpdate['eventImage'] = "/storage/public/$path";
             }
 
             $event->update($dataToUpdate);
