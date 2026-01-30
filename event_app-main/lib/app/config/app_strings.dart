@@ -2,7 +2,7 @@ class AppStrings {
   AppStrings._();
 
   static const String onboardText1 = 'Grab all events now only in your hands';
-  static const String onboardText2 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua';
+  static const String onboardText2 = 'Discover amazing events happening near you. Browse, book tickets, and never miss out on your favorite concerts, festivals, and gatherings.';
   static const String onboardText3 = 'Let\'s go to your favourite event right now!';
   static const String onboardText4 = 'Easy Payment & fast event ticketing';
 
@@ -24,15 +24,9 @@ class AppStrings {
   static const String signinText = 'Sign in';
   static const String loginText = 'Login to Your Account';
   static const String forgotpassText = 'Forgot Password';
-  static const String morningtext = 'Good Morning';
-  static const String nametext = 'Andrew Ainsley';
   static const String featuretext = 'Featured';
   static const String seealltext = 'See all';
-  static const String festext = 'National Music Festival';
-  static const String datetext = 'Mon, Dec 24. 18:00-23:00 PM';
   static const String populartext = 'Popular Event';
-  static const String arttext = 'Art Workshops';
-  static const String locationtext = 'Grand Park, New York';
 
 // HomeScreen
 

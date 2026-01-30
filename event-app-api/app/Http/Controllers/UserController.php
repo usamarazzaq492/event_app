@@ -188,4 +188,113 @@ public function viewPublicProfile(Request $request, $id)
     }
 }
 
+    /**
+     * Delete user account and all associated data
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteAccount(Request $request)
+    {
+        try {
+            $user = $request->user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized - No authenticated user found'
+                ], 401);
+            }
+
+            $userId = $user->userId;
+
+            // Use database transaction to ensure data consistency
+            DB::beginTransaction();
+
+            try {
+                // 1. Delete user's profile image
+                if ($user->profileImageUrl) {
+                    Storage::disk('public')->delete($user->profileImageUrl);
+                }
+
+                // 2. Delete user's events (and their associated data)
+                $userEvents = DB::table('events')->where('userId', $userId)->get();
+                foreach ($userEvents as $event) {
+                    // Delete event images if they exist
+                    if ($event->eventImage) {
+                        Storage::disk('public')->delete($event->eventImage);
+                    }
+                }
+                DB::table('events')->where('userId', $userId)->delete();
+
+                // 3. Delete user's bookings
+                DB::table('booking')->where('userId', $userId)->delete();
+
+                // 4. Delete user's follows (both as follower and followee)
+                DB::table('follows')->where('follower_id', $userId)->delete();
+                DB::table('follows')->where('followee_id', $userId)->delete();
+
+                // 5. Delete user's event invites (both sent and received)
+                // Notifications are generated from follows and event_invites, so deleting those will handle notifications
+                DB::table('event_invites')->where('inviterId', $userId)->delete();
+                DB::table('event_invites')->where('inviteeId', $userId)->delete();
+
+                // 6. Delete user's ads/donations
+                $userAds = DB::table('donation')->where('userId', $userId)->get();
+                foreach ($userAds as $ad) {
+                    // Delete ad images if they exist
+                    if ($ad->imageUrl) {
+                        Storage::disk('public')->delete($ad->imageUrl);
+                    }
+                }
+                DB::table('donation')->where('userId', $userId)->delete();
+                
+                // Delete donation transactions
+                DB::table('donation_transactions')->where('userId', $userId)->delete();
+
+                // 7. Delete user's payment QR codes
+                DB::table('payment_qr_codes')->where('userId', $userId)->delete();
+
+                // 8. Delete user's promotion transactions
+                // Note: Promotion data is also stored in events table (isPromoted, promotionStartDate, etc.)
+                // but those will be deleted when events are deleted above
+                DB::table('promotion_transactions')->where('userId', $userId)->delete();
+
+                // 9. Delete user's Square account connections (if any)
+                $organizerIds = DB::table('organizers')->where('userId', $userId)->pluck('organizerId');
+                if ($organizerIds->isNotEmpty()) {
+                    DB::table('organizer_square_accounts')
+                        ->whereIn('organizerId', $organizerIds)
+                        ->delete();
+                    DB::table('organizers')->where('userId', $userId)->delete();
+                }
+
+                // 10. Delete user's Sanctum tokens
+                $user->tokens()->delete();
+
+                // 11. Finally, delete the user
+                $user->delete();
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Account deleted successfully. All your data has been permanently removed.'
+                ], 200);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete account',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
+

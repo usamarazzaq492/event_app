@@ -718,19 +718,19 @@ class _ProfileScreenState extends State<ProfileScreen>
             leading: Container(
               padding: EdgeInsets.all(2.w),
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.2),
+                color: Colors.orange.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 Icons.logout,
-                color: Colors.red,
+                color: Colors.orange,
                 size: 16.sp,
               ),
             ),
             title: Text(
               'Logout',
               style: TextStyles.regularhometext2.copyWith(
-                color: Colors.red,
+                color: Colors.orange,
               ),
             ),
             onTap: () async {
@@ -741,10 +741,232 @@ class _ProfileScreenState extends State<ProfileScreen>
             },
           ),
 
+          SizedBox(height: 1.h),
+
+          // Delete Account option
+          ListTile(
+            leading: Container(
+              padding: EdgeInsets.all(2.w),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.delete_forever,
+                color: Colors.red,
+                size: 16.sp,
+              ),
+            ),
+            title: Text(
+              'Delete Account',
+              style: TextStyles.regularhometext2.copyWith(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            onTap: () {
+              HapticUtils.light();
+              NavigationUtils.pop(context);
+              _showDeleteAccountConfirmation(context);
+            },
+          ),
+
           SizedBox(height: 2.h),
         ],
       ),
     );
+  }
+
+  void _showDeleteAccountConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.signinoptioncolor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.red,
+                size: 24.sp,
+              ),
+              SizedBox(width: 2.w),
+              Expanded(
+                child: Text(
+                  'Delete Account',
+                  style: TextStyles.heading.copyWith(
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Are you sure you want to delete your account?',
+                style: TextStyles.regularwhite,
+              ),
+              SizedBox(height: 2.h),
+              Container(
+                padding: EdgeInsets.all(3.w),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.red.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'This action cannot be undone. All your data will be permanently deleted, including:',
+                      style: TextStyles.regularwhite.copyWith(
+                        color: Colors.white70,
+                        fontSize: 11.sp,
+                      ),
+                    ),
+                    SizedBox(height: 1.h),
+                    _buildWarningItem('Your profile and personal information'),
+                    _buildWarningItem('All your events'),
+                    _buildWarningItem('All your bookings and tickets'),
+                    _buildWarningItem('Your followers and following relationships'),
+                    _buildWarningItem('All your ads and promotions'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                HapticUtils.light();
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyles.buttontext.copyWith(
+                  color: Colors.white70,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                HapticUtils.buttonPress();
+                Navigator.of(context).pop();
+                await _handleDeleteAccount();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Delete Account',
+                style: TextStyles.buttontext,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildWarningItem(String text) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 0.5.h),
+      child: Row(
+        children: [
+          Icon(
+            Icons.close,
+            size: 12.sp,
+            color: Colors.red,
+          ),
+          SizedBox(width: 1.w),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyles.regularwhite.copyWith(
+                color: Colors.white70,
+                fontSize: 11.sp,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleDeleteAccount() async {
+    // Show loading dialog
+    if (!mounted) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            backgroundColor: AppColors.signinoptioncolor,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(
+                  color: AppColors.blueColor,
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  'Deleting your account...',
+                  style: TextStyles.regularwhite,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      final authController = Get.find<AuthViewModel>();
+      
+      // Close dialog before navigation to avoid Navigator history issues
+      if (mounted) {
+        Navigator.of(context).pop(); // Close loading dialog first
+      }
+      
+      // Small delay to ensure dialog is closed
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      // Delete account (this will handle navigation)
+      await authController.deleteAccount();
+    } catch (e) {
+      // If error occurs, try to close dialog if still mounted
+      if (mounted) {
+        try {
+          Navigator.of(context).pop(); // Close loading dialog
+        } catch (_) {
+          // Dialog might already be closed, ignore
+        }
+        Get.snackbar(
+          "Error",
+          "Failed to delete account: ${e.toString()}",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    }
   }
 
   Future<void> _refreshProfile() async {

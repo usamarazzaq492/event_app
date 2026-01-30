@@ -443,4 +443,102 @@ class AuthController extends Controller
 
         return back()->with('success', '🔐 Password changed successfully!');
     }
+
+    /**
+     * Delete user account and all associated data
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function deleteAccount(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Unauthorized. Please log in again.');
+        }
+
+        $userId = $user->userId;
+
+        // Use database transaction to ensure data consistency
+        DB::beginTransaction();
+
+        try {
+            // 1. Delete user's profile image
+            if ($user->profileImageUrl) {
+                Storage::disk('public')->delete($user->profileImageUrl);
+            }
+
+            // 2. Delete user's events (and their associated data)
+            $userEvents = DB::table('events')->where('userId', $userId)->get();
+            foreach ($userEvents as $event) {
+                // Delete event images if they exist
+                if ($event->eventImage) {
+                    Storage::disk('public')->delete($event->eventImage);
+                }
+            }
+            DB::table('events')->where('userId', $userId)->delete();
+
+            // 3. Delete user's bookings
+            DB::table('booking')->where('userId', $userId)->delete();
+
+            // 4. Delete user's follows (both as follower and followee)
+            DB::table('follows')->where('follower_id', $userId)->delete();
+            DB::table('follows')->where('followee_id', $userId)->delete();
+
+            // 5. Delete user's event invites (both sent and received)
+            DB::table('event_invites')->where('inviterId', $userId)->delete();
+            DB::table('event_invites')->where('inviteeId', $userId)->delete();
+
+            // 6. Delete user's ads/donations
+            $userAds = DB::table('donation')->where('userId', $userId)->get();
+            foreach ($userAds as $ad) {
+                // Delete ad images if they exist
+                if ($ad->imageUrl) {
+                    Storage::disk('public')->delete($ad->imageUrl);
+                }
+            }
+            DB::table('donation')->where('userId', $userId)->delete();
+            
+            // Delete donation transactions
+            DB::table('donation_transactions')->where('userId', $userId)->delete();
+
+            // 7. Delete user's payment QR codes
+            DB::table('payment_qr_codes')->where('userId', $userId)->delete();
+
+            // 8. Delete user's promotion transactions
+            DB::table('promotion_transactions')->where('userId', $userId)->delete();
+
+            // 9. Delete user's Square account connections (if any)
+            $organizerIds = DB::table('organizers')->where('userId', $userId)->pluck('organizerId');
+            if ($organizerIds->isNotEmpty()) {
+                DB::table('organizer_square_accounts')
+                    ->whereIn('organizerId', $organizerIds)
+                    ->delete();
+                DB::table('organizers')->where('userId', $userId)->delete();
+            }
+
+            // 10. Delete user's Sanctum tokens (if using API tokens)
+            if (method_exists($user, 'tokens')) {
+                $user->tokens()->delete();
+            }
+
+            // 11. Logout user before deleting account
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            // 12. Finally, delete the user
+            DB::table('mstuser')->where('userId', $userId)->delete();
+
+            DB::commit();
+
+            return redirect()->route('home')->with('success', 'Your account has been permanently deleted. All your data has been removed.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return back()->with('error', 'Failed to delete account: ' . $e->getMessage());
+        }
+    }
 }

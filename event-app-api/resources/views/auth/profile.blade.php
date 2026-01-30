@@ -315,6 +315,37 @@
                                 </form>
                             </div>
                         </div>
+
+                        <!-- Delete Account Section -->
+                        <div class="card border-0 shadow-sm mt-4 border-danger" style="border-width: 2px !important;">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0 text-danger">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Delete Account
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-danger d-flex align-items-start" role="alert">
+                                    <i class="fas fa-exclamation-circle me-2 fa-lg mt-1"></i>
+                                    <div>
+                                        <strong>Warning: This action cannot be undone!</strong>
+                                        <p class="mb-2 small">
+                                            Deleting your account will permanently remove all your data, including:
+                                        </p>
+                                        <ul class="small mb-0">
+                                            <li>Your profile and personal information</li>
+                                            <li>All events you've created</li>
+                                            <li>All your bookings and tickets</li>
+                                            <li>Your followers and following relationships</li>
+                                            <li>All your ads and campaigns</li>
+                                            <li>Your payment and transaction history</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                    <i class="fas fa-trash-alt me-2"></i>Delete My Account
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- My Events Tab -->
@@ -940,5 +971,78 @@ function showToast(message, type = 'info') {
         setTimeout(() => document.body.removeChild(toast), 300);
     }, 3000);
 }
+</script>
+
+<!-- Delete Account Confirmation Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger" style="border-width: 2px;">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title text-white" id="deleteAccountModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Account Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger mb-3">
+                    <strong>⚠️ This action is permanent and cannot be undone!</strong>
+                </div>
+                <p>Are you absolutely sure you want to delete your account? This will permanently remove:</p>
+                <ul class="mb-3">
+                    <li>Your profile and personal information</li>
+                    <li>All events you've created</li>
+                    <li>All your bookings and tickets</li>
+                    <li>Your followers and following relationships</li>
+                    <li>All your ads and campaigns</li>
+                    <li>Your payment and transaction history</li>
+                </ul>
+                <p class="text-danger fw-bold">Once deleted, you will not be able to recover any of this data.</p>
+                <form method="POST" action="{{ route('profile.delete') }}" id="deleteAccountForm">
+                    @csrf
+                    <div class="mb-3">
+                        <label for="confirmDelete" class="form-label">Type <strong>"DELETE"</strong> to confirm:</label>
+                        <input type="text" class="form-control" id="confirmDelete" name="confirmDelete" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>
+                    <i class="fas fa-trash-alt me-2"></i>Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enable delete button only when user types "DELETE"
+document.getElementById('confirmDelete').addEventListener('input', function(e) {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    if (e.target.value === 'DELETE') {
+        confirmBtn.disabled = false;
+        confirmBtn.classList.remove('btn-secondary');
+        confirmBtn.classList.add('btn-danger');
+    } else {
+        confirmBtn.disabled = true;
+        confirmBtn.classList.remove('btn-danger');
+        confirmBtn.classList.add('btn-secondary');
+    }
+});
+
+// Handle form submission
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    const confirmInput = document.getElementById('confirmDelete').value;
+    if (confirmInput === 'DELETE') {
+        // Show loading state
+        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Deleting...';
+        this.disabled = true;
+        
+        // Submit the form
+        document.getElementById('deleteAccountForm').submit();
+    }
+});
 </script>
 @endsection

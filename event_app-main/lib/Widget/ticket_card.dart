@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,8 @@ Widget TicketCard({
   required String title,
   required String date,
   required String location,
-  required String imagePath,
+  String? imagePath,
+  String? imageUrl,
   required String status,
   bool completed = false,
 }) {
@@ -25,7 +27,35 @@ Widget TicketCard({
             ClipRRect(
               borderRadius:
               BorderRadius.circular(2.h),
-              child: Image.asset(imagePath, width: 13.h, height: 13.h, fit: BoxFit.cover),
+              child: imageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      width: 13.h,
+                      height: 13.h,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        width: 13.h,
+                        height: 13.h,
+                        color: Colors.grey[800],
+                        child: const Center(
+                          child: CircularProgressIndicator(color: AppColors.blueColor),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        width: 13.h,
+                        height: 13.h,
+                        color: Colors.grey[800],
+                        child: const Icon(Icons.broken_image, color: Colors.white70),
+                      ),
+                    )
+                  : imagePath != null
+                      ? Image.asset(imagePath, width: 13.h, height: 13.h, fit: BoxFit.cover)
+                      : Container(
+                          width: 13.h,
+                          height: 13.h,
+                          color: Colors.grey[800],
+                          child: const Icon(Icons.event, color: Colors.white70),
+                        ),
             ),
              SizedBox(width: 3.w),
             Expanded(

@@ -187,6 +187,26 @@ class AuthService {
     }
   }
 
+  /// 📧 Resend Verification Email
+  static Future<Map<String, dynamic>> resendVerificationEmail({
+    required String email,
+  }) async {
+    var url = Uri.parse('$baseUrl/resend-verification');
+
+    var response = await http.post(
+      url,
+      headers: {'Accept': 'application/json'},
+      body: {'email': email},
+    );
+
+    print('🔵 Resend Verification Status: ${response.statusCode}');
+    print('🔵 Resend Verification Response: ${response.body}');
+
+    var decodedResponse = _safeJsonDecode(response.body);
+    decodedResponse['statusCode'] = response.statusCode;
+    return decodedResponse;
+  }
+
   /// 🚪 Logout User
   static Future<Map<String, dynamic>> logoutUser() async {
     final token = await _getToken();
@@ -210,6 +230,38 @@ class AuthService {
     if (response.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
+    }
+
+    return decodedResponse;
+  }
+
+  /// 🗑️ Delete User Account
+  static Future<Map<String, dynamic>> deleteAccount() async {
+    final token = await _getToken();
+    if (token == null || token.isEmpty) {
+      throw Exception('Authentication required. Please log in again.');
+    }
+
+    var url = Uri.parse('$baseUrl/user/delete');
+
+    var response = await http.delete(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    print('🔴 Delete Account Status: ${response.statusCode}');
+    print('🔴 Delete Account Response: ${response.body}');
+
+    var decodedResponse = _safeJsonDecode(response.body);
+    decodedResponse['statusCode'] = response.statusCode;
+
+    // Clear token and all user data from storage on successful deletion
+    if (response.statusCode == 200) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear(); // Clear all stored data
     }
 
     return decodedResponse;

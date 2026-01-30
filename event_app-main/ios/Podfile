@@ -41,6 +41,31 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'x86_64'
+      # Allow device frameworks in simulator builds (for M-series Macs)
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+    end
+  end
+  
+  # Fix ML Kit frameworks (MLImage) for simulator - they only have device architecture
+  # On M-series Macs, simulator is arm64 so device frameworks work
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+    # Only exclude x86_64 for simulator - allow arm64 for M-series Macs
+    config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'x86_64'
+    # Skip validation for frameworks that don't have simulator slices
+    config.build_settings['VALIDATE_WORKSPACE'] = 'NO'
+    config.build_settings['VALIDATE_PRODUCT'] = 'NO'
+  end
+  
+  # Allow simulator to link device-only frameworks (for MLImage on M-series Macs)
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      # Allow simulator to use device arm64 frameworks
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+      if config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'].nil?
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'x86_64'
+      end
     end
   end
 end

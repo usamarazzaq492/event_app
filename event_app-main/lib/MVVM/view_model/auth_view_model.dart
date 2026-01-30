@@ -241,6 +241,34 @@ class AuthViewModel extends GetxController {
     }
   }
 
+  /// 📧 Resend verification code
+  Future<void> resendVerificationCode(String email) async {
+    try {
+      final result = await AuthService.resendVerificationEmail(email: email);
+      if (result['statusCode'] == 200) {
+        _showSuccess(result['message'] ?? 'Verification code has been resent');
+      } else {
+        throw Exception(result['message'] ?? 'Failed to resend code');
+      }
+    } catch (e) {
+      _handleApiError(e);
+    }
+  }
+
+  /// 🔑 Resend password reset code
+  Future<void> resendPasswordResetCode(String email) async {
+    try {
+      final result = await AuthService.forgotPassword(email: email);
+      if (result.containsKey('message')) {
+        _showSuccess(result['message'] ?? 'OTP has been resent');
+      } else {
+        throw Exception('Failed to resend OTP');
+      }
+    } catch (e) {
+      _handleApiError(e);
+    }
+  }
+
   /// 🔑 Forgot password
   Future<void> forgotPassword(String email) async {
     clearErrors();
@@ -406,6 +434,50 @@ class AuthViewModel extends GetxController {
         "An error occurred",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red, // ✅ Red for exception errors
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// 🗑️ Delete User Account
+  Future<void> deleteAccount() async {
+    try {
+      isLoading.value = true;
+      final response = await AuthService.deleteAccount();
+      if (response['statusCode'] == 200) {
+        // Show success message first
+        Get.snackbar(
+          "Account Deleted",
+          response['message'] ?? "Your account has been permanently deleted",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: AppColors.blueColor,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2),
+        );
+        
+        // Wait a moment for snackbar to show, then navigate
+        await Future.delayed(const Duration(milliseconds: 500));
+        
+        // Navigate to login screen after successful deletion
+        // Use Get.offAllNamed to avoid Navigator history issues
+        Get.offAllNamed(RouteName.loginScreen);
+      } else {
+        Get.snackbar(
+          "Error",
+          response['message'] ?? "Failed to delete account",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "An error occurred while deleting your account: ${e.toString()}",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
         colorText: Colors.white,
       );
     } finally {

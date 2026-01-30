@@ -86,6 +86,57 @@ $mailSent = mail($to, $subject, $message, $headers);
 }
 
 
+    public function resendVerificationCode(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:mstuser,email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user->emailVerified == 1) {
+            return response()->json(['message' => 'Email already verified.'], 200);
+        }
+
+        // Generate new verification code
+        $user->verificationCode = rand(1000, 9999);
+        $user->save();
+
+        // Send verification email
+        $to = $user->email;
+        $subject = "Email Verification - EventGo";
+
+        $message = '
+        <html>
+          <body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+            <div style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; margin: auto;">
+              <h2 style="color: #584CF4;">Email Verification</h2>
+              <p>Thank you for signing up with <strong>EventGo</strong>.</p>
+              <p>Your verification code is:</p>
+              <p style="font-size: 22px; font-weight: bold; color: #ff9500; background: #f8f9ff; padding: 10px; border-radius: 5px; text-align: center;">' . htmlspecialchars($user->verificationCode) . '</p>
+              <p>If you didn\'t request this, you can ignore this email.</p>
+              <p style="margin-top: 30px; font-size: 12px; color: #aaa;">&copy; ' . date('Y') . ' EventGo Live</p>
+            </div>
+          </body>
+        </html>
+        ';
+
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
+
+        $mailSent = mail($to, $subject, $message, $headers);
+
+        if ($mailSent) {
+            return response()->json([
+                'message' => 'Verification code has been resent to your email.',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Failed to send verification email. Please try again.',
+            ], 500);
+        }
+    }
+
     public function verifyEmail(Request $request)
     {
         $request->validate([

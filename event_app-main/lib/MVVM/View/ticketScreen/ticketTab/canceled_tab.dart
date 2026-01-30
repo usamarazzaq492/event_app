@@ -1,45 +1,118 @@
+import 'package:event_app/MVVM/view_model/ticket_view_model.dart';
+import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../../Widget/ticket_card.dart';
-import '../../../../app/config/app_asset.dart';
-
 
 class CancelledTab extends StatelessWidget {
+  final TicketViewModel ticketVM = Get.find<TicketViewModel>();
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        TicketCard(
-          title: "Traditional Dance Festival",
-          date: "Tue, Dec 16 · 18:00 - 22:00 PM",
-          location: "New Avenue...",
-          imagePath: AppImages.img4,
-          status: "Cancelled",
-        ),
+    return Obx(() {
+      if (ticketVM.isLoading.value) {
+        return const Center(
+          child: CircularProgressIndicator(color: AppColors.blueColor),
+        );
+      }
 
-        TicketCard(
-          title: "Painting Workshops",
-          date: "Sun, Dec 23 · 19:00 - 23:00 PM",
-          location: "Grand Park...",
-          imagePath: AppImages.img4,
-          status: "Cancelled",
-        ),
-        TicketCard(
-          title: "Gebyar Music Festival",
-          date: "Thu, Dec 20 · 17:00 - 22:00 PM",
-          location: "Central Hall...",
-          imagePath: AppImages.img4,
-          status: "Cancelled",
-        ),
-        TicketCard(
-          title: "National Concert of...",
-          date: "Wed, Dec 18 · 18:00 - 22:00 PM",
-          location: "Central Park...",
-          imagePath: AppImages.img4,
-          status: "Cancelled",
-        ),
-      ],
-    );
+      // Filter tickets by cancelled/canceled status
+      final cancelledTickets = ticketVM.tickets.where((ticket) {
+        final status = (ticket['status'] ?? '').toString().toLowerCase();
+        return status.contains('cancel') || 
+               status.contains('refund') ||
+               status == 'cancelled' ||
+               status == 'canceled';
+      }).toList();
+
+      if (cancelledTickets.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: EdgeInsets.all(5.h),
+            child: Text(
+              "No cancelled tickets",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14.sp,
+              ),
+            ),
+          ),
+        );
+      }
+
+      return ListView.builder(
+        padding: EdgeInsets.all(2.h),
+        itemCount: cancelledTickets.length,
+        itemBuilder: (context, index) {
+          final ticket = cancelledTickets[index];
+          final eventTitle = ticket['eventTitle'] ?? 'Event';
+          final startDate = ticket['startDate'] ?? '';
+          final endDate = ticket['endDate'] ?? '';
+          final startTime = ticket['startTime'] ?? '';
+          final endTime = ticket['endTime'] ?? '';
+          final address = ticket['address'] ?? '';
+          final city = ticket['city'] ?? '';
+          final eventImage = ticket['eventImage'] ?? '';
+          final status = ticket['status'] ?? 'Cancelled';
+
+          // Format date
+          String formattedDate = 'Date TBA';
+          if (startDate.isNotEmpty) {
+            try {
+              final date = DateTime.parse(startDate);
+              formattedDate = DateFormat('EEE, MMM d').format(date);
+              
+              // Add time if available
+              if (startTime.isNotEmpty && endTime.isNotEmpty) {
+                try {
+                  final start = DateFormat("HH:mm:ss").parse(startTime);
+                  final end = DateFormat("HH:mm:ss").parse(endTime);
+                  formattedDate += ' · ${DateFormat.jm().format(start)} - ${DateFormat.jm().format(end)}';
+                } catch (e) {
+                  // If time parsing fails, just use date
+                }
+              }
+            } catch (e) {
+              formattedDate = startDate;
+            }
+          }
+
+          // Format location
+          String location = 'Location TBA';
+          if (address.isNotEmpty && city.isNotEmpty) {
+            location = '$address, $city';
+          } else if (city.isNotEmpty) {
+            location = city;
+          } else if (address.isNotEmpty) {
+            location = address;
+          }
+
+          // Truncate location if too long
+          if (location.length > 30) {
+            location = '${location.substring(0, 27)}...';
+          }
+
+          // Build image URL
+          String? imageUrl;
+          if (eventImage.isNotEmpty) {
+            imageUrl = eventImage.startsWith('http')
+                ? eventImage
+                : 'https://eventgo-live.com$eventImage';
+          }
+
+          return TicketCard(
+            title: eventTitle,
+            date: formattedDate,
+            location: location,
+            imageUrl: imageUrl,
+            status: status.toString(),
+            completed: false,
+          );
+        },
+      );
+    });
   }
 }

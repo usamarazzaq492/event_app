@@ -17,6 +17,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+    Route::post('/resend-verification', [AuthController::class, 'resendVerificationCode']);
 
     // 🔑 Forgot Password
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -36,6 +37,7 @@ Route::prefix('v1')->group(function () {
         // 👤 User Profile
         Route::get('/user', [UserController::class, 'showProfile']);
         Route::post('/user/update', [UserController::class, 'updateProfile']);
+        Route::delete('/user/delete', [UserController::class, 'deleteAccount']);
         Route::get('/user/{id}', [UserController::class, 'viewPublicProfile']);
 
         // 🤝 Follow System

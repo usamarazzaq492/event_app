@@ -76,6 +76,7 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('
 Route::get('/profile', [AuthController::class, 'profile'])->name('profile')->middleware('auth');
 Route::post('/profile', [AuthController::class, 'updateProfile'])->name('profile.update')->middleware('auth');
 Route::post('/profile/password', [AuthController::class, 'changePassword'])->name('profile.password')->middleware('auth');
+Route::post('/profile/delete', [AuthController::class, 'deleteAccount'])->name('profile.delete')->middleware('auth');
 
 // Ticket routes
 Route::get('/ticket/{bookingId}', [TicketController::class, 'downloadTicket'])->name('ticket.download')->middleware('auth');
