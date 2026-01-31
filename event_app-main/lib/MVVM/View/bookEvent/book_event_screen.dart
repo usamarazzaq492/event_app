@@ -1,6 +1,8 @@
 import 'package:event_app/MVVM/View/paymentMethod/payment_method.dart';
 import 'package:event_app/Widget/button_widget.dart';
 import 'package:event_app/app/config/app_colors.dart';
+import 'package:event_app/app/config/app_text_style.dart';
+import 'package:event_app/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -75,29 +77,12 @@ class _BookEventScreenState extends State<BookEventScreen>
       body: SingleChildScrollView(
         child: Padding(
           padding:
-              EdgeInsets.only(top: 7.h, left: 4.w, right: 4.w, bottom: 4.h),
+              EdgeInsets.only(top: 4.h, left: 5.w, right: 5.w, bottom: 4.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 🔷 Top bar
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  SizedBox(width: 10.w),
-                  Text('Book Event',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Montserrat',
-                        fontSize: 18.sp,
-                      )),
-                ],
-              ),
+              _buildHeader(),
               SizedBox(height: 4.h),
-
               // 🔷 TabBar Card
               Container(
                 decoration: BoxDecoration(
@@ -292,6 +277,44 @@ class _BookEventScreenState extends State<BookEventScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              onPressed: () {
+                HapticUtils.navigation();
+                Navigator.pop(context);
+              },
+            ),
+            Expanded(
+              child: Center(
+                child: Text('Book Event', style: TextStyles.heading),
+              ),
+            ),
+            const SizedBox(width: 48),
+          ],
+        ),
+        SizedBox(height: 1.h),
+        Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.06),
+                Colors.white.withValues(alpha: 0.02),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

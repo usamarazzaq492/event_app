@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import '../../body_model/event_model.dart';
+import '../../../utils/haptic_utils.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -59,40 +60,68 @@ class _SearchScreenState extends State<SearchScreen>
   }
 
   Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
       children: [
-        Text(
-          "Search Events",
-          style: TextStyles.tickettext.copyWith(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
         Row(
           children: [
             IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
               onPressed: () {
-                setState(() {
-                  _showFilters = !_showFilters;
-                });
+                HapticUtils.navigation();
+                Navigator.pop(context);
               },
-              icon: Icon(
-                _showFilters ? Icons.filter_list : Icons.filter_list_off,
-                color: AppColors.blueColor,
-                size: 24.sp,
+            ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  "Search Events",
+                  style: TextStyles.tickettext.copyWith(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
-            IconButton(
-              onPressed: () {
-                controller.clearSearch();
-                setState(() {
-                  _showFilters = false;
-                });
-              },
-              icon: Icon(Icons.clear, color: AppColors.blueColor, size: 24.sp),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _showFilters = !_showFilters;
+                    });
+                  },
+                  icon: Icon(
+                    _showFilters ? Icons.filter_list : Icons.filter_list_off,
+                    color: AppColors.blueColor,
+                    size: 24.sp,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    controller.clearSearch();
+                    setState(() {
+                      _showFilters = false;
+                    });
+                  },
+                  icon: Icon(Icons.clear, color: AppColors.blueColor, size: 24.sp),
+                ),
+              ],
             ),
           ],
+        ),
+        SizedBox(height: 1.h),
+        Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.06),
+                Colors.white.withValues(alpha: 0.02),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
         ),
       ],
     );

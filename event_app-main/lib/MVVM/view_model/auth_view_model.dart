@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthViewModel extends GetxController {
   // Reactive state variables
   final isLoading = false.obs;
+  final isLoggedIn = false.obs;
   final user = Rxn<LoginModel>();
   final users = <Data>[].obs;
   final registeredEmail = ''.obs;
@@ -38,7 +39,13 @@ class AuthViewModel extends GetxController {
   void onInit() async {
     super.onInit();
     _prefs = await SharedPreferences.getInstance();
+    _updateLoginStateFromPrefs();
     loadCurrentUser();
+  }
+
+  void _updateLoginStateFromPrefs() {
+    final token = _prefs.getString('token');
+    isLoggedIn.value = token != null && token.isNotEmpty;
   }
 
   /// Clears all form errors
@@ -100,6 +107,7 @@ class AuthViewModel extends GetxController {
         _showSuccess(response['message']);
         await _prefs.setString('user', jsonEncode(user));
         currentUser.value = user; // update observable
+        isLoggedIn.value = true;
         // 🔷 OPTION A: If your login API returns full user data
         bool isProfileComplete = _isProfileComplete(user);
 
@@ -365,6 +373,18 @@ class AuthViewModel extends GetxController {
     final userService = UserService();
 
     try {
+      // ✅ If there is no stored token, treat user as guest and
+      //    send them directly to the main app (BottomNav) instead
+      //    of forcing a login screen.
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null || token.isEmpty) {
+        Get.offAllNamed(RouteName.bottomNav); // Guest flow
+        return;
+      }
+
+      // ✅ Token exists → try to load full profile as before
       final profile = await userService.fetchProfile();
       final user = profile.data;
 
@@ -387,7 +407,14 @@ class AuthViewModel extends GetxController {
       }
     } catch (e) {
       print('Error in checkLoginStatus: $e');
-      Get.offAllNamed(RouteName.loginScreen);
+      // Invalid/expired token or network error: clear auth and open app as guest
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+      await prefs.remove('userid');
+      await prefs.remove('user');
+      currentUser.clear();
+      isLoggedIn.value = false;
+      Get.offAllNamed(RouteName.bottomNav);
     }
   }
 
@@ -411,6 +438,11 @@ class AuthViewModel extends GetxController {
       isLoading.value = true;
       final response = await AuthService.logoutUser();
       if (response['statusCode'] == 200) {
+        await _prefs.remove('token');
+        await _prefs.remove('userid');
+        await _prefs.remove('user');
+        currentUser.clear();
+        isLoggedIn.value = false;
         Get.offAll(() => SigninScreen()); // Navigate to login screen
         Get.snackbar(
           "Success",
@@ -463,6 +495,13 @@ class AuthViewModel extends GetxController {
         // Navigate to login screen after successful deletion
         // Use Get.offAllNamed to avoid Navigator history issues
         Get.offAllNamed(RouteName.loginScreen);
+
+        // Clear local auth state
+        await _prefs.remove('token');
+        await _prefs.remove('userid');
+        await _prefs.remove('user');
+        currentUser.clear();
+        isLoggedIn.value = false;
       } else {
         Get.snackbar(
           "Error",

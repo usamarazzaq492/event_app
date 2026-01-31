@@ -115,6 +115,18 @@ class EventController extends Controller
             'promotionPackage'
         ]);
 
+        // Filter out expired promotions - set isPromoted to false if promotionEndDate has passed
+        $now = now();
+        $events = $events->map(function ($event) use ($now) {
+            if ($event->isPromoted && $event->promotionEndDate) {
+                $endDate = \Carbon\Carbon::parse($event->promotionEndDate);
+                if ($endDate->isPast()) {
+                    $event->isPromoted = 0;
+                }
+            }
+            return $event;
+        });
+
         return response()->json([
             'success' => true,
             'data' => $events,
@@ -213,6 +225,18 @@ class EventController extends Controller
                 ])
                 ->get();
 
+            // Filter out expired promotions - set isPromoted to false if promotionEndDate has passed
+            $now = now();
+            $events = $events->map(function ($event) use ($now) {
+                if ($event->isPromoted && $event->promotionEndDate) {
+                    $endDate = \Carbon\Carbon::parse($event->promotionEndDate);
+                    if ($endDate->isPast()) {
+                        $event->isPromoted = 0;
+                    }
+                }
+                return $event;
+            });
+
             // Debug logging
             Log::info('Timeline Events Found', [
                 'user_id' => $userId,
@@ -243,21 +267,29 @@ class EventController extends Controller
         return response()->json(['error' => 'Event not found.'], 404);
     }
 
-    // Get current user ID
-    $userId = $request->user()->userId;
+    // Get current user ID (null for guests)
+    $user = $request->user();
+    $userId = $user?->userId;
 
-    // Check booking status for this user and event
-    $isBooked = DB::table('booking')
-        ->where('eventId', $id)
-        ->where('userId', $userId)
-        ->where('status', 'confirmed')
-        ->exists();
+    // For guests: no booking, not organizer, no live stream access
+    $isBooked = false;
+    $isOrganizer = false;
+    $hasLiveStreamAccess = false;
 
-    // Check if user is the organizer
-    $isOrganizer = $event->userId == $userId;
+    if ($userId) {
+        // Check booking status for this user and event
+        $isBooked = DB::table('booking')
+            ->where('eventId', $id)
+            ->where('userId', $userId)
+            ->where('status', 'confirmed')
+            ->exists();
 
-    // Check if user has access to live stream
-    $hasLiveStreamAccess = $isOrganizer || $isBooked;
+        // Check if user is the organizer
+        $isOrganizer = $event->userId == $userId;
+
+        // Check if user has access to live stream
+        $hasLiveStreamAccess = $isOrganizer || $isBooked;
+    }
 
     // Convert event object to array
     $eventArray = (array) $event;
@@ -271,6 +303,14 @@ class EventController extends Controller
     } else if ($event->live_stream_url) {
         // Add embed URL for live stream
         $eventArray['live_stream_embed_url'] = $this->getLiveStreamEmbedUrl($event->live_stream_url);
+    }
+
+    // Filter out expired promotions - set isPromoted to false if promotionEndDate has passed
+    if ($eventArray['isPromoted'] && $eventArray['promotionEndDate']) {
+        $endDate = \Carbon\Carbon::parse($eventArray['promotionEndDate']);
+        if ($endDate->isPast()) {
+            $eventArray['isPromoted'] = 0;
+        }
     }
 
     return response()->json($eventArray);

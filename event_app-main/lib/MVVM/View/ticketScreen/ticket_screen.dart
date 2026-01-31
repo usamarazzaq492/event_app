@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/view_model/ticket_view_model.dart';
+import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
+import 'package:event_app/app/config/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -21,55 +23,136 @@ class TicketScreen extends StatefulWidget {
 
 class _TicketScreenState extends State<TicketScreen> {
   final TicketViewModel ticketVM = Get.put(TicketViewModel());
+  final AuthViewModel authViewModel = Get.put(AuthViewModel());
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ticketVM.getTickets();
+      if (authViewModel.isLoggedIn.value) {
+        ticketVM.getTickets();
+      }
     });
+  }
+
+  Widget _buildGuestPrompt() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.confirmation_number_outlined,
+              size: 64.sp,
+              color: Colors.white54,
+            ),
+            SizedBox(height: 3.h),
+            Text(
+              "Sign in to view your tickets",
+              style: TextStyles.tickettext.copyWith(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 1.5.h),
+            Text(
+              "Purchase event tickets and they will appear here.",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 13.sp,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 4.h),
+            ElevatedButton(
+              onPressed: () => Get.toNamed(RouteName.loginScreen),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.blueColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(2.h),
+                ),
+              ),
+              child: Text(
+                "Sign in",
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: AppColors.backgroundColor,
-        body: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: 5.h, left: 5.w, right: 5.w),
-                child: Row(
-                  children: [
-                    Text("My Tickets", style: TextStyles.tickettext),
-                    const Spacer(),
+    return Obx(() {
+      if (!authViewModel.isLoggedIn.value) {
+        return Scaffold(
+          backgroundColor: AppColors.backgroundColor,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 5.h, left: 5.w, right: 5.w),
+                  child: Row(
+                    children: [
+                      Text("My Tickets", style: TextStyles.tickettext),
+                      const Spacer(),
+                    ],
+                  ),
+                ),
+                Expanded(child: _buildGuestPrompt()),
+              ],
+            ),
+          ),
+        );
+      }
+      return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          backgroundColor: AppColors.backgroundColor,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 5.h, left: 5.w, right: 5.w),
+                  child: Row(
+                    children: [
+                      Text("My Tickets", style: TextStyles.tickettext),
+                      const Spacer(),
+                    ],
+                  ),
+                ),
+                const TabBar(
+                  labelColor: Colors.white,
+                  indicatorColor: AppColors.blueColor,
+                  unselectedLabelColor: Colors.grey,
+                  tabs: [
+                    Tab(text: 'General Admission'),
+                    Tab(text: 'VIP'),
                   ],
                 ),
-              ),
-              const TabBar(
-                labelColor: Colors.white,
-                indicatorColor: AppColors.blueColor,
-                unselectedLabelColor: Colors.grey,
-                tabs: [
-                  Tab(text: 'General Admission'),
-                  Tab(text: 'VIP'),
-                ],
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _buildTicketList('general'),
-                    _buildTicketList('vip'),
-                  ],
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      _buildTicketList('general'),
+                      _buildTicketList('vip'),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildTicketList(String type) {

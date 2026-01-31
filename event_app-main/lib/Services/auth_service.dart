@@ -164,6 +164,20 @@ class AuthService {
     return decodedResponse;
   }
 
+  /// 👥 Search Users (Public - no auth, for guests)
+  static Future<UserListModel> searchUsers(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.length < 2) {
+      return UserListModel(success: true, data: [], message: 'Query too short', count: 0);
+    }
+    final uri = Uri.parse('$baseUrl/users/search').replace(queryParameters: {'q': trimmed});
+    var response = await http.get(uri, headers: {'Accept': 'application/json'});
+    if (response.statusCode == 200) {
+      return UserListModel.fromJson(json.decode(response.body));
+    }
+    return UserListModel(success: false, data: [], message: 'Search failed', count: 0);
+  }
+
   /// 👥 Fetch Users (Authenticated)
   static Future<UserListModel> fetchUsers() async {
     final token = await _getToken();

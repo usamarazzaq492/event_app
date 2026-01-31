@@ -30,6 +30,22 @@ Route::prefix('v1')->group(function () {
     // 📱 Payment QR Code Validation (Public - for scanning)
     Route::post('/payment-qr/validate', [PaymentQrController::class, 'validatePaymentQr']);
 
+    // 📢 Ads / Promoted events (Public - list and view without login)
+    Route::prefix('ads')->group(function () {
+        Route::get('/', [DonationController::class, 'listAds']);
+        Route::get('/{adId}', [DonationController::class, 'getAd']);
+    });
+
+    // 📅 Events list (Public - browse without login, same as Explore/Discover)
+    Route::get('/events', [EventController::class, 'index']);
+    Route::post('/events', [EventController::class, 'index']);
+    Route::get('/events/{id}', [EventController::class, 'show']);  // Public event detail (guests can view)
+
+    // 👤 Public user/organizer profile (guests can view)
+    Route::get('/user/{id}', [UserController::class, 'viewPublicProfile']);
+    // 👥 Public user search (guests can search organizers by name)
+    Route::get('/users/search', [UserController::class, 'searchUsers']);
+
     // 🔒 Authenticated User Actions
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -38,7 +54,6 @@ Route::prefix('v1')->group(function () {
         Route::get('/user', [UserController::class, 'showProfile']);
         Route::post('/user/update', [UserController::class, 'updateProfile']);
         Route::delete('/user/delete', [UserController::class, 'deleteAccount']);
-        Route::get('/user/{id}', [UserController::class, 'viewPublicProfile']);
 
         // 🤝 Follow System
         Route::post('/user/{id}/follow', [FollowController::class, 'followUser']);
@@ -46,13 +61,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/user/{id}/followers', [FollowController::class, 'getFollowers']);
         Route::get('/user/{id}/following', [FollowController::class, 'getFollowing']);
 
-        // 📅 Events
+        // 📅 Events (list and GET /events/{id} are public above - no duplicate)
         Route::prefix('events')->group(function () {
             Route::post('/add', [EventController::class, 'store']);             // Create event
-            Route::post('/', [EventController::class, 'index']);              // List all events
             Route::get('/my', [EventController::class, 'myEvents']);         // List my events
             Route::get('/timeline', [EventController::class, 'getTimelineEvents']); // Timeline: events from followed users
-            Route::get('/{id}', [EventController::class, 'show']);           // View single event
             Route::post('/{id}', [EventController::class, 'update']);         // Update event
             Route::delete('/{id}', [EventController::class, 'destroy']);     // Delete event
 
@@ -79,13 +92,11 @@ Route::prefix('v1')->group(function () {
         // Notifications (unified)
         Route::get('/notifications', [NotificationController::class, 'getAllNotifications']);
 
-        // Ads
+        // Ads (create & donate require auth)
         Route::prefix('ads')->group(function () {
-    Route::post('/add', [DonationController::class, 'createAd']);
-    Route::get('/', [DonationController::class, 'listAds']);
-    Route::get('/{adId}', [DonationController::class, 'getAd']);
-    Route::post('/{adId}/donate', [DonationController::class, 'donate']);
-});
+            Route::post('/add', [DonationController::class, 'createAd']);
+            Route::post('/{adId}/donate', [DonationController::class, 'donate']);
+        });
 
         // 📱 Payment QR Code Management
         Route::post('/payment-qr/{qrId}/deactivate', [PaymentQrController::class, 'deactivateQrCode']);

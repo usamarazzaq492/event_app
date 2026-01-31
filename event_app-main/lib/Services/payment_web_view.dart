@@ -194,7 +194,12 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
-        title: Text(widget.isPromotion ? 'Promote Event' : 'Complete Payment'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(widget.isPromotion ? 'Promote Event' : 'Complete Payment',
+            style: const TextStyle(color: Colors.white)),
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
       ),

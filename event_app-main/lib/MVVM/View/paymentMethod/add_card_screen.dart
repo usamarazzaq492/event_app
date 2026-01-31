@@ -2,6 +2,8 @@ import 'package:event_app/Widget/button_widget.dart';
 import 'package:event_app/Widget/input_text_field.dart';
 import 'package:event_app/app/config/app_asset.dart';
 import 'package:event_app/app/config/app_colors.dart';
+import 'package:event_app/app/config/app_text_style.dart';
+import 'package:event_app/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -22,30 +24,12 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0E0E12),
-
       body: Padding(
-        padding: EdgeInsets.only(top: 7.h, left: 4.w, right: 4.w),
+        padding: EdgeInsets.only(top: 4.h, left: 5.w, right: 5.w),
         child: Column(
           children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.arrow_back,
-                  color: Colors.white,
-                ),
-                SizedBox(
-                  width: 15.w,
-                ),
-                Text('Add New Card',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Montserrat',
-
-                        fontSize: 15.sp)),
-              ],
-            ),
-            SizedBox(height: 3.h,),
+            _buildHeader(),
+            SizedBox(height: 3.h),
             Image.asset(AppImages.creditcard), // your card image placeholder
             SizedBox(height: 3.h),
             InputTextField(
@@ -127,5 +111,41 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
     );
   }
 
-
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              onPressed: () {
+                HapticUtils.navigation();
+                Navigator.pop(context);
+              },
+            ),
+            Expanded(
+              child: Center(
+                child: Text('Add New Card', style: TextStyles.heading),
+              ),
+            ),
+            const SizedBox(width: 48),
+          ],
+        ),
+        SizedBox(height: 1.h),
+        Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.06),
+                Colors.white.withValues(alpha: 0.02),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

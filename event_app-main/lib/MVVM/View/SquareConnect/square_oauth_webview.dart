@@ -374,6 +374,10 @@ class _SquareOAuthWebViewState extends State<SquareOAuthWebView> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text('Connect Square Account'),
         backgroundColor: Colors.white,
         elevation: 0,

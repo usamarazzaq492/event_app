@@ -5,6 +5,7 @@ import 'package:event_app/MVVM/View/exploreevent/create_event.dart';
 import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
 import 'package:event_app/MVVM/view_model/ad_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
+import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:event_app/utils/navigation_utils.dart';
@@ -49,9 +50,11 @@ class _ProfileScreenState extends State<ProfileScreen>
     });
   }
 
+  AuthViewModel get authViewModel => Get.put(AuthViewModel());
+
   @override
   void refreshData() {
-    if (mounted) {
+    if (mounted && authViewModel.isLoggedIn.value) {
       controller.fetchUserProfile();
       adVM.fetchAds();
     }
@@ -61,6 +64,89 @@ class _ProfileScreenState extends State<ProfileScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Widget _buildGuestProfilePrompt() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.person_outline,
+              size: 72.sp,
+              color: Colors.white54,
+            ),
+            SizedBox(height: 3.h),
+            Text(
+              "Sign in to your account",
+              style: TextStyles.heading.copyWith(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 1.5.h),
+            Text(
+              "Manage your profile, events, and tickets.",
+              style: TextStyles.regularwhite.copyWith(
+                color: Colors.white70,
+                fontSize: 13.sp,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 4.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Get.toNamed(RouteName.signupScreen),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: AppColors.blueColor),
+                      padding: EdgeInsets.symmetric(vertical: 2.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2.h),
+                      ),
+                    ),
+                    child: Text(
+                      "Sign up",
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 4.w),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => Get.toNamed(RouteName.loginScreen),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.blueColor,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 2.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2.h),
+                      ),
+                    ),
+                    child: Text(
+                      "Sign in",
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -73,20 +159,27 @@ class _ProfileScreenState extends State<ProfileScreen>
       _tabController.index = safeIndex;
       _activeIndex = safeIndex;
     }
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return _buildLoadingState();
-          } else if (controller.error.isNotEmpty) {
-            return _buildErrorState();
-          } else if (controller.userProfile.value == null) {
-            return _buildEmptyState();
-          }
+    return Obx(() {
+      if (!authViewModel.isLoggedIn.value) {
+        return Scaffold(
+          backgroundColor: AppColors.backgroundColor,
+          body: SafeArea(child: _buildGuestProfilePrompt()),
+        );
+      }
+      return Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        body: SafeArea(
+          child: Obx(() {
+            if (controller.isLoading.value) {
+              return _buildLoadingState();
+            } else if (controller.error.isNotEmpty) {
+              return _buildErrorState();
+            } else if (controller.userProfile.value == null) {
+              return _buildEmptyState();
+            }
 
-          final profile = controller.userProfile.value!;
-          return RefreshIndicator(
+            final profile = controller.userProfile.value!;
+            return RefreshIndicator(
             onRefresh: _refreshProfile,
             color: AppColors.blueColor,
             backgroundColor: AppColors.signinoptioncolor,
@@ -124,6 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         }),
       ),
     );
+    });
   }
 
   // Loading State

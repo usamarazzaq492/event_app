@@ -27,12 +27,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   final List<Map<String, String>> _navItems = [
     {
-      'label': 'Home',
+      'label': 'Discover',
       'filled': AppImages.homefilledIcon,
       'outline': AppImages.homeoutlinedIcon
     },
     {
-      'label': 'Explore',
+      'label': 'Search',
       'filled': AppImages.explorefilledIcon,
       'outline': AppImages.exploreoutlinedIcon
     },
@@ -42,7 +42,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       'outline': AppImages.adsoutlinedIcon
     },
     {
-      'label': 'Tickets',
+      'label': 'My Tickets',
       'filled': AppImages.ticketfilledIcon,
       'outline': AppImages.ticketoutlinedIcon
     },
@@ -78,6 +78,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             children: _screens,
           )),
       bottomNavigationBar: Obx(() => Container(
+            margin: EdgeInsets.only(top: 1.5.h),
             decoration: BoxDecoration(
               color: AppColors.bottombarcolor,
               borderRadius: BorderRadius.vertical(top: Radius.circular(1.6.h)),

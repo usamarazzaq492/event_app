@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/MVVM/view_model/data_view_model.dart';
 import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
 import 'package:event_app/app/config/app_colors.dart';
+import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:event_app/utils/navigation_utils.dart';
@@ -20,9 +22,11 @@ class PublicProfileScreen extends StatefulWidget {
   State<PublicProfileScreen> createState() => _PublicProfileScreenState();
 }
 
-class _PublicProfileScreenState extends State<PublicProfileScreen> with RefreshOnNavigation {
+class _PublicProfileScreenState extends State<PublicProfileScreen>
+    with RefreshOnNavigation {
   final PublicProfileController controller = Get.put(PublicProfileController());
   final DataViewModel dataViewModel = Get.put(DataViewModel());
+  final AuthViewModel authViewModel = Get.put(AuthViewModel());
 
   final Map<String, IconData> knownInterestIcons = {
     'music': Icons.music_note,
@@ -133,161 +137,213 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> with RefreshO
 
   // Loading State
   Widget _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.blueColor),
-            strokeWidth: 3,
-          ),
-          SizedBox(height: 3.h),
-          Text(
-            'Loading profile...',
-            style: TextStyles.regularwhite.copyWith(
-              fontSize: 12.sp,
-              color: Colors.white70,
+    return Column(
+      children: [
+        _buildBackOnlyHeader(),
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.blueColor),
+                  strokeWidth: 3,
+                ),
+                SizedBox(height: 3.h),
+                Text(
+                  'Loading profile...',
+                  style: TextStyles.regularwhite.copyWith(
+                    fontSize: 12.sp,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   // Error State
   Widget _buildErrorState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 48.sp,
-            color: Colors.red.shade400,
-          ),
-          SizedBox(height: 3.h),
-          Text(
-            'Error Loading Profile',
-            style: TextStyles.homeheadingtext.copyWith(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 1.h),
-          Text(
-            controller.error.value,
-            style: TextStyles.regularwhite.copyWith(
-              fontSize: 11.sp,
-              color: Colors.white70,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 4.h),
-          ElevatedButton.icon(
-            onPressed: () => loadProfile(),
-            icon: Icon(Icons.refresh, size: 14.sp),
-            label: Text('Retry', style: TextStyle(fontSize: 12.sp)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blueColor,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.h),
+    return Column(
+      children: [
+        _buildBackOnlyHeader(),
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+              Icon(
+                Icons.error_outline,
+                size: 48.sp,
+                color: Colors.red.shade400,
               ),
+              SizedBox(height: 3.h),
+              Text(
+                'Error Loading Profile',
+                style: TextStyles.homeheadingtext.copyWith(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 1.h),
+              Text(
+                controller.error.value,
+                style: TextStyles.regularwhite.copyWith(
+                  fontSize: 11.sp,
+                  color: Colors.white70,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 4.h),
+              ElevatedButton.icon(
+                onPressed: () => loadProfile(),
+                icon: Icon(Icons.refresh, size: 14.sp),
+                label: Text('Retry', style: TextStyle(fontSize: 12.sp)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blueColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2.h),
+                  ),
+                ),
+              ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   // Empty State
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.person_off,
-            size: 48.sp,
-            color: Colors.grey.shade400,
-          ),
-          SizedBox(height: 3.h),
-          Text(
-            'Profile Not Found',
-            style: TextStyles.homeheadingtext.copyWith(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 1.h),
-          Text(
-            'This profile doesn\'t exist or has been removed.',
-            style: TextStyles.regularwhite.copyWith(
-              fontSize: 11.sp,
-              color: Colors.white70,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 4.h),
-          ElevatedButton.icon(
-            onPressed: () => NavigationUtils.pop(context),
-            icon: Icon(Icons.arrow_back, size: 14.sp),
-            label: Text('Go Back', style: TextStyle(fontSize: 12.sp)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blueColor,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.h),
+    return Column(
+      children: [
+        _buildBackOnlyHeader(),
+        Expanded(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.person_off,
+                size: 48.sp,
+                color: Colors.grey.shade400,
               ),
-            ),
+              SizedBox(height: 3.h),
+              Text(
+                'Profile Not Found',
+                style: TextStyles.homeheadingtext.copyWith(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 1.h),
+              Text(
+                'This profile doesn\'t exist or has been removed.',
+                style: TextStyles.regularwhite.copyWith(
+                  fontSize: 11.sp,
+                  color: Colors.white70,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 4.h),
+              ElevatedButton.icon(
+                onPressed: () => NavigationUtils.pop(context),
+                icon: Icon(Icons.arrow_back, size: 14.sp),
+                label: Text('Go Back', style: TextStyle(fontSize: 12.sp)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blueColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2.h),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBackOnlyHeader() {
+    return Padding(
+      padding: EdgeInsets.only(top: 2.h, left: 2.w),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          onPressed: () {
+            HapticUtils.navigation();
+            Navigator.of(context).pop();
+          },
+        ),
       ),
     );
   }
 
   // Header
   Widget _buildHeader() {
-    return Row(
-      children: [
-        InkWell(
-          onTap: () {
-            HapticUtils.navigation();
-            NavigationUtils.pop(context);
-          },
-          child: const Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        SizedBox(width: 5.w),
-        Text(
-          'Profile',
-          style: TextStyles.heading,
-        ),
-        const Spacer(),
-        PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert, color: Colors.white),
-          onSelected: (String value) {
-            HapticUtils.light();
-            if (value == 'share') {
-              _shareProfile();
-            }
-          },
-          itemBuilder: (BuildContext context) => [
-            const PopupMenuItem<String>(
-              value: 'share',
-              child: Row(
-                children: [
-                  Icon(Icons.share, color: Colors.blue),
-                  SizedBox(width: 8),
-                  Text('Share Profile'),
-                ],
-              ),
+    return Column(children: [
+      Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+            onPressed: () {
+              HapticUtils.navigation();
+              Navigator.of(context).pop();
+            },
+          ),
+          Expanded(
+            child: Center(
+              child: Text('Profile', style: TextStyles.heading),
             ),
-          ],
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onSelected: (String value) {
+              HapticUtils.light();
+              if (value == 'share') {
+                _shareProfile();
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'share',
+                child: Row(
+                  children: [
+                    Icon(Icons.share, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('Share Profile'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      SizedBox(height: 1.h),
+      Container(
+        height: 1,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.white.withValues(alpha: 0.06),
+              Colors.white.withValues(alpha: 0.02),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
         ),
-      ],
-    );
+      ),
+    ]);
   }
 
   // Profile Image
@@ -353,6 +409,29 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> with RefreshO
           return InkWell(
             onTap: () {
               HapticUtils.buttonPress();
+              if (!authViewModel.isLoggedIn.value) {
+                Get.snackbar(
+                  'Sign in required',
+                  'Please sign in or sign up first to follow users',
+                  backgroundColor: AppColors.blueColor,
+                  colorText: Colors.white,
+                  duration: const Duration(seconds: 3),
+                  mainButton: TextButton(
+                    onPressed: () {
+                      Get.closeCurrentSnackbar();
+                      Get.toNamed(RouteName.loginScreen);
+                    },
+                    child: Text(
+                      'Sign in',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+                return;
+              }
               final userId = profile.userId;
               if (userId != null) {
                 dataViewModel.toggleFollow(userId);

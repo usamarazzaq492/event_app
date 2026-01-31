@@ -743,8 +743,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
           children: [
             IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const BottomNavBar())),
+              onPressed: () => Navigator.of(context).pop(),
             ),
             Expanded(
               child: Center(

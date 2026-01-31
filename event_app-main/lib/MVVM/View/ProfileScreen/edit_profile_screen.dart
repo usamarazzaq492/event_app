@@ -1,14 +1,15 @@
 import 'dart:io';
 import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/Widget/button_widget.dart';
 import 'package:event_app/Widget/input_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
+import '../../../app/config/app_text_style.dart';
 import '../../../utils/form_validation_utils.dart';
+import '../../../utils/haptic_utils.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -133,18 +134,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                /// Header
-                Text(
-                  'Edit Profile',
-                  style: TextStyles.profiletext.copyWith(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                _buildHeader(),
                 SizedBox(height: 3.h),
-
                 /// Profile Image Picker
                 GestureDetector(
                   onTap: pickImage,
@@ -268,6 +259,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
       textInputAction:
           nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              onPressed: () {
+                HapticUtils.navigation();
+                Navigator.pop(context);
+              },
+            ),
+            Expanded(
+              child: Center(
+                child: Text('Edit Profile', style: TextStyles.heading),
+              ),
+            ),
+            const SizedBox(width: 48),
+          ],
+        ),
+        SizedBox(height: 1.h),
+        Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withValues(alpha: 0.06),
+                Colors.white.withValues(alpha: 0.02),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

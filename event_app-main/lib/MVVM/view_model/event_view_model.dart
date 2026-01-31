@@ -8,6 +8,7 @@ import 'package:event_app/Services/event_service.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../View/bottombar/bottom_navigation_bar.dart';
 import 'bottom_nav_controller.dart';
@@ -32,10 +33,20 @@ class EventController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initEvents();
+  }
+
+  Future<void> _initEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final hasToken = token != null && token.isNotEmpty;
+
     fetchUpcomingEventsForHome();
     fetchAllEvents();
-    getMyEvents();
-    fetchTimelineEvents();
+    if (hasToken) {
+      getMyEvents();
+      fetchTimelineEvents();
+    }
   }
 
   /// 🔷 Fetch all events and separate into upcoming & past
@@ -57,6 +68,13 @@ class EventController extends GetxController {
           }
         }
       }
+
+      upcoming.sort((a, b) {
+        final aDate = DateTime.tryParse(a.startDate ?? '');
+        final bDate = DateTime.tryParse(b.startDate ?? '');
+        if (aDate == null || bDate == null) return 0;
+        return aDate.compareTo(bDate);
+      });
 
       upcomingEvents.assignAll(upcoming);
       pastEvents.assignAll(past);

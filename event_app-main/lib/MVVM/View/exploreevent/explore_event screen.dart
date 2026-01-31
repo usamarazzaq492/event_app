@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/View/EventDetailScreen/event_detail_screen.dart';
 import 'package:event_app/MVVM/view_model/event_view_model.dart';
 import 'package:event_app/MVVM/view_model/bottom_nav_controller.dart';
+import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
+import 'package:event_app/app/config/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -26,6 +28,7 @@ class ExploreEventScreen extends StatefulWidget {
 class _ExploreEventScreenState extends State<ExploreEventScreen>
     with TickerProviderStateMixin {
   final EventController controller = Get.put(EventController());
+  final AuthViewModel authViewModel = Get.put(AuthViewModel());
   final BottomNavController navController =
       Get.find<BottomNavController>(tag: 'BottomNavController');
 
@@ -327,11 +330,35 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
           heroTag: "explore_fab",
           backgroundColor: AppColors.blueColor,
           child: const Icon(Icons.add, color: Colors.white),
-          onPressed: () => NavigationUtils.push(
-            context,
-            const CreateEvent(),
-            routeName: '/create-event',
-          ),
+          onPressed: () {
+            if (authViewModel.isLoggedIn.value) {
+              NavigationUtils.push(
+                context,
+                const CreateEvent(),
+                routeName: '/create-event',
+              );
+            } else {
+              Get.snackbar(
+                'Sign in to create events',
+                'Create an account to host your own events.',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: AppColors.signinoptioncolor,
+                colorText: Colors.white,
+                mainButton: TextButton(
+                  onPressed: () {
+                    Get.toNamed(RouteName.loginScreen);
+                  },
+                  child: Text(
+                    'Sign in',
+                    style: TextStyle(
+                      color: AppColors.blueColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              );
+            }
+          },
         ),
         body: SafeArea(
           child: _buildScrollableContent(),
@@ -356,11 +383,15 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
               size: 20.sp,
             ),
           ),
-          Text(
-            "Explore Events",
-            style: TextStyles.heading,
+          Expanded(
+            child: Text(
+              "Search events",
+              style: TextStyles.heading,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          const Spacer(),
+          SizedBox(width: 2.w),
           IconButton(
             onPressed: () async {
               HapticUtils.light();

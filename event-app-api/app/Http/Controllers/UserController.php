@@ -14,6 +14,65 @@ class UserController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+    /**
+     * Public user search - for guests and logged-in users.
+     * Search by name (no auth required).
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchUsers(Request $request)
+    {
+        try {
+            $query = $request->get('q', '');
+            $query = trim($query);
+
+            if (strlen($query) < 2) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'message' => 'Query too short',
+                    'count' => 0
+                ]);
+            }
+
+            $users = \App\Models\User::select([
+                    'userId',
+                    'name',
+                    'email',
+                    'profileImageUrl',
+                ])
+                ->where('isActive', 1)
+                ->where(function ($q) use ($query) {
+                    $q->where('name', 'like', '%' . $query . '%')
+                      ->orWhere('email', 'like', '%' . $query . '%');
+                })
+                ->limit(10)
+                ->get()
+                ->map(function ($user) {
+                    return [
+                        'userId' => $user->userId,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'profileImageUrl' => $user->profileImageUrl,
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $users,
+                'message' => 'Users found',
+                'count' => $users->count()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Search failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function index(Request $request)
     {
         try {
@@ -161,14 +220,18 @@ public function viewPublicProfile(Request $request, $id)
     try {
         $user = \App\Models\User::findOrFail($id);
 
-        // 🔹 Get logged-in user ID
-        $currentUserId = $request->user()->userId;
+        // 🔹 Get logged-in user ID (null for guests)
+        $currentUser = $request->user();
+        $currentUserId = $currentUser?->userId;
 
-        // 🔹 Check if current user is following this profile
-        $isFollowing = DB::table('follows')
-            ->where('follower_id', $currentUserId)
-            ->where('followee_id', $user->userId)
-            ->exists();
+        // 🔹 Check if current user is following this profile (guests are never following)
+        $isFollowing = false;
+        if ($currentUserId) {
+            $isFollowing = DB::table('follows')
+                ->where('follower_id', $currentUserId)
+                ->where('followee_id', $user->userId)
+                ->exists();
+        }
 
         return response()->json([
             'userId' => $user->userId,
@@ -248,7 +311,7 @@ public function viewPublicProfile(Request $request, $id)
                     }
                 }
                 DB::table('donation')->where('userId', $userId)->delete();
-                
+
                 // Delete donation transactions
                 DB::table('donation_transactions')->where('userId', $userId)->delete();
 

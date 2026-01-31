@@ -22,10 +22,10 @@ class CancelledTab extends StatelessWidget {
       // Filter tickets by cancelled/canceled status
       final cancelledTickets = ticketVM.tickets.where((ticket) {
         final status = (ticket['status'] ?? '').toString().toLowerCase();
-        return status.contains('cancel') || 
-               status.contains('refund') ||
-               status == 'cancelled' ||
-               status == 'canceled';
+        return status.contains('cancel') ||
+            status.contains('refund') ||
+            status == 'cancelled' ||
+            status == 'canceled';
       }).toList();
 
       if (cancelledTickets.isEmpty) {
@@ -50,7 +50,6 @@ class CancelledTab extends StatelessWidget {
           final ticket = cancelledTickets[index];
           final eventTitle = ticket['eventTitle'] ?? 'Event';
           final startDate = ticket['startDate'] ?? '';
-          final endDate = ticket['endDate'] ?? '';
           final startTime = ticket['startTime'] ?? '';
           final endTime = ticket['endTime'] ?? '';
           final address = ticket['address'] ?? '';
@@ -64,13 +63,14 @@ class CancelledTab extends StatelessWidget {
             try {
               final date = DateTime.parse(startDate);
               formattedDate = DateFormat('EEE, MMM d').format(date);
-              
+
               // Add time if available
               if (startTime.isNotEmpty && endTime.isNotEmpty) {
                 try {
                   final start = DateFormat("HH:mm:ss").parse(startTime);
                   final end = DateFormat("HH:mm:ss").parse(endTime);
-                  formattedDate += ' · ${DateFormat.jm().format(start)} - ${DateFormat.jm().format(end)}';
+                  formattedDate +=
+                      ' · ${DateFormat.jm().format(start)} - ${DateFormat.jm().format(end)}';
                 } catch (e) {
                   // If time parsing fails, just use date
                 }

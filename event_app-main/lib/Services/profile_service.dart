@@ -9,7 +9,7 @@ import 'package:path/path.dart';
 class UserService {
   static const String baseUrl = 'https://eventgo-live.com/api/v1';
 
-  /// 🔷 Fetch Public Profile by userId
+  /// 🔷 Fetch Public Profile by userId (works without auth for guests)
   Future<ViewPublicProfileModel?> fetchPublicProfile(int? id) async {
     if (id == null) {
       print('❌ fetchPublicProfile called with null id');
@@ -21,14 +21,15 @@ class UserService {
 
     final uri = Uri.parse('$baseUrl/user/$id');
     print('🔷 Fetching public profile: $uri');
-    
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Accept': 'application/json',
-      },
-    );
+
+    final headers = <String, String>{
+      'Accept': 'application/json',
+    };
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await http.get(uri, headers: headers);
 
     print('🔷 Profile API Response Status: ${response.statusCode}');
     print('🔷 Profile API Response Body: ${response.body}');

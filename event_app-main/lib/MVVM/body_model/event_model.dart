@@ -77,7 +77,7 @@ class EventModel {
       hasLiveStreamAccess: json['hasLiveStreamAccess'],
       isBooked: json['isBooked'],
       isOrganizer: json['isOrganizer'],
-      isPromoted: json['isPromoted'] == 1 || json['isPromoted'] == true,
+      isPromoted: json['isPromoted'] == 1 || json['isPromoted'] == true || json['isPromoted'] == '1',
       promotionStartDate: json['promotionStartDate'],
       promotionEndDate: json['promotionEndDate'],
       promotionPackage: json['promotionPackage'],
@@ -86,15 +86,21 @@ class EventModel {
     );
   }
 
-  /// Check if promotion is currently active
+  /// Check if promotion is currently active (API may send isPromoted=1; promotionEndDate can be null or MySQL-style "YYYY-MM-DD HH:mm:ss")
   bool get isPromotionActive {
     if (isPromoted == null || !isPromoted!) return false;
-    if (promotionEndDate == null) return false;
+    if (promotionEndDate == null || promotionEndDate!.trim().isEmpty) {
+      return true; // Marked promoted but no end date → treat as active
+    }
     try {
-      final endDate = DateTime.parse(promotionEndDate!);
+      String dateStr = promotionEndDate!.trim();
+      if (dateStr.contains(' ') && !dateStr.contains('T')) {
+        dateStr = dateStr.replaceFirst(' ', 'T'); // Dart parse prefers T for ISO
+      }
+      final endDate = DateTime.parse(dateStr);
       return DateTime.now().isBefore(endDate);
     } catch (e) {
-      return false;
+      return true; // Parse failed → treat as active if isPromoted
     }
   }
 }

@@ -3,8 +3,10 @@ import 'package:event_app/MVVM/View/EventDetailScreen/event_detail_screen.dart';
 import 'package:event_app/MVVM/View/Promotion/select_event_to_promote_screen.dart';
 import 'package:event_app/MVVM/body_model/ads_model.dart';
 import 'package:event_app/MVVM/view_model/ad_view_model.dart';
+import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/app/config/app_asset.dart';
 import 'package:event_app/app/config/app_colors.dart';
+import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/refresh_on_navigation_mixin.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,7 @@ class AllAdsScreen extends StatefulWidget {
 
 class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
   final adVM = Get.put(AdViewModel());
+  final authViewModel = Get.put(AuthViewModel());
 
   @override
   void refreshData() {
@@ -64,6 +67,26 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
+              if (!authViewModel.isLoggedIn.value) {
+                Get.snackbar(
+                  'Sign in to promote',
+                  'Create an account to promote your events.',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: AppColors.signinoptioncolor,
+                  colorText: Colors.white,
+                  mainButton: TextButton(
+                    onPressed: () => Get.toNamed(RouteName.loginScreen),
+                    child: Text(
+                      'Sign in',
+                      style: TextStyle(
+                        color: AppColors.blueColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                );
+                return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -118,43 +141,51 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
       child: Row(
         children: [
           // Icon and Title
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(1.5.w),
-                decoration: BoxDecoration(
-                  color: AppColors.blueColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(1.5.h),
-                ),
-                child: Icon(
-                  Icons.trending_up,
-                  color: AppColors.blueColor,
-                  size: 20.sp,
-                ),
-              ),
-              SizedBox(width: 3.w),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Promoted Events",
-                    style: TextStyles.heading.copyWith(
-                      fontSize: 18.sp,
-                    ),
+          Expanded(
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(1.5.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.blueColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(1.5.h),
                   ),
-                  SizedBox(height: 0.3.h),
-                  Obx(() => Text(
-                        "${adVM.ads.length} active promotion${adVM.ads.length != 1 ? 's' : ''}",
-                        style: TextStyles.regularwhite.copyWith(
-                          fontSize: 11.sp,
-                          color: Colors.white60,
+                  child: Icon(
+                    Icons.trending_up,
+                    color: AppColors.blueColor,
+                    size: 20.sp,
+                  ),
+                ),
+                SizedBox(width: 3.w),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Promoted Events",
+                        style: TextStyles.heading.copyWith(
+                          fontSize: 18.sp,
                         ),
-                      )),
-                ],
-              ),
-            ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 0.3.h),
+                      Obx(() => Text(
+                            "${adVM.ads.length} active promotion${adVM.ads.length != 1 ? 's' : ''}",
+                            style: TextStyles.regularwhite.copyWith(
+                              fontSize: 11.sp,
+                              color: Colors.white60,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           // Refresh Button
           Container(
             decoration: BoxDecoration(
@@ -187,14 +218,50 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
             child: CircularProgressIndicator(color: Colors.white),
           );
         } else if (adVM.error.isNotEmpty) {
+          // Show friendly message for auth/network errors instead of raw exception
+          final isAuthError = adVM.error.value.toLowerCase().contains('unauthenticated') ||
+              adVM.error.value.contains('401') ||
+              adVM.error.value.toLowerCase().contains('unauthorized');
           return ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
               SizedBox(height: 20.h),
               Center(
-                child: Text(
-                  adVM.error.value,
-                  style: const TextStyle(color: Colors.red),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isAuthError ? Icons.info_outline : Icons.cloud_off,
+                        size: 48.sp,
+                        color: Colors.white54,
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        isAuthError
+                            ? 'Pull to refresh promoted events'
+                            : 'Something went wrong. Pull to refresh.',
+                        style: TextStyles.regularwhite.copyWith(
+                          color: Colors.white70,
+                          fontSize: 14.sp,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 1.h),
+                      TextButton.icon(
+                        onPressed: () => adVM.fetchAds(),
+                        icon: const Icon(Icons.refresh, color: Colors.white70, size: 20),
+                        label: Text(
+                          'Retry',
+                          style: TextStyles.regularwhite.copyWith(
+                            color: AppColors.blueColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

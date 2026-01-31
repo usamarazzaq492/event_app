@@ -118,4 +118,22 @@ class EventDetailModel {
     data['isBooked'] = isBooked; // updated
     return data;
   }
+
+  /// Check if promotion is currently active (isPromoted=true AND promotionEndDate has not passed)
+  bool get isPromotionActive {
+    if (isPromoted == null || !isPromoted!) return false;
+    if (promotionEndDate == null || promotionEndDate!.trim().isEmpty) {
+      return true; // Marked promoted but no end date → treat as active
+    }
+    try {
+      String dateStr = promotionEndDate!.trim();
+      if (dateStr.contains(' ') && !dateStr.contains('T')) {
+        dateStr = dateStr.replaceFirst(' ', 'T'); // Dart parse prefers T for ISO
+      }
+      final endDate = DateTime.parse(dateStr);
+      return DateTime.now().isBefore(endDate);
+    } catch (e) {
+      return true; // Parse failed → treat as active if isPromoted
+    }
+  }
 }

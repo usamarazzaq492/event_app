@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../app/config/app_text_style.dart';
+import '../../../utils/haptic_utils.dart';
 
 class ADsDetailScreen extends StatefulWidget {
   final int? adId;
@@ -92,7 +93,10 @@ class _ADsDetailScreenState extends State<ADsDetailScreen> {
                   top: 4.h,
                   left: 4.w,
                   child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      HapticUtils.navigation();
+                      Navigator.pop(context);
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.54),
@@ -101,12 +105,12 @@ class _ADsDetailScreenState extends State<ADsDetailScreen> {
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.45),
                             blurRadius: 4,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       padding: EdgeInsets.all(1.h),
-                      child: const Icon(Icons.arrow_back, color: Colors.white),
+                      child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
                     ),
                   ),
                 ),

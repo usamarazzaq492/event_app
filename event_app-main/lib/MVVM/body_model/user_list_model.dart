@@ -61,7 +61,9 @@ class Data {
     phoneNumber = json['phoneNumber'];
     profileImageUrl = json['profileImageUrl'];
     shortBio = json['shortBio'];
-    interests = json['interests'].cast<String>();
+    interests = json['interests'] is List
+        ? (json['interests'] as List).map((e) => e.toString()).toList()
+        : null;
     isActive = json['isActive'];
     emailVerified = json['emailVerified'];
     createdAt = json['created_at'];

@@ -1,14 +1,13 @@
 import 'package:event_app/app/config/app_asset.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_strings.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/Widget/button_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:get/get.dart';
+import 'package:event_app/MVVM/View/Onboarding/permissions_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -32,12 +31,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     },
   ];
 
-  /// ✅ Save onboarding seen flag
-  Future<void> setOnboardingSeen() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_seen', true);
-  }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -46,9 +39,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void onNextPressed() async {
     if (currentIndex == onboardData.length - 1) {
-      await setOnboardingSeen();
+      // Go to permissions screen (Eventbrite-style) before login
       if (mounted) {
-        Get.offAllNamed(RouteName.loginScreen); // Using GetX navigation
+        Get.off(() => const PermissionsScreen());
       }
     } else {
       _controller.nextPage(

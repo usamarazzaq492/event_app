@@ -3,6 +3,7 @@ import 'package:event_app/MVVM/View/CreateAd/payment_donate_screen.dart';
 import 'package:event_app/Widget/button_widget.dart';
 import 'package:event_app/Widget/input_text_field.dart';
 import 'package:event_app/app/config/app_colors.dart';
+import 'package:event_app/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -51,14 +52,17 @@ class _DonationScreenState extends State<DonationScreen> {
                   top: 2.h,
                   left: 4.w,
                   child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      HapticUtils.navigation();
+                      Navigator.pop(context);
+                    },
                     child: Container(
                       decoration: const BoxDecoration(
                         color: Colors.black54,
                         shape: BoxShape.circle,
                       ),
                       padding: EdgeInsets.all(1.h),
-                      child: const Icon(Icons.arrow_back, color: Colors.white),
+                      child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
                     ),
                   ),
                 ),

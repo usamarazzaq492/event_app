@@ -70,31 +70,41 @@ class EventService {
     return await http.Response.fromStream(streamedResponse);
   }
 
-  /// 🔷 Fetch All Events
+  /// 🔷 Fetch All Events (works without auth for guests)
+  /// Uses GET so the public list works without auth; POST is also supported by API.
   Future<List<EventModel>> fetchEvents() async {
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
-    final response = await http.post(
+    final headers = <String, String>{
+      "Accept": "application/json",
+    };
+    if (token != null && token.isNotEmpty) {
+      headers["Authorization"] = "Bearer $token";
+    }
+
+    // Use GET for list (public route) — no body, works for guests
+    final response = await http.get(
       Uri.parse(baseUrl),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-      },
+      headers: headers,
     );
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
-      if (body['success'] == true && body['data'] != null) {
+      if (body is Map && body['success'] == true && body['data'] != null) {
         final List data = body['data'];
         return data.map((e) => EventModel.fromJson(e)).toList();
       } else {
-        throw Exception(body['message'] ?? "API Error");
+        throw Exception(body is Map ? (body['message'] ?? "API Error") : "Invalid response");
       }
-    } else {
-      throw Exception('Failed to load events. Status: ${response.statusCode}');
     }
+    // 401/403/404: API may require auth or route not yet deployed — return empty so UI shows "No Events" instead of "Something went wrong"
+    if (response.statusCode == 401 ||
+        response.statusCode == 403 ||
+        response.statusCode == 404) {
+      return [];
+    }
+    throw Exception('Failed to load events. Status: ${response.statusCode}');
   }
 
   /// 🔷 Search Events by Location and Category
@@ -264,22 +274,28 @@ class EventService {
     }
   }
 
-  /// 🔷 Fetch Event Detail by ID
+  /// 🔷 Fetch Event Detail by ID (works without auth for guests)
   Future<EventDetailModel> fetchEventDetail(String id) async {
     final uri = Uri.parse('$baseUrl/$id');
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
-    final response = await http.get(uri, headers: {
+    final headers = <String, String>{
       'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    });
+    };
+    // Only add Authorization for valid tokens - never send "Bearer null" (causes 401 for guests)
+    final hasValidToken = token != null && token.isNotEmpty && token.toLowerCase() != 'null';
+    if (hasValidToken) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await http.get(uri, headers: headers);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       return EventDetailModel.fromJson(data);
     } else {
-      throw Exception('Failed to load event details');
+      throw Exception('Failed to load event details. Status: ${response.statusCode}');
     }
   }
 

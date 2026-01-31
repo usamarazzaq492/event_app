@@ -2,6 +2,7 @@ import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/MVVM/view_model/event_view_model.dart';
 import 'package:event_app/MVVM/body_model/event_detail_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
+import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -259,10 +260,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchEventDetailById(widget.eventId, onLoaded: (detail) {
         hostProfileController.loadPublicProfile(detail.userId);
-        // Load QR codes if user is the creator
-        final currentUserId = authViewModel.currentUser['userId'];
-        if (currentUserId == detail.userId) {
-          _loadQrCodes();
+        // Load QR codes only if user is logged in and is the creator
+        if (authViewModel.isLoggedIn.value) {
+          final currentUserId = authViewModel.currentUser['userId'];
+          if (currentUserId == detail.userId) {
+            _loadQrCodes();
+          }
         }
       });
     });
@@ -325,8 +328,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             eventStartDate != null && DateTime.now().isAfter(eventStartDate);
         final hasEventEnded =
             eventEndDate != null && DateTime.now().isAfter(eventEndDate);
-        final currentUserId = authViewModel.currentUser['userId'];
-        final isCreator = currentUserId == event.userId;
+        final currentUserId = authViewModel.isLoggedIn.value
+            ? authViewModel.currentUser['userId']
+            : null;
+        final isCreator = currentUserId != null && currentUserId == event.userId;
         final isBooked = event.isBooked ?? false;
 
         return CustomScrollView(
@@ -1465,6 +1470,27 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           ? null
                           : () {
                               HapticUtils.buttonPress();
+                              if (!authViewModel.isLoggedIn.value) {
+                                Get.snackbar(
+                                  'Sign in to get tickets',
+                                  'Create an account to purchase tickets.',
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  backgroundColor: AppColors.signinoptioncolor,
+                                  colorText: Colors.white,
+                                  mainButton: TextButton(
+                                    onPressed: () =>
+                                        Get.toNamed(RouteName.loginScreen),
+                                    child: Text(
+                                      'Sign in',
+                                      style: TextStyle(
+                                        color: AppColors.blueColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
                               NavigationUtils.push(
                                 context,
                                 BookEventScreen(id: event.eventId),
@@ -1513,7 +1539,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                           ? 'Already Booked'
                                           : isCreator
                                               ? 'Your Event'
-                                              : 'Book Event',
+                                              : 'Get Tickets',
                               style: TextStyle(
                                 fontSize: 12.sp,
                                 fontWeight: FontWeight.bold,
@@ -1534,19 +1560,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   // Check if promotion is active
                   Builder(
                     builder: (context) {
-                      bool isPromotionActive = false;
-                      if (event.isPromoted == true &&
-                          event.promotionEndDate != null) {
-                        try {
-                          final endDate =
-                              DateTime.parse(event.promotionEndDate!);
-                          isPromotionActive = DateTime.now().isBefore(endDate);
-                        } catch (e) {
-                          isPromotionActive = false;
-                        }
-                      }
-
-                      if (isPromotionActive) {
+                      if (event.isPromotionActive) {
                         // Show promotion active message
                         return Container(
                           width: double.infinity,
@@ -2080,13 +2094,34 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ElevatedButton(
                       onPressed: () {
                         HapticUtils.buttonPress();
+                        if (!authViewModel.isLoggedIn.value) {
+                          Get.snackbar(
+                            'Sign in to get tickets',
+                            'Create an account to purchase tickets.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: AppColors.signinoptioncolor,
+                            colorText: Colors.white,
+                            mainButton: TextButton(
+                              onPressed: () =>
+                                  Get.toNamed(RouteName.loginScreen),
+                              child: Text(
+                                'Sign in',
+                                style: TextStyle(
+                                  color: AppColors.blueColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          );
+                          return;
+                        }
                         NavigationUtils.push(
                           context,
                           BookEventScreen(id: event.eventId),
                           routeName: '/book-event',
                         );
                       },
-                      child: Text('Purchase Ticket'),
+                      child: Text('Get Tickets'),
                     ),
                   ],
                 ),

@@ -23,14 +23,14 @@ class CompletedTab extends StatelessWidget {
       final completedTickets = ticketVM.tickets.where((ticket) {
         final status = (ticket['status'] ?? '').toString().toLowerCase();
         final eventDate = ticket['endDate'] ?? ticket['startDate'] ?? '';
-        
+
         // Check if status indicates completion or if event date has passed
-        if (status.contains('completed') || 
-            status.contains('finished') || 
+        if (status.contains('completed') ||
+            status.contains('finished') ||
             status.contains('done')) {
           return true;
         }
-        
+
         // Check if event date has passed
         if (eventDate.isNotEmpty) {
           try {
@@ -42,7 +42,7 @@ class CompletedTab extends StatelessWidget {
             // If date parsing fails, skip this check
           }
         }
-        
+
         return false;
       }).toList();
 
@@ -68,7 +68,6 @@ class CompletedTab extends StatelessWidget {
           final ticket = completedTickets[index];
           final eventTitle = ticket['eventTitle'] ?? 'Event';
           final startDate = ticket['startDate'] ?? '';
-          final endDate = ticket['endDate'] ?? '';
           final startTime = ticket['startTime'] ?? '';
           final endTime = ticket['endTime'] ?? '';
           final address = ticket['address'] ?? '';
@@ -82,13 +81,14 @@ class CompletedTab extends StatelessWidget {
             try {
               final date = DateTime.parse(startDate);
               formattedDate = DateFormat('EEE, MMM d').format(date);
-              
+
               // Add time if available
               if (startTime.isNotEmpty && endTime.isNotEmpty) {
                 try {
                   final start = DateFormat("HH:mm:ss").parse(startTime);
                   final end = DateFormat("HH:mm:ss").parse(endTime);
-                  formattedDate += ' · ${DateFormat.jm().format(start)} - ${DateFormat.jm().format(end)}';
+                  formattedDate +=
+                      ' · ${DateFormat.jm().format(start)} - ${DateFormat.jm().format(end)}';
                 } catch (e) {
                   // If time parsing fails, just use date
                 }

@@ -65,14 +65,18 @@ class LocationService {
     return degrees * (pi / 180);
   }
 
-  /// Get city name from coordinates
+  /// Get city name from coordinates (tries locality, subAdministrativeArea, administrativeArea)
   static Future<String> getCityFromCoordinates(
       double latitude, double longitude) async {
     try {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
-        return placemarks.first.locality ?? 'Unknown City';
+        final p = placemarks.first;
+        return p.locality?.trim().toString() ??
+            p.subAdministrativeArea?.trim().toString() ??
+            p.administrativeArea?.trim().toString() ??
+            'Unknown City';
       }
       return 'Unknown City';
     } catch (e) {

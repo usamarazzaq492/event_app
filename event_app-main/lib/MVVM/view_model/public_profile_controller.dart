@@ -3,6 +3,7 @@ import 'package:event_app/MVVM/body_model/profile_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Services/profile_service.dart';
 import '../body_model/ViewProfileModel.dart';
 
@@ -18,13 +19,24 @@ class PublicProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchUserProfile(); // Loads current logged-in user's profile at initialization
+    // Only fetch current user profile if logged in (requires auth)
+    _fetchProfileIfLoggedIn();
   }
 
   @override
   void onReady() {
     super.onReady();
-    fetchUserProfile(); // ✅ Refresh profile every time this controller's view comes into focus
+    _fetchProfileIfLoggedIn();
+  }
+
+  void _fetchProfileIfLoggedIn() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token != null && token.isNotEmpty) {
+        await fetchUserProfile();
+      }
+    } catch (_) {}
   }
 
   /// ✅ Fetch public profile by userId
