@@ -95,7 +95,9 @@ class EventService {
         final List data = body['data'];
         return data.map((e) => EventModel.fromJson(e)).toList();
       } else {
-        throw Exception(body is Map ? (body['message'] ?? "API Error") : "Invalid response");
+        throw Exception(body is Map
+            ? (body['message'] ?? "API Error")
+            : "Invalid response");
       }
     }
     // 401/403/404: API may require auth or route not yet deployed — return empty so UI shows "No Events" instead of "Something went wrong"
@@ -284,7 +286,8 @@ class EventService {
       'Accept': 'application/json',
     };
     // Only add Authorization for valid tokens - never send "Bearer null" (causes 401 for guests)
-    final hasValidToken = token != null && token.isNotEmpty && token.toLowerCase() != 'null';
+    final hasValidToken =
+        token != null && token.isNotEmpty && token.toLowerCase() != 'null';
     if (hasValidToken) {
       headers['Authorization'] = 'Bearer $token';
     }
@@ -295,7 +298,8 @@ class EventService {
       final data = json.decode(response.body);
       return EventDetailModel.fromJson(data);
     } else {
-      throw Exception('Failed to load event details. Status: ${response.statusCode}');
+      throw Exception(
+          'Failed to load event details. Status: ${response.statusCode}');
     }
   }
 
@@ -348,11 +352,17 @@ class EventService {
         final List data = body['data'];
         return data.map((e) => EventModel.fromJson(e)).toList();
       } else {
-        return []; // Return empty list if no events or not following anyone
+        return [];
       }
-    } else {
-      throw Exception('Failed to load timeline events. Status: ${response.statusCode}');
     }
+    // 401/403/404: return empty - don't block main events list (Search tab)
+    if (response.statusCode == 401 ||
+        response.statusCode == 403 ||
+        response.statusCode == 404) {
+      return [];
+    }
+    throw Exception(
+        'Failed to load timeline events. Status: ${response.statusCode}');
   }
 
   /// 🔷 Delete Event

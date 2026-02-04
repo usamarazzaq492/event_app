@@ -25,12 +25,19 @@ class ViewPublicProfileModel {
     profileImageUrl = json['profileImageUrl'];
     shortBio = json['shortBio'];
 
-    // 🔹 Parse interests as List<String>
+    // 🔹 Parse interests as List<String> (null-safe: API may return null in list)
     if (json['interests'] != null) {
       if (json['interests'] is String) {
-        interests = (json['interests'] as String).split(',');
+        interests = (json['interests'] as String)
+            .split(',')
+            .map((s) => s.trim())
+            .where((s) => s.isNotEmpty)
+            .toList();
       } else if (json['interests'] is List) {
-        interests = List<String>.from(json['interests']);
+        interests = (json['interests'] as List)
+            .map((e) => (e == null ? '' : e).toString())
+            .where((s) => s.isNotEmpty)
+            .toList();
       }
     }
 

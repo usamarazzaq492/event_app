@@ -314,7 +314,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
         // Load host profile after event loads (defer to avoid build-time state changes)
         if ((hostProfileController.profile.value == null ||
-            hostProfileController.profile.value!.userId != event.userId) &&
+                hostProfileController.profile.value!.userId != event.userId) &&
             !hostProfileController.isLoading.value) {
           Future.microtask(() {
             hostProfileController.loadPublicProfile(event.userId);
@@ -331,7 +331,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         final currentUserId = authViewModel.isLoggedIn.value
             ? authViewModel.currentUser['userId']
             : null;
-        final isCreator = currentUserId != null && currentUserId == event.userId;
+        final isCreator =
+            currentUserId != null && currentUserId == event.userId;
         final isBooked = event.isBooked ?? false;
 
         return CustomScrollView(
@@ -1942,7 +1943,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     } catch (e) {
       qrDataMap = {'web': qrCodeData, 'app': qrCodeData};
     }
-    
+
     // Use web URL for QR code (works with all scanners, including iPhone)
     final qrString = qrDataMap['web'] ?? (qrDataMap['app'] ?? qrCodeData);
     final ticketType = qr['ticketType'] ?? 'general';

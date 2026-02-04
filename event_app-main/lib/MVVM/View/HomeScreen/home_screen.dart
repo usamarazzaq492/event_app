@@ -280,11 +280,12 @@ class _HomeScreenState extends State<HomeScreen>
       if (!mounted) return;
     }
 
-    if (mounted) setState(() {
-      _searchEventResults = eventResults;
-      _searchUserResults = userResults;
-      _showSearchResults = eventResults.isNotEmpty || userResults.isNotEmpty;
-    });
+    if (mounted)
+      setState(() {
+        _searchEventResults = eventResults;
+        _searchUserResults = userResults;
+        _showSearchResults = eventResults.isNotEmpty || userResults.isNotEmpty;
+      });
   }
 
   void _dismissSearchResults() {

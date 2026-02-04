@@ -3,6 +3,7 @@ import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../Widget/input_text_field.dart';
@@ -370,16 +371,16 @@ class _SignupScreenState extends State<SignupScreen> {
                               validator: (v) =>
                                   FormValidationUtils.validateConfirmPassword(
                                       v, passwordController.text),
-                              onChanged: (_) => controller
-                                  .confirmPasswordError.value = '',
+                              onChanged: (_) =>
+                                  controller.confirmPasswordError.value = '',
                             ),
                           ),
                           Obx(
-                            () => controller.confirmPasswordError.value
-                                    .isNotEmpty
-                                ? _buildErrorText(controller
-                                    .confirmPasswordError.value)
-                                : const SizedBox.shrink(),
+                            () =>
+                                controller.confirmPasswordError.value.isNotEmpty
+                                    ? _buildErrorText(
+                                        controller.confirmPasswordError.value)
+                                    : const SizedBox.shrink(),
                           ),
                           SizedBox(height: 2.h),
 
@@ -416,17 +417,17 @@ class _SignupScreenState extends State<SignupScreen> {
                                       children: [
                                         TextSpan(
                                           text: 'Terms & Conditions',
-                                          style: TextStyles.regulartext
-                                              .copyWith(
+                                          style:
+                                              TextStyles.regulartext.copyWith(
                                             fontSize: 11.sp,
                                             fontWeight: FontWeight.w600,
-                                            decoration: TextDecoration.underline,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                           recognizer: TapGestureRecognizer()
                                             ..onTap = () {
                                               HapticUtils.navigation();
-                                              Navigator.pushNamed(
-                                                  context,
+                                              Navigator.pushNamed(context,
                                                   RouteName.termsScreen);
                                             },
                                         ),
@@ -462,69 +463,73 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           SizedBox(height: 2.h),
 
-                          /// Or sign up with
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: Divider(
-                                      color: AppColors
-                                          .signinoptionbordercolor)),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 3.w),
-                                child: Text(
-                                  'Or sign up with',
-                                  style: TextStyles.regularwhite.copyWith(
-                                    fontSize: 12.sp,
-                                    color: Colors.white54,
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                  child: Divider(
-                                      color: AppColors
-                                          .signinoptionbordercolor)),
-                            ],
-                          ),
-                          SizedBox(height: 3.h),
-
-                          /// Social sign-up buttons
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildSocialButton(
-                                  icon: 'G',
-                                  label: 'Google',
-                                  onTap: () {
-                                    HapticUtils.light();
-                                    Get.snackbar(
-                                      'Coming soon',
-                                      'Google sign-up will be available soon',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: AppColors.blueColor,
-                                      colorText: AppColors.whiteColor,
+                          /// Sign in with Apple (Guideline 4.8) - TODO: revert to if (Platform.isIOS) for production
+                          ...[
+                            SizedBox(
+                              height: 50,
+                              child: SignInWithAppleButton(
+                                onPressed: () async {
+                                  HapticUtils.light();
+                                  try {
+                                    final credential = await SignInWithApple
+                                        .getAppleIDCredential(
+                                      scopes: [
+                                        AppleIDAuthorizationScopes.email,
+                                        AppleIDAuthorizationScopes.fullName,
+                                      ],
                                     );
-                                  },
-                                ),
-                              ),
-                              SizedBox(width: 4.w),
-                              Expanded(
-                                child: _buildSocialButton(
-                                  icon: 'f',
-                                  label: 'Facebook',
-                                  onTap: () {
-                                    HapticUtils.light();
-                                    Get.snackbar(
-                                      'Coming soon',
-                                      'Facebook sign-up will be available soon',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: AppColors.blueColor,
-                                      colorText: AppColors.whiteColor,
+                                    final token = credential.identityToken;
+                                    if (token == null || token.isEmpty) {
+                                      Get.snackbar(
+                                        'Apple Sign In',
+                                        'Could not get credentials from Apple.',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor:
+                                            AppColors.signinoptioncolor,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+                                    await controller.signInWithApple(
+                                      identityToken: token,
+                                      authorizationCode:
+                                          credential.authorizationCode,
+                                      userIdentifier: credential.userIdentifier,
+                                      email: credential.email,
+                                      givenName: credential.givenName,
+                                      familyName: credential.familyName,
                                     );
-                                  },
-                                ),
+                                  } on SignInWithAppleAuthorizationException catch (e) {
+                                    if (e.code !=
+                                        AuthorizationErrorCode.canceled) {
+                                      Get.snackbar(
+                                        'Apple Sign In',
+                                        e.message.isNotEmpty
+                                            ? e.message
+                                            : 'Could not sign in with Apple',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor:
+                                            AppColors.signinoptioncolor,
+                                        colorText: Colors.white,
+                                      );
+                                    }
+                                  } catch (e) {
+                                    Get.snackbar(
+                                      'Apple Sign In',
+                                      'Could not sign in with Apple. Please try again.',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor:
+                                          AppColors.signinoptioncolor,
+                                      colorText: Colors.white,
+                                    );
+                                  }
+                                },
+                                style: SignInWithAppleButtonStyle.black,
+                                borderRadius: BorderRadius.circular(14),
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 2.h),
+                          ],
                         ],
                       ),
                     ),
@@ -559,51 +564,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildSocialButton({
-    required String icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: AppColors.backgroundColor,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 2.h),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.signinoptionbordercolor),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                icon,
-                style: TextStyle(
-                  color: label == 'Google'
-                      ? AppColors.lightColor
-                      : AppColors.blueColor,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(width: 2.w),
-              Text(
-                label,
-                style: TextStyles.regularwhite.copyWith(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildErrorText(String error) {
     return Padding(
       padding: EdgeInsets.only(top: 0.5.h),
@@ -614,8 +574,7 @@ class _SignupScreenState extends State<SignupScreen> {
           Flexible(
             child: Text(
               error,
-              style: TextStyle(
-                  color: Colors.red.shade400, fontSize: 11.sp),
+              style: TextStyle(color: Colors.red.shade400, fontSize: 11.sp),
             ),
           ),
         ],

@@ -10,11 +10,11 @@ import 'package:event_app/MVVM/body_model/user_list_model.dart';
 import 'package:event_app/Services/auth_service.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_pages.dart';
+import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
 import 'package:event_app/Services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class AuthViewModel extends GetxController {
   // Reactive state variables
@@ -138,6 +138,51 @@ class AuthViewModel extends GetxController {
       */
       } else {
         _handleApiError(response['message'] ?? 'Login failed');
+      }
+    } catch (e) {
+      _handleApiError(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Sign in with Apple (Guideline 4.8)
+  Future<void> signInWithApple({
+    required String identityToken,
+    String? authorizationCode,
+    String? userIdentifier,
+    String? email,
+    String? givenName,
+    String? familyName,
+  }) async {
+    clearErrors();
+    isLoading.value = true;
+    try {
+      final response = await AuthService.loginWithApple(
+        identityToken: identityToken,
+        authorizationCode: authorizationCode,
+        userIdentifier: userIdentifier,
+        email: email,
+        givenName: givenName,
+        familyName: familyName,
+      );
+      if (response['message'] == 'Login successful') {
+        final user = response['user'] as Map<String, dynamic>;
+        await _prefs.setString('token', response['token']);
+        await _prefs.setInt('userid', user['userId']);
+        _showSuccess(response['message']);
+        await _prefs.setString('user', jsonEncode(user));
+        currentUser.value = user;
+        isLoggedIn.value = true;
+        bool isProfileComplete = _isProfileComplete(user);
+        if (isProfileComplete) {
+          await fetchUsers();
+          Get.offAllNamed(RouteName.bottomNav);
+        } else {
+          Get.offAll(() => AccountSetupScreen());
+        }
+      } else {
+        _handleApiError(response['message'] ?? 'Apple sign-in failed');
       }
     } catch (e) {
       _handleApiError(e);
@@ -384,12 +429,18 @@ class AuthViewModel extends GetxController {
         return;
       }
 
-      // ✅ Token exists → try to load full profile as before
+      // ✅ Token exists → try to load full profile
       final profile = await userService.fetchProfile();
       final user = profile.data;
 
       if (user == null) {
-        Get.offAllNamed(RouteName.loginScreen);
+        // Invalid/expired token: clear auth and allow browsing as guest (Guideline 5.1.1)
+        await prefs.remove('token');
+        await prefs.remove('userid');
+        await prefs.remove('user');
+        currentUser.clear();
+        isLoggedIn.value = false;
+        Get.offAllNamed(RouteName.bottomNav);
         return;
       }
 
@@ -443,12 +494,15 @@ class AuthViewModel extends GetxController {
         await _prefs.remove('user');
         currentUser.clear();
         isLoggedIn.value = false;
-        Get.offAll(() => SigninScreen()); // Navigate to login screen
+        try {
+          Get.find<PublicProfileController>().clearCurrentUserProfile();
+        } catch (_) {}
+        Get.offAllNamed(RouteName.bottomNav);
         Get.snackbar(
-          "Success",
-          "Logged out successfully",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: AppColors.blueColor, // ✅ Purple for success
+          "Logged out",
+          "You have been logged out successfully",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.blueColor,
           colorText: Colors.white,
         );
       } else {
@@ -488,10 +542,10 @@ class AuthViewModel extends GetxController {
           colorText: Colors.white,
           duration: const Duration(seconds: 2),
         );
-        
+
         // Wait a moment for snackbar to show, then navigate
         await Future.delayed(const Duration(milliseconds: 500));
-        
+
         // Navigate to login screen after successful deletion
         // Use Get.offAllNamed to avoid Navigator history issues
         Get.offAllNamed(RouteName.loginScreen);

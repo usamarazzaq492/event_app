@@ -16,6 +16,7 @@ Route::prefix('v1')->group(function () {
     // 🔐 Auth
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/auth/apple', [AuthController::class, 'signInWithApple']);
     Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
     Route::post('/resend-verification', [AuthController::class, 'resendVerificationCode']);
 

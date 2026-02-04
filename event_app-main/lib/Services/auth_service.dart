@@ -47,8 +47,8 @@ class AuthService {
   }
 
   /// 📝 Register User
-  static Future<Map<String, dynamic>> registerUser(
-      String name, String email, String password, String confirmPassword) async {
+  static Future<Map<String, dynamic>> registerUser(String name, String email,
+      String password, String confirmPassword) async {
     var url = Uri.parse('$baseUrl/register');
 
     var response = await http.post(
@@ -168,14 +168,17 @@ class AuthService {
   static Future<UserListModel> searchUsers(String query) async {
     final trimmed = query.trim();
     if (trimmed.length < 2) {
-      return UserListModel(success: true, data: [], message: 'Query too short', count: 0);
+      return UserListModel(
+          success: true, data: [], message: 'Query too short', count: 0);
     }
-    final uri = Uri.parse('$baseUrl/users/search').replace(queryParameters: {'q': trimmed});
+    final uri = Uri.parse('$baseUrl/users/search')
+        .replace(queryParameters: {'q': trimmed});
     var response = await http.get(uri, headers: {'Accept': 'application/json'});
     if (response.statusCode == 200) {
       return UserListModel.fromJson(json.decode(response.body));
     }
-    return UserListModel(success: false, data: [], message: 'Search failed', count: 0);
+    return UserListModel(
+        success: false, data: [], message: 'Search failed', count: 0);
   }
 
   /// 👥 Fetch Users (Authenticated)
@@ -219,6 +222,36 @@ class AuthService {
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
     return decodedResponse;
+  }
+
+  /// Sign in with Apple (Guideline 4.8 - equivalent login option)
+  static Future<Map<String, dynamic>> loginWithApple({
+    required String identityToken,
+    String? authorizationCode,
+    String? userIdentifier,
+    String? email,
+    String? givenName,
+    String? familyName,
+  }) async {
+    var url = Uri.parse('$baseUrl/auth/apple');
+    var response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: jsonEncode({
+        'identity_token': identityToken,
+        'authorization_code': authorizationCode,
+        'user_identifier': userIdentifier,
+        'email': email,
+        'given_name': givenName,
+        'family_name': familyName,
+      }),
+    );
+    var decoded = _safeJsonDecode(response.body);
+    decoded['statusCode'] = response.statusCode;
+    return decoded;
   }
 
   /// 🚪 Logout User
@@ -280,5 +313,4 @@ class AuthService {
 
     return decodedResponse;
   }
-
 }

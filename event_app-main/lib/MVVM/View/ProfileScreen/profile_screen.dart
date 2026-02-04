@@ -151,14 +151,6 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Guard against hot-reload or prior state with different length
-    if (_tabController.length != 3) {
-      final int safeIndex = 0;
-      _tabController.dispose();
-      _tabController = TabController(vsync: this, length: 3);
-      _tabController.index = safeIndex;
-      _activeIndex = safeIndex;
-    }
     return Obx(() {
       if (!authViewModel.isLoggedIn.value) {
         return Scaffold(
@@ -180,43 +172,43 @@ class _ProfileScreenState extends State<ProfileScreen>
 
             final profile = controller.userProfile.value!;
             return RefreshIndicator(
-            onRefresh: _refreshProfile,
-            color: AppColors.blueColor,
-            backgroundColor: AppColors.signinoptioncolor,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildHeader(context),
-                  SizedBox(height: 3.h),
-                  _buildProfileImage(profile),
-                  SizedBox(height: 2.h),
-                  _buildUserName(profile),
-                  SizedBox(height: 2.h),
-                  _buildFollowCounts(profile),
-                  SizedBox(height: 2.h),
-                  Row(
-                    children: [
-                      Expanded(child: _buildEditProfileButton(context)),
-                      SizedBox(width: 3.w),
-                      Expanded(child: _buildCreateEventButton(context)),
-                    ],
-                  ),
-                  SizedBox(height: 3.h),
-                  _buildTabBar(),
-                  SizedBox(height: 2.h),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.5,
-                    child: _buildTabBarView(),
-                  ),
-                ],
+              onRefresh: _refreshProfile,
+              color: AppColors.blueColor,
+              backgroundColor: AppColors.signinoptioncolor,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildHeader(context),
+                    SizedBox(height: 3.h),
+                    _buildProfileImage(profile),
+                    SizedBox(height: 2.h),
+                    _buildUserName(profile),
+                    SizedBox(height: 2.h),
+                    _buildFollowCounts(profile),
+                    SizedBox(height: 2.h),
+                    Row(
+                      children: [
+                        Expanded(child: _buildEditProfileButton(context)),
+                        SizedBox(width: 3.w),
+                        Expanded(child: _buildCreateEventButton(context)),
+                      ],
+                    ),
+                    SizedBox(height: 3.h),
+                    _buildTabBar(),
+                    SizedBox(height: 2.h),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.5,
+                      child: _buildTabBarView(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }),
-      ),
-    );
+            );
+          }),
+        ),
+      );
     });
   }
 
@@ -309,88 +301,119 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // Error State
+  // Error State (scrollable for iPad/overflow safety)
   Widget _buildErrorState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 48.sp,
-            color: Colors.red.shade400,
-          ),
-          SizedBox(height: 3.h),
-          Text(
-            'Error Loading Profile',
-            style: TextStyles.heading,
-          ),
-          SizedBox(height: 1.h),
-          Text(
-            controller.error.value,
-            style: TextStyles.regularwhite.copyWith(
-              color: Colors.white70,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 4.h),
-          ElevatedButton.icon(
-            onPressed: () => _refreshProfile(),
-            icon: Icon(Icons.refresh, size: 12.sp),
-            label: Text('Retry', style: TextStyles.buttontext),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blueColor,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.h),
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height -
+              MediaQuery.of(context).padding.top -
+              MediaQuery.of(context).padding.bottom -
+              100,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 48.sp,
+                color: Colors.red.shade400,
               ),
-            ),
+              SizedBox(height: 3.h),
+              Text(
+                'Error Loading Profile',
+                style: TextStyles.heading,
+              ),
+              SizedBox(height: 1.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.w),
+                child: Text(
+                  controller.error.value,
+                  style: TextStyles.regularwhite.copyWith(
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 5,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(height: 4.h),
+              ElevatedButton.icon(
+                onPressed: () => _refreshProfile(),
+                icon: Icon(Icons.refresh, size: 12.sp),
+                label: Text('Retry', style: TextStyles.buttontext),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blueColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2.h),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  // Empty State
+  // Empty State (scrollable for iPad/overflow safety)
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.person_off,
-            size: 48.sp,
-            color: Colors.grey.shade400,
-          ),
-          SizedBox(height: 3.h),
-          Text(
-            'Profile Not Found',
-            style: TextStyles.heading,
-          ),
-          SizedBox(height: 1.h),
-          Text(
-            'This profile doesn\'t exist or has been removed.',
-            style: TextStyles.regularwhite.copyWith(
-              color: Colors.white70,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 4.h),
-          ElevatedButton.icon(
-            onPressed: () => _refreshProfile(),
-            icon: Icon(Icons.refresh, size: 12.sp),
-            label: Text('Retry', style: TextStyles.buttontext),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blueColor,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.h),
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height -
+              MediaQuery.of(context).padding.top -
+              MediaQuery.of(context).padding.bottom -
+              100,
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.person_off,
+                size: 48.sp,
+                color: Colors.grey.shade400,
               ),
-            ),
+              SizedBox(height: 3.h),
+              Text(
+                'Profile Not Found',
+                style: TextStyles.heading,
+              ),
+              SizedBox(height: 1.h),
+              Text(
+                'This profile doesn\'t exist or has been removed.',
+                style: TextStyles.regularwhite.copyWith(
+                  color: Colors.white70,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 4.h),
+              ElevatedButton.icon(
+                onPressed: () => _refreshProfile(),
+                icon: Icon(Icons.refresh, size: 12.sp),
+                label: Text('Retry', style: TextStyles.buttontext),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blueColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2.h),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -455,9 +478,12 @@ class _ProfileScreenState extends State<ProfileScreen>
       child: CircleAvatar(
         radius: 60,
         backgroundColor: Colors.grey.shade800,
-        backgroundImage: CachedNetworkImageProvider(
-          'https://eventgo-live.com/${profile.data?.profileImageUrl}',
-        ),
+        backgroundImage: (profile.data?.profileImageUrl != null &&
+                profile.data!.profileImageUrl!.isNotEmpty)
+            ? CachedNetworkImageProvider(
+                'https://eventgo-live.com/${profile.data!.profileImageUrl}',
+              )
+            : null,
         child: profile.data?.profileImageUrl == null
             ? Icon(
                 Icons.person,
@@ -932,7 +958,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                     _buildWarningItem('Your profile and personal information'),
                     _buildWarningItem('All your events'),
                     _buildWarningItem('All your bookings and tickets'),
-                    _buildWarningItem('Your followers and following relationships'),
+                    _buildWarningItem(
+                        'Your followers and following relationships'),
                     _buildWarningItem('All your ads and promotions'),
                   ],
                 ),
@@ -1004,7 +1031,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   Future<void> _handleDeleteAccount() async {
     // Show loading dialog
     if (!mounted) return;
-    
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1033,15 +1060,15 @@ class _ProfileScreenState extends State<ProfileScreen>
 
     try {
       final authController = Get.find<AuthViewModel>();
-      
+
       // Close dialog before navigation to avoid Navigator history issues
       if (mounted) {
         Navigator.of(context).pop(); // Close loading dialog first
       }
-      
+
       // Small delay to ensure dialog is closed
       await Future.delayed(const Duration(milliseconds: 100));
-      
+
       // Delete account (this will handle navigation)
       await authController.deleteAccount();
     } catch (e) {

@@ -35,8 +35,16 @@ class PublicProfileController extends GetxController {
       final token = prefs.getString('token');
       if (token != null && token.isNotEmpty) {
         await fetchUserProfile();
+      } else {
+        clearCurrentUserProfile();
       }
     } catch (_) {}
+  }
+
+  /// Clear current user profile state (e.g. when logged out) to avoid stale error/empty state
+  void clearCurrentUserProfile() {
+    userProfile.value = null;
+    error.value = '';
   }
 
   /// ✅ Fetch public profile by userId
@@ -49,17 +57,18 @@ class PublicProfileController extends GetxController {
     try {
       isLoading.value = true;
       error.value = ''; // Clear previous errors
-      
+
       // Force fresh fetch by clearing cached profile if ID changed
       if (profile.value?.userId != id) {
         profile.value = null;
       }
-      
+
       final result = await _userService.fetchPublicProfile(id);
       if (result != null) {
         profile.value = result;
         error.value = '';
-        print('🔷 Profile loaded successfully - isFollowing: ${result.isFollowing}, followersCount: ${result.followersCount}');
+        print(
+            '🔷 Profile loaded successfully - isFollowing: ${result.isFollowing}, followersCount: ${result.followersCount}');
       } else {
         error.value = 'Failed to load profile';
         print('❌ Profile result is null');
@@ -78,7 +87,7 @@ class PublicProfileController extends GetxController {
       isLoading.value = true;
       error.value = ''; // Clear any previous errors
       final result = await _userService.fetchProfile();
-      
+
       // Validate that we got valid data
       if (result.data == null) {
         error.value = 'Failed to load profile';

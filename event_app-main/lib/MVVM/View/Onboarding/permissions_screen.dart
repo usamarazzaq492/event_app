@@ -64,11 +64,6 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
     }
   }
 
-  void _onSkip() async {
-    await _markOnboardingComplete();
-    Get.offAllNamed(RouteName.bottomNav);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,7 +102,8 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                 iconColor: Colors.green.shade400,
                 title: 'Location',
                 subtitle: 'Find events near you',
-                description: 'See events happening in your area on your home feed.',
+                description:
+                    'See events happening in your area on your home feed.',
                 isGranted: _locationGranted,
               ),
               SizedBox(height: 3.h),
@@ -118,31 +114,19 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                 iconColor: Colors.orange.shade400,
                 title: 'Notifications',
                 subtitle: 'Stay in the loop',
-                description: 'Get reminders about your tickets and events you might like.',
+                description:
+                    'Get reminders about your tickets and events you might like.',
                 isGranted: _notificationGranted,
               ),
 
               const Spacer(),
 
-              // Turn on button
+              // Continue button - proceeds to system permission request (no skip option)
               ButtonWidget(
-                text: _isRequesting ? 'Enabling...' : 'Turn on',
+                text: _isRequesting ? 'Enabling...' : 'Continue',
                 onPressed: _isRequesting ? null : _onContinue,
                 backgroundColor: AppColors.blueColor,
                 borderRadius: 4.h,
-              ),
-              SizedBox(height: 2.h),
-
-              // Skip link
-              TextButton(
-                onPressed: _onSkip,
-                child: Text(
-                  'Maybe later',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 13.sp,
-                  ),
-                ),
               ),
             ],
           ),
@@ -209,7 +193,8 @@ class _PermissionCard extends StatelessWidget {
                     ),
                     if (isGranted) ...[
                       SizedBox(width: 2.w),
-                      Icon(Icons.check_circle, size: 18.sp, color: Colors.green),
+                      Icon(Icons.check_circle,
+                          size: 18.sp, color: Colors.green),
                     ],
                   ],
                 ),

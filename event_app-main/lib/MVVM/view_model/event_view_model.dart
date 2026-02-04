@@ -20,7 +20,8 @@ class EventController extends GetxController {
   var upcomingEvents = <EventModel>[].obs;
   var pastEvents = <EventModel>[].obs;
   var myEvents = <MyEventModel>[].obs;
-  var timelineEvents = <EventModel>[].obs; // Timeline: events from followed users
+  var timelineEvents =
+      <EventModel>[].obs; // Timeline: events from followed users
   var eventDetail = Rxn<EventDetailModel>();
 
   var isLoading = false.obs;
@@ -79,6 +80,7 @@ class EventController extends GetxController {
       upcomingEvents.assignAll(upcoming);
       pastEvents.assignAll(past);
       events.assignAll(result);
+      errorMessage.value = ''; // Clear on success
     } catch (e) {
       errorMessage.value = e.toString();
     } finally {
@@ -111,8 +113,8 @@ class EventController extends GetxController {
       final result = await _eventService.fetchTimelineEvents();
       timelineEvents.assignAll(result);
     } catch (e) {
-      errorMessage.value = e.toString();
-      timelineEvents.clear(); // Clear on error
+      timelineEvents.clear();
+      // Don't set errorMessage - timeline is supplemental; main events list (Search tab) should not show timeline errors
     } finally {
       isTimelineLoading.value = false;
     }
@@ -283,9 +285,9 @@ class EventController extends GetxController {
         // Refresh the event list after successful update
         await fetchAllEvents();
       } else {
-        final errorMessage = data["error"] ?? 
-                           data["message"] ?? 
-                           "Update failed. Status: ${response.statusCode}";
+        final errorMessage = data["error"] ??
+            data["message"] ??
+            "Update failed. Status: ${response.statusCode}";
         Get.snackbar("Error", errorMessage,
             backgroundColor: Colors.red, colorText: Colors.white);
         print("Update Event Error: ${response.statusCode} - ${response.body}");

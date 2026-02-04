@@ -145,8 +145,10 @@ class _AboutTabState extends State<AboutTab> {
       final bio = profile.data?.shortBio ?? 'No bio available';
       final rawInterests = profile.data?.interests ?? [];
       final splitInterests = rawInterests
+          .map((e) => e.toString())
           .expand((e) => e.split(','))
           .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
           .toList();
 
       return SingleChildScrollView(

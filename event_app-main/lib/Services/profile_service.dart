@@ -38,10 +38,12 @@ class UserService {
       final jsonData = json.decode(response.body);
       print('🔷 Parsed JSON: $jsonData');
       final profile = ViewPublicProfileModel.fromJson(jsonData);
-      print('🔷 Parsed Profile - isFollowing: ${profile.isFollowing}, followersCount: ${profile.followersCount}');
+      print(
+          '🔷 Parsed Profile - isFollowing: ${profile.isFollowing}, followersCount: ${profile.followersCount}');
       return profile;
     } else {
-      print('❌ Failed to fetch profile: ${response.statusCode} - ${response.body}');
+      print(
+          '❌ Failed to fetch profile: ${response.statusCode} - ${response.body}');
       return null;
     }
   }
@@ -66,21 +68,31 @@ class UserService {
       ).timeout(
         const Duration(seconds: 30),
         onTimeout: () {
-          throw Exception('Connection timeout. Please check your internet connection.');
+          throw Exception(
+              'Connection timeout. Please check your internet connection.');
         },
       );
 
       final jsonResponse = json.decode(response.body);
-      print('[fetchProfile] Status: ${response.statusCode}, Response: $jsonResponse');
+      print(
+          '[fetchProfile] Status: ${response.statusCode}, Response: $jsonResponse');
 
       if (response.statusCode == 200) {
         // Check if API returned success: false
-        if (jsonResponse is Map<String, dynamic> && 
+        if (jsonResponse is Map<String, dynamic> &&
             jsonResponse['success'] == false) {
-          final errorMessage = jsonResponse['message'] ?? 'Failed to load profile';
+          final errorMessage =
+              jsonResponse['message'] ?? 'Failed to load profile';
           throw Exception(errorMessage);
         }
-        return ProfileModel.fromJson(jsonResponse);
+        if (jsonResponse is! Map) {
+          throw Exception('Invalid profile response from server.');
+        }
+        try {
+          return ProfileModel.fromJson(Map<String, dynamic>.from(jsonResponse));
+        } catch (e) {
+          throw Exception('Failed to load profile. Please try again.');
+        }
       } else if (response.statusCode == 401) {
         throw Exception('Session expired. Please log in again.');
       } else if (response.statusCode == 404) {
@@ -88,7 +100,7 @@ class UserService {
       } else if (response.statusCode >= 500) {
         throw Exception('Server error. Please try again later.');
       } else {
-        final errorMessage = jsonResponse['message'] ?? 
+        final errorMessage = jsonResponse['message'] ??
             'Failed to load profile (${response.statusCode})';
         throw Exception(errorMessage);
       }
@@ -146,12 +158,14 @@ class UserService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('[updateUserProfile] Status: ${response.statusCode}, Body: ${response.body}');
+      print(
+          '[updateUserProfile] Status: ${response.statusCode}, Body: ${response.body}');
 
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to update profile: ${response.statusCode}, ${response.body}');
+        throw Exception(
+            'Failed to update profile: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
       print('❌ Error in updateUserProfile: $e');

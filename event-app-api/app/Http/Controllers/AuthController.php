@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
+use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
 
 class AuthController extends Controller
 {
@@ -176,7 +178,10 @@ $mailSent = mail($to, $subject, $message, $headers);
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+        if (!$user->password || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
@@ -293,6 +298,99 @@ $mailSent = mail($to, $subject, $message, $headers);
         $user->save();
 
         return response()->json(['message' => 'Password reset successful.']);
+    }
+
+    /**
+     * Sign in with Apple - verifies identity token and creates/logs in user.
+     * Required for App Store Guideline 4.8 when offering third-party login.
+     */
+    public function signInWithApple(Request $request)
+    {
+        $request->validate([
+            'identity_token' => 'required|string',
+            'authorization_code' => 'nullable|string',
+            'user_identifier' => 'nullable|string',
+            'email' => 'nullable|email',
+            'given_name' => 'nullable|string|max:255',
+            'family_name' => 'nullable|string|max:255',
+        ]);
+
+        $identityToken = $request->identity_token;
+
+        try {
+            $payload = $this->verifyAppleIdentityToken($identityToken);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid Apple sign-in. Please try again.',
+            ], 401);
+        }
+
+        $appleId = $payload['sub'] ?? null;
+        $email = $payload['email'] ?? $request->email;
+        $emailVerified = ($payload['email_verified'] ?? false) || !empty($email);
+
+        $givenName = $request->given_name ?? '';
+        $familyName = $request->family_name ?? '';
+        $name = trim($givenName . ' ' . $familyName) ?: ($payload['email'] ?? 'Apple User');
+
+        if (!$appleId) {
+            return response()->json(['message' => 'Invalid Apple token.'], 401);
+        }
+
+        $user = User::where('apple_id', $appleId)->first();
+
+        if (!$user) {
+            if ($email && User::where('email', $email)->exists()) {
+                $user = User::where('email', $email)->first();
+                $user->apple_id = $appleId;
+                $user->save();
+            } else {
+                $user = User::create([
+                    'apple_id' => $appleId,
+                    'email' => $email ?: 'apple_' . substr($appleId, 0, 12) . '@privaterelay.appleid.com',
+                    'name' => $name,
+                    'password' => Hash::make(bin2hex(random_bytes(32))), // Random - Apple users sign in via Apple only
+                    'emailVerified' => $emailVerified ? 1 : 0,
+                    'isActive' => 1,
+                    'terms_accepted_at' => now(),
+                    'terms_version_accepted' => 'v1',
+                ]);
+            }
+        }
+
+        $tokenResult = $user->createToken('auth_token');
+        $token = $tokenResult->accessToken;
+        $token->expires_at = now()->addDays(30);
+        $token->save();
+
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $tokenResult->plainTextToken,
+            'expires_at' => $token->expires_at->toDateTimeString(),
+            'user' => $user->makeHidden(['password', 'verificationCode']),
+        ], 200);
+    }
+
+    private function verifyAppleIdentityToken(string $identityToken): array
+    {
+        $keys = json_decode(file_get_contents('https://appleid.apple.com/auth/keys'), true);
+        $jwks = JWK::parseKeySet($keys);
+
+        $decoded = JWT::decode($identityToken, $jwks);
+        $payload = json_decode(json_encode($decoded), true);
+
+        $iss = $payload['iss'] ?? '';
+        $exp = $payload['exp'] ?? 0;
+
+        if ($iss !== 'https://appleid.apple.com') {
+            throw new \Exception('Invalid issuer');
+        }
+        if ($exp < time()) {
+            throw new \Exception('Token expired');
+        }
+
+        return $payload;
     }
 
     public function logout(Request $request)
