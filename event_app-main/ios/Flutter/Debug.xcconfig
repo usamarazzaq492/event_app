@@ -1,5 +1,5 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include "Generated.xcconfig"
 #include? "GoogleMaps.xcconfig"
-// Override CocoaPods arm64 exclusion for simulator (needed for M-series Macs)
-EXCLUDED_ARCHS[sdk=iphonesimulator*] = x86_64
+// MLImage/ML Kit lacks arm64-simulator; use x86_64 (Rosetta on M1)
+EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64
