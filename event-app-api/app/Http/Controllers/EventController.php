@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\Event;
 use App\Models\Booking;
 
@@ -92,6 +93,12 @@ class EventController extends Controller
         // Name filter (case-insensitive search)
         if ($request->filled('name')) {
             $query->where('eventTitle', 'like', '%'.$validated['name'].'%');
+        }
+
+        // Filter out events from blocked users (Guideline 1.2)
+        $blockedIds = $this->getBlockedUserIds($request);
+        if (!empty($blockedIds)) {
+            $query->whereNotIn('userId', $blockedIds);
         }
 
         $events = $query->get([
@@ -185,11 +192,25 @@ class EventController extends Controller
                 ]);
             }
 
+            // Exclude blocked users (Guideline 1.2)
+            $blockedIds = DB::table('blocked_users')
+                ->where('blocker_id', $userId)
+                ->pluck('blocked_id')
+                ->toArray();
+            $filteredFollowingIds = array_diff($followingIds, $blockedIds);
+            if (empty($filteredFollowingIds)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'message' => 'Follow users to see their events in your timeline'
+                ]);
+            }
+
             // Get events from followed users with user information (like social media feed)
             // Use whereDate for proper date comparison (ignores time)
             $events = DB::table('events')
                 ->join('mstuser', 'events.userId', '=', 'mstuser.userId')
-                ->whereIn('events.userId', $followingIds)
+                ->whereIn('events.userId', $filteredFollowingIds)
                 ->where('events.isActive', 1)
                 ->whereDate('events.startDate', '>=', now()->toDateString()) // Only upcoming events (including today)
                 ->orderByRaw('
@@ -457,5 +478,26 @@ class EventController extends Controller
         $pattern = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/';
         preg_match($pattern, $url, $matches);
         return isset($matches[1]) ? $matches[1] : null;
+    }
+
+    /** Get blocked user IDs for optional auth (Guideline 1.2) */
+    private function getBlockedUserIds(Request $request): array
+    {
+        $token = $request->bearerToken();
+        if (!$token) {
+            return [];
+        }
+        $accessToken = PersonalAccessToken::findToken($token);
+        if (!$accessToken) {
+            return [];
+        }
+        $user = $accessToken->tokenable;
+        if (!$user) {
+            return [];
+        }
+        return DB::table('blocked_users')
+            ->where('blocker_id', $user->userId)
+            ->pluck('blocked_id')
+            ->toArray();
     }
 }

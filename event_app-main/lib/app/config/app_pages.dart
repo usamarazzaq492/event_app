@@ -6,7 +6,6 @@ class RouteName {
   static const String onboardScreen = 'onboarding_screen';
   static const String home = 'home_screen';
   static const String bottomNav = 'bottom_nav';
-  static const String account = 'account_setup_screen';
   static const String otpScreen = 'otp_screen';
   static const String password = 'password_setting';
   static const String forgotpassword = 'forgot_password';

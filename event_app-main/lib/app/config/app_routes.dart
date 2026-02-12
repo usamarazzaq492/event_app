@@ -6,7 +6,6 @@ import 'package:event_app/MVVM/View/Onboarding/onboarding_screen.dart';
 import 'package:event_app/MVVM/View/welcome/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../../MVVM/View/AccountSetup/account_setup_screnn.dart';
 import '../../MVVM/View/AccountSetup/otp_screen.dart';
 import '../../MVVM/View/AccountSetup/password_setting.dart';
 import '../../MVVM/View/ForgotPAssword/forgot_password.dart';
@@ -65,8 +64,6 @@ class Routes {
             message: args['message'],
           ),
         );
-      case RouteName.account:
-        return MaterialPageRoute(builder: (_) => AccountSetupScreen());
       case RouteName.password:
         return MaterialPageRoute(builder: (_) => PasswordSetting());
       case RouteName.forgotpassword:

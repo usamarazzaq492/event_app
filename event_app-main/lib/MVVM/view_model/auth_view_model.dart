@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:event_app/MVVM/View/AccountSetup/account_setup_screnn.dart';
 import 'package:event_app/MVVM/View/AccountSetup/otp_screen.dart';
 import 'package:event_app/MVVM/View/AccountSetup/verify_email.dart';
 import 'package:event_app/MVVM/View/Auth/sign_in.dart';
@@ -108,34 +107,8 @@ class AuthViewModel extends GetxController {
         await _prefs.setString('user', jsonEncode(user));
         currentUser.value = user; // update observable
         isLoggedIn.value = true;
-        // 🔷 OPTION A: If your login API returns full user data
-        bool isProfileComplete = _isProfileComplete(user);
-
-        if (isProfileComplete) {
-          await fetchUsers();
-          Get.offAllNamed(RouteName.bottomNav);
-        } else {
-          Get.offAll(() => AccountSetupScreen());
-        }
-
-        // 🔷 OPTION B: If login API does NOT return full user data
-        // Uncomment below if needed and comment out Option A
-
-        /*
-      final profileResponse = await DataService.getUserProfile();
-      if (profileResponse['statusCode'] == 200) {
-        final userProfile = profileResponse['data'];
-        bool isProfileComplete = _isProfileComplete(userProfile);
-
-        if (isProfileComplete) {
-          Get.offAllNamed(RouteName.home);
-        } else {
-          Get.offAll(() => AccountSetupScreen());
-        }
-      } else {
-        _handleApiError('Failed to fetch profile');
-      }
-      */
+        await fetchUsers();
+        Get.offAllNamed(RouteName.bottomNav);
       } else {
         _handleApiError(response['message'] ?? 'Login failed');
       }
@@ -174,13 +147,8 @@ class AuthViewModel extends GetxController {
         await _prefs.setString('user', jsonEncode(user));
         currentUser.value = user;
         isLoggedIn.value = true;
-        bool isProfileComplete = _isProfileComplete(user);
-        if (isProfileComplete) {
-          await fetchUsers();
-          Get.offAllNamed(RouteName.bottomNav);
-        } else {
-          Get.offAll(() => AccountSetupScreen());
-        }
+        await fetchUsers();
+        Get.offAllNamed(RouteName.bottomNav);
       } else {
         _handleApiError(response['message'] ?? 'Apple sign-in failed');
       }
@@ -199,19 +167,6 @@ class AuthViewModel extends GetxController {
     } else {
       print("No user data found in prefs");
     }
-  }
-
-  bool _isProfileComplete(Map<String, dynamic> user) {
-    return user['name'] != null &&
-        user['name'].toString().isNotEmpty &&
-        user['phoneNumber'] != null &&
-        user['phoneNumber'].toString().isNotEmpty &&
-        user['interests'] != null &&
-        user['interests'].toString().isNotEmpty &&
-        user['shortBio'] != null &&
-        user['shortBio'].toString().isNotEmpty &&
-        user['profileImageUrl'] != null &&
-        user['profileImageUrl'].toString().isNotEmpty;
   }
 
   /// 📝 Register new user
@@ -444,18 +399,7 @@ class AuthViewModel extends GetxController {
         return;
       }
 
-      bool isProfileComplete = (user.name != null && user.name!.isNotEmpty) &&
-          (user.profileImageUrl != null && user.profileImageUrl!.isNotEmpty) &&
-          (user.shortBio != null && user.shortBio!.isNotEmpty) &&
-          (user.phoneNumber != null && user.phoneNumber!.isNotEmpty) &&
-          (user.interests != null && user.interests!.isNotEmpty);
-
-      if (isProfileComplete) {
-        Get.offAllNamed(RouteName.bottomNav); // home tab by default
-      } else {
-        Get.offAll(() =>
-            AccountSetupScreen()); // ✅ Navigate to Account Setup if profile incomplete
-      }
+      Get.offAllNamed(RouteName.bottomNav);
     } catch (e) {
       print('Error in checkLoginStatus: $e');
       // Invalid/expired token or network error: clear auth and open app as guest

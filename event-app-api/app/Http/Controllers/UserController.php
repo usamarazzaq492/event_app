@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class UserController extends Controller
 {
@@ -36,18 +37,25 @@ class UserController extends Controller
                 ]);
             }
 
-            $users = \App\Models\User::select([
+            $q = \App\Models\User::select([
                     'userId',
                     'name',
                     'email',
                     'profileImageUrl',
                 ])
                 ->where('isActive', 1)
-                ->where(function ($q) use ($query) {
-                    $q->where('name', 'like', '%' . $query . '%')
+                ->where(function ($qb) use ($query) {
+                    $qb->where('name', 'like', '%' . $query . '%')
                       ->orWhere('email', 'like', '%' . $query . '%');
-                })
-                ->limit(10)
+                });
+
+            // Exclude blocked users when logged in (Guideline 1.2)
+            $blockedIds = $this->getBlockedUserIdsOptional($request);
+            if (!empty($blockedIds)) {
+                $q->whereNotIn('userId', $blockedIds);
+            }
+
+            $users = $q->limit(10)
                 ->get()
                 ->map(function ($user) {
                     return [
@@ -71,6 +79,26 @@ class UserController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function getBlockedUserIdsOptional(Request $request): array
+    {
+        $token = $request->bearerToken();
+        if (!$token) {
+            return [];
+        }
+        $accessToken = PersonalAccessToken::findToken($token);
+        if (!$accessToken) {
+            return [];
+        }
+        $user = $accessToken->tokenable;
+        if (!$user) {
+            return [];
+        }
+        return DB::table('blocked_users')
+            ->where('blocker_id', $user->userId)
+            ->pluck('blocked_id')
+            ->toArray();
     }
 
     public function index(Request $request)

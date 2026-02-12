@@ -26,6 +26,7 @@ import 'package:event_app/Services/payment_qr_service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:event_app/Services/moderation_service.dart';
 
 /// Safe Google Map Widget with error handling - COMMENTED OUT
 /*
@@ -298,6 +299,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  Future<void> _showReportEventSheet(int eventId) async {
+    final reason = await Get.dialog<String>(
+      _ReportEventReasonDialog(),
+    );
+    if (reason == null) return;
+    try {
+      final res = await ModerationService.reportEvent(eventId, reason: reason.isEmpty ? null : reason);
+      if (res['statusCode'] == 201 || res['statusCode'] == 200) {
+        Get.snackbar('Reported', res['message'] ?? 'Report submitted.', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.signinoptioncolor, colorText: Colors.white);
+      } else {
+        Get.snackbar('Error', res['message'] ?? 'Could not submit report.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      }
+    } catch (e) {
+      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -490,11 +508,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             color: Colors.black.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(1.h),
           ),
-          child: IconButton(
-            icon: Icon(Icons.share, color: Colors.white, size: 16.sp),
-            onPressed: () {
+          child: PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: Colors.white, size: 16.sp),
+            color: AppColors.signinoptioncolor,
+            onSelected: (value) async {
               HapticUtils.light();
-              ShareUtils.shareEvent(
+              if (value == 'share') {
+                ShareUtils.shareEvent(
                 eventTitle: event.eventTitle ?? 'Event',
                 eventDescription: event.description ?? '',
                 eventDate: event.startDate ?? '',
@@ -504,7 +524,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 eventUrl: 'https://eventgo-live.com/event/${event.eventId}',
                 organizerName: hostProfile?.name,
               );
+              } else if (value == 'report') {
+                if (!authViewModel.isLoggedIn.value) {
+                  Get.snackbar('Sign in required', 'Please sign in to report.', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.blueColor, colorText: Colors.white, mainButton: TextButton(onPressed: () { Get.closeCurrentSnackbar(); Get.toNamed(RouteName.loginScreen); }, child: Text('Sign in', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))));
+                  return;
+                }
+                await _showReportEventSheet(event.eventId!);
+              }
             },
+            itemBuilder: (context) => [
+              PopupMenuItem(value: 'share', child: Row(children: [Icon(Icons.share, color: Colors.white, size: 18), SizedBox(width: 8), Text('Share', style: TextStyle(color: Colors.white))])),
+              PopupMenuItem(value: 'report', child: Row(children: [Icon(Icons.flag, color: Colors.orange, size: 18), SizedBox(width: 8), Text('Report', style: TextStyle(color: Colors.white))])),
+            ],
           ),
         ),
         if (isCreator)
@@ -2145,4 +2176,51 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   String capitalize(String text) =>
       text.isNotEmpty ? '${text[0].toUpperCase()}${text.substring(1)}' : text;
+}
+
+class _ReportEventReasonDialog extends StatefulWidget {
+  @override
+  State<_ReportEventReasonDialog> createState() => _ReportEventReasonDialogState();
+}
+
+class _ReportEventReasonDialogState extends State<_ReportEventReasonDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppColors.signinoptioncolor,
+      title: Text('Report Event', style: TextStyle(color: Colors.white)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Optionally describe the issue:', style: TextStyle(color: Colors.white70, fontSize: 12)),
+          SizedBox(height: 8),
+          TextField(
+            controller: _controller,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Reason (optional)',
+              hintStyle: TextStyle(color: Colors.white38),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              filled: true,
+              fillColor: Colors.white.withValues(alpha: 0.1),
+            ),
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: Colors.white70))),
+        TextButton(onPressed: () => Navigator.pop(context, _controller.text.trim()), child: Text('Submit', style: TextStyle(color: AppColors.blueColor))),
+      ],
+    );
+  }
 }

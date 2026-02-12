@@ -56,6 +56,13 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.dark,
         theme: AppTheme.darkTheme,
         darkTheme: AppTheme.darkTheme,
+        builder: (context, child) {
+          return GestureDetector(
+            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+            behavior: HitTestBehavior.opaque,
+            child: child,
+          );
+        },
         home: FutureBuilder<bool>(
           future: checkOnboardingSeen(),
           builder: (context, snapshot) {

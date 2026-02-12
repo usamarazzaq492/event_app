@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:event_app/Services/moderation_service.dart';
 
 class PublicProfileScreen extends StatefulWidget {
   final int? id;
@@ -308,10 +309,34 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (String value) {
+            onSelected: (String value) async {
               HapticUtils.light();
+              if (!authViewModel.isLoggedIn.value && (value == 'report' || value == 'block')) {
+                Get.snackbar(
+                  'Sign in required',
+                  'Please sign in to report or block users.',
+                  backgroundColor: AppColors.blueColor,
+                  colorText: Colors.white,
+                  mainButton: TextButton(
+                    onPressed: () {
+                      Get.closeCurrentSnackbar();
+                      Get.toNamed(RouteName.loginScreen);
+                    },
+                    child: Text('Sign in', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                );
+                return;
+              }
+              final profile = controller.profile.value;
+              if (profile == null) return;
+              final userId = profile.userId;
+              if (userId == null) return;
               if (value == 'share') {
                 _shareProfile();
+              } else if (value == 'report') {
+                await _showReportUserSheet(userId);
+              } else if (value == 'block') {
+                await _showBlockUserSheet(userId);
               }
             },
             itemBuilder: (BuildContext context) => [
@@ -322,6 +347,26 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                     Icon(Icons.share, color: Colors.blue),
                     SizedBox(width: 8),
                     Text('Share Profile'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'report',
+                child: Row(
+                  children: [
+                    Icon(Icons.flag, color: Colors.orange),
+                    SizedBox(width: 8),
+                    Text('Report'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'block',
+                child: Row(
+                  children: [
+                    Icon(Icons.block, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Block'),
                   ],
                 ),
               ),
@@ -612,5 +657,95 @@ Download EventGo app to connect with them and discover amazing events!
         subject: '${profile.name ?? 'User'}\'s Profile on EventGo',
       );
     }
+  }
+
+  Future<void> _showReportUserSheet(int userId) async {
+    final reason = await Get.dialog<String>(
+      _ReportReasonDialog(),
+    );
+    if (reason == null) return;
+    try {
+      final res = await ModerationService.reportUser(userId, reason: reason.isEmpty ? null : reason);
+      if (res['statusCode'] == 201 || res['statusCode'] == 200) {
+        Get.snackbar('Reported', res['message'] ?? 'Report submitted.', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.signinoptioncolor, colorText: Colors.white);
+      } else {
+        Get.snackbar('Error', res['message'] ?? 'Could not submit report.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      }
+    } catch (e) {
+      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+    }
+  }
+
+  Future<void> _showBlockUserSheet(int userId) async {
+    final confirm = await Get.dialog<bool>(
+      AlertDialog(
+        backgroundColor: AppColors.signinoptioncolor,
+        title: Text('Block User?', style: TextStyle(color: Colors.white)),
+        content: Text('This user will be removed from your feed. You can unblock them later from settings.', style: TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: TextStyle(color: Colors.white70))),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Block', style: TextStyle(color: Colors.red))),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    try {
+      final res = await ModerationService.blockUser(userId);
+      if (res['statusCode'] == 200) {
+        Get.snackbar('Blocked', res['message'] ?? 'User blocked.', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.signinoptioncolor, colorText: Colors.white);
+        if (mounted) Navigator.of(context).pop();
+      } else {
+        Get.snackbar('Error', res['message'] ?? 'Could not block.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      }
+    } catch (e) {
+      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+    }
+  }
+}
+
+class _ReportReasonDialog extends StatefulWidget {
+  @override
+  State<_ReportReasonDialog> createState() => _ReportReasonDialogState();
+}
+
+class _ReportReasonDialogState extends State<_ReportReasonDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppColors.signinoptioncolor,
+      title: Text('Report User', style: TextStyle(color: Colors.white)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Optionally describe the issue:', style: TextStyle(color: Colors.white70, fontSize: 12)),
+          SizedBox(height: 8),
+          TextField(
+            controller: _controller,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Reason (optional)',
+              hintStyle: TextStyle(color: Colors.white38),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              filled: true,
+              fillColor: Colors.white.withValues(alpha: 0.1),
+            ),
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: Colors.white70))),
+        TextButton(onPressed: () => Navigator.pop(context, _controller.text.trim()), child: Text('Submit', style: TextStyle(color: AppColors.blueColor))),
+      ],
+    );
   }
 }

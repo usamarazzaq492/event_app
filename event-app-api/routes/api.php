@@ -11,6 +11,7 @@ use App\Http\Controllers\DonationController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\PaymentQrController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ModerationController;
 
 Route::prefix('v1')->group(function () {
     // 🔐 Auth
@@ -61,6 +62,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/user/{id}/unfollow', [FollowController::class, 'unfollowUser']);
         Route::get('/user/{id}/followers', [FollowController::class, 'getFollowers']);
         Route::get('/user/{id}/following', [FollowController::class, 'getFollowing']);
+
+        // 🛡️ Moderation (Guideline 1.2 - User-Generated Content)
+        Route::post('/report/event/{id}', [ModerationController::class, 'reportEvent']);
+        Route::post('/report/user/{id}', [ModerationController::class, 'reportUser']);
+        Route::post('/user/{id}/block', [ModerationController::class, 'blockUser']);
+        Route::post('/user/{id}/unblock', [ModerationController::class, 'unblockUser']);
+        Route::get('/moderation/blocked-ids', [ModerationController::class, 'getBlockedUserIds']);
 
         // 📅 Events (list and GET /events/{id} are public above - no duplicate)
         Route::prefix('events')->group(function () {
