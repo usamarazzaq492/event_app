@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Terms of Service')
+@section('title', 'Terms of Service - EventGo-Live')
 
 @section('content')
 <div class="container py-5">
@@ -116,6 +116,22 @@
                 <p>
                     All content provided through the Service is protected by intellectual property laws. Unauthorized
                     reproduction or distribution is strictly prohibited.
+                </p>
+
+                <hr class="my-4">
+
+                <h3>User-Generated Content Policy</h3>
+                <p>
+                    EVENTGO-Live has zero tolerance for objectionable content or abusive users. By using this app, you agree to:
+                </p>
+                <ul>
+                    <li>Not post content that is offensive, harmful, or inappropriate.</li>
+                    <li>Report any objectionable content or abusive behavior you encounter.</li>
+                    <li>Use the block feature to prevent abusive users from appearing in your feed.</li>
+                    <li>Understand that we act on reports within 24 hours by removing content and taking action against offending accounts.</li>
+                </ul>
+                <p>
+                    For support or to report issues, contact us at <strong>support@eventgo-live.com</strong>.
                 </p>
 
                 <hr class="my-4">

@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class TermsScreen extends StatefulWidget {
-  const TermsScreen({super.key});
+class ContactScreen extends StatefulWidget {
+  const ContactScreen({super.key});
 
   @override
-  State<TermsScreen> createState() => _TermsScreenState();
+  State<ContactScreen> createState() => _ContactScreenState();
 }
 
-class _TermsScreenState extends State<TermsScreen> {
+class _ContactScreenState extends State<ContactScreen> {
   late final WebViewController _controller;
 
   @override
@@ -20,7 +20,7 @@ class _TermsScreenState extends State<TermsScreen> {
     super.initState();
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse('https://eventgo-live.com/terms'));
+      ..loadRequest(Uri.parse('https://eventgo-live.com/contact'));
   }
 
   @override
@@ -38,7 +38,7 @@ class _TermsScreenState extends State<TermsScreen> {
           },
         ),
         title: Text(
-          'Terms & Conditions',
+          'Contact & Support',
           style: TextStyles.heading.copyWith(fontSize: 14.sp),
         ),
         centerTitle: false,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -355,8 +357,8 @@ class _SigninScreenState extends State<SigninScreen> {
                         ),
                         SizedBox(height: 2.h),
 
-                        /// Sign in with Apple (Guideline 4.8) - TODO: revert to if (Platform.isIOS) for production
-                        ...[
+                        /// Sign in with Apple (Guideline 4.8) - iOS only
+                        if (Platform.isIOS) ...[
                           SizedBox(
                             height: 50,
                             child: SignInWithAppleButton(

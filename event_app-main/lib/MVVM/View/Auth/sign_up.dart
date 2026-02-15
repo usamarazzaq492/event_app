@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:event_app/Widget/button_widget.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/gestures.dart';
@@ -431,6 +433,30 @@ class _SignupScreenState extends State<SignupScreen> {
                                                   RouteName.termsScreen);
                                             },
                                         ),
+                                        TextSpan(
+                                          text: ' and ',
+                                          style: TextStyles.regularwhite
+                                              .copyWith(
+                                            fontSize: 11.sp,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: 'Privacy Policy',
+                                          style:
+                                              TextStyles.regulartext.copyWith(
+                                            fontSize: 11.sp,
+                                            fontWeight: FontWeight.w600,
+                                            decoration:
+                                                TextDecoration.underline,
+                                          ),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              HapticUtils.navigation();
+                                              Navigator.pushNamed(context,
+                                                  RouteName.privacyScreen);
+                                            },
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -463,8 +489,8 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                           SizedBox(height: 2.h),
 
-                          /// Sign in with Apple (Guideline 4.8) - TODO: revert to if (Platform.isIOS) for production
-                          ...[
+                          /// Sign in with Apple (Guideline 4.8) - iOS only
+                          if (Platform.isIOS) ...[
                             SizedBox(
                               height: 50,
                               child: SignInWithAppleButton(

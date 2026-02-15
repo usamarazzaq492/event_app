@@ -816,6 +816,30 @@ class _ProfileScreenState extends State<ProfileScreen>
     });
   }
 
+  Widget _buildMenuTile({
+    required BuildContext context,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Container(
+        padding: EdgeInsets.all(2.w),
+        decoration: BoxDecoration(
+          color: iconColor.withValues(alpha: 0.2),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: iconColor, size: 16.sp),
+      ),
+      title: Text(
+        title,
+        style: TextStyles.regularhometext2.copyWith(color: Colors.white),
+      ),
+      onTap: onTap,
+    );
+  }
+
   Widget _buildBottomSheetMenu(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(4.w),
@@ -832,6 +856,48 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ),
           SizedBox(height: 3.h),
+
+          // Terms & Conditions
+          _buildMenuTile(
+            context: context,
+            icon: Icons.description_outlined,
+            iconColor: Colors.blue,
+            title: 'Terms & Conditions',
+            onTap: () {
+              HapticUtils.light();
+              NavigationUtils.pop(context);
+              Navigator.pushNamed(context, RouteName.termsScreen);
+            },
+          ),
+          SizedBox(height: 1.h),
+
+          // Privacy Policy
+          _buildMenuTile(
+            context: context,
+            icon: Icons.privacy_tip_outlined,
+            iconColor: Colors.blue,
+            title: 'Privacy Policy',
+            onTap: () {
+              HapticUtils.light();
+              NavigationUtils.pop(context);
+              Navigator.pushNamed(context, RouteName.privacyScreen);
+            },
+          ),
+          SizedBox(height: 1.h),
+
+          // Contact & Support
+          _buildMenuTile(
+            context: context,
+            icon: Icons.support_agent_outlined,
+            iconColor: Colors.blue,
+            title: 'Contact & Support',
+            onTap: () {
+              HapticUtils.light();
+              NavigationUtils.pop(context);
+              Navigator.pushNamed(context, RouteName.contactScreen);
+            },
+          ),
+          SizedBox(height: 2.h),
 
           // Logout option
           ListTile(
