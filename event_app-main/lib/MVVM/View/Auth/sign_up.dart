@@ -75,6 +75,12 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  void onSignUpPressed() {
+    FocusScope.of(context).unfocus();
+    HapticUtils.medium();
+    _submitForm();
+  }
+
   @override
   Widget build(BuildContext context) {
     final canPop = Navigator.of(context).canPop();
@@ -97,7 +103,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 right: 4.w,
                 bottom: 6.h,
               ),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -388,10 +394,11 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           /// Terms & Conditions
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Transform.translate(
-                                offset: const Offset(0, -2),
+                              SizedBox(
+                                height: 24,
+                                width: 24,
                                 child: Checkbox(
                                   value: _acceptedTerms,
                                   activeColor: AppColors.blueColor,
@@ -406,9 +413,15 @@ class _SignupScreenState extends State<SignupScreen> {
                                   },
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               Expanded(
-                                child: Padding(
-                                  padding: EdgeInsets.only(top: 1.h),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _acceptedTerms = !_acceptedTerms;
+                                      if (_acceptedTerms) _termsError = null;
+                                    });
+                                  },
                                   child: RichText(
                                     text: TextSpan(
                                       text: 'I agree to the ',
@@ -435,8 +448,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                         ),
                                         TextSpan(
                                           text: ' and ',
-                                          style: TextStyles.regularwhite
-                                              .copyWith(
+                                          style:
+                                              TextStyles.regularwhite.copyWith(
                                             fontSize: 11.sp,
                                             color: Colors.white70,
                                           ),
@@ -482,7 +495,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             () => ButtonWidget(
                               text: AppStrings.signupText,
                               isLoading: controller.isLoading.value,
-                              onPressed: _submitForm,
+                              onPressed: onSignUpPressed,
                               backgroundColor: AppColors.blueColor,
                               borderRadius: 14,
                             ),

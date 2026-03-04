@@ -23,128 +23,231 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0E12),
-      body: Padding(
-        padding: EdgeInsets.only(top: 4.h, left: 5.w, right: 5.w),
-        child: Column(
-          children: [
-            _buildHeader(),
-            SizedBox(height: 3.h),
-            Image.asset(AppImages.creditcard), // your card image placeholder
-            SizedBox(height: 3.h),
-            InputTextField(
-              myController: cardNameController,
-              onFieldSubmittedValue: (value) {
-                // You can trigger validation or API calls here if necessary
-              },
-              keyBoardType: TextInputType.emailAddress,
-              obscureText: false,
-              hint: 'Card Name',
-
-              validator: (value) {
-                return null;
-              },
+      backgroundColor: AppColors.backgroundColor,
+      body: Column(
+        children: [
+          /// Gradient header (consistent with Auth/Profile screens)
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 2.h,
+              left: 4.w,
+              right: 4.w,
+              bottom: 6.h,
             ),
-            SizedBox(height: 1.5.h),
-            InputTextField(
-              myController: cardNumberController,
-              onFieldSubmittedValue: (value) {
-                // You can trigger validation or API calls here if necessary
-              },
-              keyBoardType: TextInputType.emailAddress,
-              obscureText: false,
-              hint: 'Card Number',
-
-              validator: (value) {
-                return null;
-              },
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.primaryColor,
+                  AppColors.backgroundColor,
+                  AppColors.signinoptioncolor,
+                ],
+              ),
             ),
-            SizedBox(height: 1.5.h),
-            Row(
+            child: Column(
               children: [
-                Expanded(
-                  child:
-                  InputTextField(
-                    myController: expiryDateController,
-                    onFieldSubmittedValue: (value) {
-                      // You can trigger validation or API calls here if necessary
-                    },
-                    keyBoardType: TextInputType.emailAddress,
-                    obscureText: false,
-                    hint: 'Expiry Date',
-
-                    validator: (value) {
-                      return null;
-                    },
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: AppColors.whiteColor,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        HapticUtils.navigation();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    Text(
+                      'Add New Card',
+                      style: TextStyles.heading.copyWith(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 48), // Spacer for balance
+                  ],
                 ),
-                SizedBox(width: 4.w),
-                Expanded(
-                  child:   InputTextField(
-                    myController: cvvController,
-                    onFieldSubmittedValue: (value) {
-                      // You can trigger validation or API calls here if necessary
-                    },
-                    keyBoardType: TextInputType.emailAddress,
-                    obscureText: false,
-                    hint: 'CVV',
+                SizedBox(height: 3.h),
 
-                    validator: (value) {
-                      return null;
-                    },
+                /// Visual Card Illustration with a subtle glow
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.blueColor.withValues(alpha: 0.15),
+                        blurRadius: 30,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Image.asset(
+                    AppImages.creditcard,
+                    height: 20.h,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ],
             ),
-            const Spacer(),
-            ButtonWidget(text: 'Continue', onPressed: (){
-              if (cardNumberController.text.isNotEmpty) {
-                Navigator.pop(
-                    context, '**** **** **** ${cardNumberController.text.substring(cardNumberController.text.length - 4)}');
-              }
-            },backgroundColor: AppColors.blueColor,
-              textColor: AppColors.whiteColor,
-              borderRadius: 4.h,)
-          ],
-        ),
+          ),
+
+          /// Form card (Glassmorphic)
+          Expanded(
+            child: Transform.translate(
+              offset: const Offset(0, -24),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.signinoptioncolor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                  border: Border.all(
+                    color: AppColors.signinoptionbordercolor,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(6.w, 4.h, 6.w, 6.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Card Details',
+                        style: TextStyles.heading.copyWith(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 0.5.h),
+                      Text(
+                        'Securely add your payment method',
+                        style: TextStyles.regularwhite.copyWith(
+                          fontSize: 12.sp,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+
+                      /// Input Fields (consistent with Auth/Profile)
+                      _buildLabeledField(
+                        label: 'Card Holder Name',
+                        child: InputTextField(
+                          myController: cardNameController,
+                          keyBoardType: TextInputType.name,
+                          obscureText: false,
+                          hint: 'e.g. John Doe',
+                          validator: (v) =>
+                              v!.isEmpty ? 'Enter card name' : null,
+                        ),
+                      ),
+                      SizedBox(height: 2.5.h),
+
+                      _buildLabeledField(
+                        label: 'Card Number',
+                        child: InputTextField(
+                          myController: cardNumberController,
+                          keyBoardType: TextInputType.number,
+                          obscureText: false,
+                          hint: '**** **** **** ****',
+                          validator: (v) =>
+                              v!.length < 16 ? 'Invalid card number' : null,
+                        ),
+                      ),
+                      SizedBox(height: 2.5.h),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildLabeledField(
+                              label: 'Expiry Date',
+                              child: InputTextField(
+                                myController: expiryDateController,
+                                keyBoardType: TextInputType.datetime,
+                                obscureText: false,
+                                hint: 'MM/YY',
+                                validator: (v) =>
+                                    v!.isEmpty ? 'Required' : null,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 4.w),
+                          Expanded(
+                            child: _buildLabeledField(
+                              label: 'CVV',
+                              child: InputTextField(
+                                myController: cvvController,
+                                keyBoardType: TextInputType.number,
+                                obscureText: true,
+                                hint: '***',
+                                validator: (v) =>
+                                    v!.isEmpty ? 'Required' : null,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 6.h),
+
+                      /// Continue Button
+                      ButtonWidget(
+                        text: 'Continue',
+                        onPressed: () {
+                          HapticUtils.buttonPress();
+                          if (cardNumberController.text.length >= 4) {
+                            Navigator.pop(
+                              context,
+                              '**** **** **** ${cardNumberController.text.substring(cardNumberController.text.length - 4)}',
+                            );
+                          }
+                        },
+                        backgroundColor: AppColors.blueColor,
+                        textColor: AppColors.whiteColor,
+                        borderRadius: 14,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildLabeledField({
+    required String label,
+    required Widget child,
+  }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              onPressed: () {
-                HapticUtils.navigation();
-                Navigator.pop(context);
-              },
-            ),
-            Expanded(
-              child: Center(
-                child: Text('Add New Card', style: TextStyles.heading),
-              ),
-            ),
-            const SizedBox(width: 48),
-          ],
-        ),
-        SizedBox(height: 1.h),
-        Container(
-          height: 1,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.06),
-                Colors.white.withValues(alpha: 0.02),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
+        Text(
+          label,
+          style: TextStyles.regularwhite.copyWith(
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.white70,
           ),
         ),
+        SizedBox(height: 1.h),
+        child,
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/MVVM/view_model/data_view_model.dart';
@@ -89,48 +90,64 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
         final rawInterests = profile.interests ?? [];
         final splitInterests =
             rawInterests.expand((e) => e.split(',')).toList();
+        final profileImageUrl = profile.profileImageUrl != null &&
+                profile.profileImageUrl!.isNotEmpty
+            ? 'https://eventgo-live.com/${profile.profileImageUrl}'
+            : null;
 
-        return RefreshIndicator(
-          onRefresh: () async {
-            print('🔷 Refreshing profile...');
-            await loadProfile();
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 7.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                _buildHeader(),
-                SizedBox(height: 3.h),
-
-                // Profile Image
-                _buildProfileImage(profile),
-                SizedBox(height: 3.h),
-
-                // Name
-                _buildName(profile),
-                SizedBox(height: 2.h),
-
-                // Stats Card
-                _buildStatsCard(profile),
-                SizedBox(height: 2.h),
-
-                // Action Buttons
-                _buildActionButtons(profile),
-                SizedBox(height: 3.h),
-
-                // About Section
-                _buildAboutSection(profile),
-                SizedBox(height: 3.h),
-
-                // Interests Section
-                _buildInterestsSection(splitInterests),
-                SizedBox(height: 2.h),
-              ],
+        return Stack(
+          children: [
+            // Dynamic Blurred Background
+            if (profileImageUrl != null)
+              Positioned.fill(
+                child: Opacity(
+                  opacity: 0.15,
+                  child: CachedNetworkImage(
+                    imageUrl: profileImageUrl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+                child: Container(color: Colors.transparent),
+              ),
             ),
-          ),
+
+            // Main Content
+            RefreshIndicator(
+              onRefresh: () async {
+                print('🔷 Refreshing profile...');
+                await loadProfile();
+              },
+              color: AppColors.blueColor,
+              backgroundColor: AppColors.signinoptioncolor,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(4.w, MediaQuery.of(context).padding.top + 2.h, 4.w, 4.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildHeader(),
+                    SizedBox(height: 3.h),
+                    _buildProfileImage(profile),
+                    SizedBox(height: 2.5.h),
+                    _buildName(profile),
+                    SizedBox(height: 3.h),
+                    _buildStatsCard(profile),
+                    SizedBox(height: 3.h),
+                    _buildActionButtons(profile),
+                    SizedBox(height: 4.h),
+                    _buildAboutSection(profile),
+                    SizedBox(height: 3.h),
+                    _buildInterestsSection(splitInterests),
+                    SizedBox(height: 2.h),
+                  ],
+                ),
+              ),
+            ),
+          ],
         );
       }),
     );
@@ -292,112 +309,184 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
 
   // Header
   Widget _buildHeader() {
-    return Column(children: [
-      Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-            onPressed: () {
-              HapticUtils.navigation();
-              Navigator.of(context).pop();
-            },
-          ),
-          Expanded(
-            child: Center(
-              child: Text('Profile', style: TextStyles.heading),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(1.5.h),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(1.5.h),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white, size: 16.sp),
+                onPressed: () {
+                  HapticUtils.navigation();
+                  Navigator.of(context).pop();
+                },
+              ),
             ),
           ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (String value) async {
-              HapticUtils.light();
-              if (!authViewModel.isLoggedIn.value && (value == 'report' || value == 'block')) {
-                Get.snackbar(
-                  'Sign in required',
-                  'Please sign in to report or block users.',
-                  backgroundColor: AppColors.blueColor,
-                  colorText: Colors.white,
-                  mainButton: TextButton(
-                    onPressed: () {
-                      Get.closeCurrentSnackbar();
-                      Get.toNamed(RouteName.loginScreen);
-                    },
-                    child: Text('Sign in', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                );
-                return;
-              }
-              final profile = controller.profile.value;
-              if (profile == null) return;
-              final userId = profile.userId;
-              if (userId == null) return;
-              if (value == 'share') {
-                _shareProfile();
-              } else if (value == 'report') {
-                await _showReportUserSheet(userId);
-              } else if (value == 'block') {
-                await _showBlockUserSheet(userId);
-              }
-            },
-            itemBuilder: (BuildContext context) => [
-              const PopupMenuItem<String>(
-                value: 'share',
-                child: Row(
-                  children: [
-                    Icon(Icons.share, color: Colors.blue),
-                    SizedBox(width: 8),
-                    Text('Share Profile'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: 'report',
-                child: Row(
-                  children: [
-                    Icon(Icons.flag, color: Colors.orange),
-                    SizedBox(width: 8),
-                    Text('Report'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: 'block',
-                child: Row(
-                  children: [
-                    Icon(Icons.block, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('Block'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-      SizedBox(height: 1.h),
-      Container(
-        height: 1,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.white.withValues(alpha: 0.06),
-              Colors.white.withValues(alpha: 0.02),
-            ],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
+        ),
+        Text(
+          'USER PROFILE',
+          style: TextStyle(
+            fontSize: 8.sp,
+            color: Colors.white38,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 2.0,
           ),
         ),
-      ),
-    ]);
+        ClipRRect(
+          borderRadius: BorderRadius.circular(1.5.h),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(1.5.h),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  cardColor: AppColors.signinoptioncolor,
+                ),
+                child: PopupMenuButton<String>(
+                  offset: Offset(0, 5.h),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  icon: Icon(Icons.more_horiz_rounded,
+                      color: Colors.white, size: 18.sp),
+                  onSelected: (String value) async {
+                    HapticUtils.light();
+                    if (!authViewModel.isLoggedIn.value &&
+                        (value == 'report' || value == 'block')) {
+                      Get.snackbar(
+                        'Sign in required',
+                        'Please sign in to report or block users.',
+                        backgroundColor: AppColors.blueColor,
+                        colorText: Colors.white,
+                        mainButton: TextButton(
+                          onPressed: () {
+                            Get.closeCurrentSnackbar();
+                            Get.toNamed(RouteName.loginScreen);
+                          },
+                          child: const Text('Sign in',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      );
+                      return;
+                    }
+                    final profile = controller.profile.value;
+                    if (profile == null) return;
+                    final userId = profile.userId;
+                    if (userId == null) return;
+                    if (value == 'share') {
+                      _shareProfile();
+                    } else if (value == 'report') {
+                      await _showReportUserSheet(userId);
+                    } else if (value == 'block') {
+                      await _showBlockUserSheet(userId);
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => [
+                    const PopupMenuItem<String>(
+                      value: 'share',
+                      child: Row(
+                        children: [
+                          Icon(Icons.share_rounded, color: AppColors.blueColor),
+                          SizedBox(width: 12),
+                          Text('Share Profile',
+                              style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'report',
+                      child: Row(
+                        children: [
+                          Icon(Icons.flag_rounded, color: Colors.orange),
+                          SizedBox(width: 12),
+                          Text('Report User',
+                              style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'block',
+                      child: Row(
+                        children: [
+                          Icon(Icons.block_rounded, color: Colors.red),
+                          SizedBox(width: 12),
+                          Text('Block User',
+                              style: TextStyle(color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   // Profile Image
   Widget _buildProfileImage(dynamic profile) {
-    return Center(
-      child: CircleAvatar(
-        radius: 60,
-        backgroundImage: CachedNetworkImageProvider(
-          'https://eventgo-live.com/${profile.profileImageUrl}',
+    return Container(
+      padding: EdgeInsets.all(1.w),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: AppColors.blueColor.withValues(alpha: 0.3),
+          width: 2,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.blueColor.withValues(alpha: 0.2),
+              blurRadius: 30,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
+        padding: EdgeInsets.all(1.w),
+        child: Hero(
+          tag: 'profile_image',
+          child: CircleAvatar(
+            radius: 65,
+            backgroundColor: Colors.white.withValues(alpha: 0.05),
+            backgroundImage: (profile.profileImageUrl != null && profile.profileImageUrl!.isNotEmpty)
+                ? CachedNetworkImageProvider(
+                    'https://eventgo-live.com/${profile.profileImageUrl}',
+                  )
+                : null,
+            child: profile.profileImageUrl == null
+                ? Icon(
+                    Icons.person_rounded,
+                    size: 40.sp,
+                    color: Colors.white24,
+                  )
+                : null,
+          ),
         ),
       ),
     );
@@ -405,41 +494,79 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
 
   // Name
   Widget _buildName(dynamic profile) {
-    return Center(
-      child: Text(
-        profile.name ?? '',
-        style: TextStyles.heading,
-      ),
+    return Column(
+      children: [
+        Text(
+          profile.name ?? 'User Name',
+          style: TextStyle(
+            fontSize: 22.sp,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            letterSpacing: -0.5,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+        if (profile.email != null)
+          Text(
+            profile.email!.toLowerCase(),
+            style: TextStyle(
+              fontSize: 10.sp,
+              color: Colors.white38,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+      ],
     );
   }
 
   // Stats Card
   Widget _buildStatsCard(dynamic profile) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 2.h),
-      margin: EdgeInsets.symmetric(horizontal: 4.w),
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor.withAlpha(51), // 20% opacity
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: Obx(() => buildCountColumn(
-                  '${dataViewModel.followersCount.value}',
-                  'Followers',
-                )),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2.5.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(2.5.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1.5,
+            ),
           ),
-          Container(
-            height: 5.h,
-            width: 1,
-            color: Colors.white.withAlpha(77), // ~30% opacity
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Obx(() => buildCountColumn(
+                      '${dataViewModel.followersCount.value}',
+                      'Followers',
+                    )),
+              ),
+              Container(
+                height: 4.h,
+                width: 1.5,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.white.withValues(alpha: 0.1),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: buildCountColumn('${profile.followingCount}', 'Following'),
+              ),
+            ],
           ),
-          Expanded(
-            child: buildCountColumn('${profile.followingCount}', 'Following'),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -451,41 +578,87 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
       children: [
         Obx(() {
           final isFollowing = dataViewModel.isFollowing.value;
-          return InkWell(
-            onTap: () {
-              HapticUtils.buttonPress();
-              if (!authViewModel.isLoggedIn.value) {
-                Get.snackbar(
-                  'Sign in required',
-                  'Please sign in or sign up first to follow users',
-                  backgroundColor: AppColors.blueColor,
-                  colorText: Colors.white,
-                  duration: const Duration(seconds: 3),
-                  mainButton: TextButton(
-                    onPressed: () {
-                      Get.closeCurrentSnackbar();
-                      Get.toNamed(RouteName.loginScreen);
-                    },
-                    child: Text(
-                      'Sign in',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+          return Container(
+            width: 45.w,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isFollowing
+                    ? [Colors.white.withValues(alpha: 0.1), Colors.white.withValues(alpha: 0.05)]
+                    : [AppColors.blueColor, AppColors.blueColor.withValues(alpha: 0.7)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(2.h),
+              border: isFollowing
+                  ? Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1)
+                  : null,
+              boxShadow: isFollowing
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: AppColors.blueColor.withValues(alpha: 0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
                       ),
-                    ),
+                    ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  HapticUtils.buttonPress();
+                  if (!authViewModel.isLoggedIn.value) {
+                    Get.snackbar(
+                      'Sign in required',
+                      'Please sign in or sign up first to follow users',
+                      backgroundColor: AppColors.blueColor,
+                      colorText: Colors.white,
+                      duration: const Duration(seconds: 3),
+                      mainButton: TextButton(
+                        onPressed: () {
+                          Get.closeCurrentSnackbar();
+                          Get.toNamed(RouteName.loginScreen);
+                        },
+                        child: const Text(
+                          'Sign in',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  final userId = profile.userId;
+                  if (userId != null) {
+                    dataViewModel.toggleFollow(userId);
+                  }
+                },
+                borderRadius: BorderRadius.circular(2.h),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 1.8.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isFollowing ? Icons.person_remove_rounded : Icons.person_add_rounded,
+                        color: isFollowing ? Colors.white70 : Colors.white,
+                        size: 16.sp,
+                      ),
+                      SizedBox(width: 2.w),
+                      Text(
+                        isFollowing ? 'Unfollow' : 'Follow',
+                        style: TextStyle(
+                          color: isFollowing ? Colors.white70 : Colors.white,
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                );
-                return;
-              }
-              final userId = profile.userId;
-              if (userId != null) {
-                dataViewModel.toggleFollow(userId);
-              }
-            },
-            child: buildActionButton(
-              icon: Icons.person_add,
-              label: isFollowing ? 'Unfollow' : 'Follow',
-              filled: true,
+                ),
+              ),
             ),
           );
         }),
@@ -498,24 +671,30 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildSectionHeader('About Me', Icons.person),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(2.w),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.signinoptioncolor, AppColors.backgroundColor],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(
-            profile.shortBio ?? 'No bio added',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12.sp,
-              height: 1.4,
+        buildSectionHeader('About Me', Icons.person_search_rounded),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(2.h),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(4.w),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.03),
+                borderRadius: BorderRadius.circular(2.h),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  width: 1.5,
+                ),
+              ),
+              child: Text(
+                profile.shortBio ?? 'No bio added yet.',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 11.sp,
+                  height: 1.5,
+                ),
+              ),
             ),
           ),
         ),
@@ -578,13 +757,21 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
       children: [
         Text(
           count,
-          style: TextStyles.regularhometext2,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            letterSpacing: -0.5,
+          ),
         ),
-        SizedBox(height: 0.5.h),
+        SizedBox(height: 0.2.h),
         Text(
-          label,
-          style: TextStyles.regularwhite.copyWith(
-            color: Colors.white.withAlpha(204), // ~80% opacity
+          label.toUpperCase(),
+          style: TextStyle(
+            fontSize: 7.sp,
+            color: Colors.white38,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
           ),
         ),
       ],
@@ -594,14 +781,19 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
   /// Helper to build section headers
   Widget buildSectionHeader(String title, IconData icon) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 1.h),
+      padding: EdgeInsets.only(bottom: 1.5.h, left: 1.w),
       child: Row(
         children: [
           Icon(icon, color: AppColors.blueColor, size: 14.sp),
-          SizedBox(width: 2.w),
+          SizedBox(width: 3.w),
           Text(
-            title,
-            style: TextStyles.subheading,
+            title.toUpperCase(),
+            style: TextStyle(
+              fontSize: 9.sp,
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+            ),
           ),
         ],
       ),
@@ -680,11 +872,11 @@ Download EventGo app to connect with them and discover amazing events!
     final confirm = await Get.dialog<bool>(
       AlertDialog(
         backgroundColor: AppColors.signinoptioncolor,
-        title: Text('Block User?', style: TextStyle(color: Colors.white)),
-        content: Text('This user will be removed from your feed. You can unblock them later from settings.', style: TextStyle(color: Colors.white70)),
+        title: const Text('Block User?', style: TextStyle(color: Colors.white)),
+        content: const Text('This user will be removed from your feed. You can unblock them later from settings.', style: TextStyle(color: Colors.white70)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: TextStyle(color: Colors.white70))),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Block', style: TextStyle(color: Colors.red))),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel', style: TextStyle(color: Colors.white70))),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Block', style: TextStyle(color: Colors.red))),
         ],
       ),
     );
@@ -721,30 +913,30 @@ class _ReportReasonDialogState extends State<_ReportReasonDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.signinoptioncolor,
-      title: Text('Report User', style: TextStyle(color: Colors.white)),
+      title: const Text('Report User', style: TextStyle(color: Colors.white)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Optionally describe the issue:', style: TextStyle(color: Colors.white70, fontSize: 12)),
-          SizedBox(height: 8),
+          const Text('Optionally describe the issue:', style: TextStyle(color: Colors.white70, fontSize: 12)),
+          const SizedBox(height: 8),
           TextField(
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Reason (optional)',
-              hintStyle: TextStyle(color: Colors.white38),
+              hintStyle: const TextStyle(color: Colors.white38),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
               fillColor: Colors.white.withValues(alpha: 0.1),
             ),
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: Colors.white70))),
-        TextButton(onPressed: () => Navigator.pop(context, _controller.text.trim()), child: Text('Submit', style: TextStyle(color: AppColors.blueColor))),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white70))),
+        TextButton(onPressed: () => Navigator.pop(context, _controller.text.trim()), child: const Text('Submit', style: TextStyle(color: AppColors.blueColor))),
       ],
     );
   }

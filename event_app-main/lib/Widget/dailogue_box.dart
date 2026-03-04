@@ -11,6 +11,7 @@ void showSuccessDialog(BuildContext context) {
     barrierDismissible: false,
     builder: (BuildContext context) {
       Future.delayed(const Duration(seconds: 5), () {
+        if (!context.mounted) return;
         Navigator.of(context).pop(); // close the dialog
         Navigator.of(context).pushReplacementNamed('/home'); // navigate to Home
       });
@@ -21,12 +22,12 @@ void showSuccessDialog(BuildContext context) {
           borderRadius: BorderRadius.circular(3.h),
         ),
         child: Container(
-          padding:  EdgeInsets.symmetric(horizontal:5.w, vertical: 3.h),
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // Shield Icon
-             Image.asset(AppImages.dailogueimg),
+              Image.asset(AppImages.dailogueimg),
               const SizedBox(height: 20),
               const Text(
                 'Congratulations!',

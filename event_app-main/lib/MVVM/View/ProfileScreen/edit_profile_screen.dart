@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/Widget/button_widget.dart';
 import 'package:event_app/Widget/input_text_field.dart';
@@ -126,106 +127,268 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+      body: Column(
+        children: [
+          /// Gradient header (consistent with Auth/Detail screens)
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 2.h,
+              left: 4.w,
+              right: 4.w,
+              bottom: 6.h,
+            ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.primaryColor,
+                  AppColors.backgroundColor,
+                  AppColors.signinoptioncolor,
+                ],
+              ),
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildHeader(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: AppColors.whiteColor,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        HapticUtils.navigation();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    Text(
+                      'Edit Profile',
+                      style: TextStyles.heading.copyWith(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 48), // Spacer for balance
+                  ],
+                ),
                 SizedBox(height: 3.h),
-                /// Profile Image Picker
+
+                /// Profile Image Picker with glow/glass effect
                 GestureDetector(
-                  onTap: pickImage,
+                  onTap: () {
+                    HapticUtils.light();
+                    pickImage();
+                  },
                   child: Stack(
                     alignment: Alignment.bottomRight,
                     children: [
-                      CircleAvatar(
-                        radius: 55,
-                        backgroundColor: Colors.grey.shade800,
-                        backgroundImage: profileImage != null
-                            ? FileImage(profileImage!)
-                            : (existingImageUrl != null
-                                ? NetworkImage(existingImageUrl!)
-                                    as ImageProvider
-                                : null),
-                        child: profileImage == null && existingImageUrl == null
-                            ? Icon(Icons.person,
-                                size: 40.sp, color: Colors.grey.shade400)
-                            : null,
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.blueColor.withValues(alpha: 0.3),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                          gradient: const LinearGradient(
+                            colors: [AppColors.blueColor, Colors.transparent],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: AppColors.signinoptioncolor,
+                          backgroundImage: (profileImage != null
+                              ? FileImage(profileImage!)
+                              : (existingImageUrl != null
+                                  ? CachedNetworkImageProvider(
+                                      existingImageUrl!)
+                                  : null)) as ImageProvider?,
+                          child:
+                              profileImage == null && existingImageUrl == null
+                                  ? Icon(Icons.person,
+                                      size: 35.sp, color: Colors.white24)
+                                  : null,
+                        ),
                       ),
                       Container(
-                        height: 30,
-                        width: 30,
+                        height: 32,
+                        width: 32,
                         decoration: BoxDecoration(
                           color: AppColors.blueColor,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2),
+                              blurRadius: 5,
+                            ),
+                          ],
                         ),
-                        child:
-                            Icon(Icons.edit, size: 15.sp, color: Colors.white),
+                        child: Icon(Icons.camera_alt_rounded,
+                            size: 14.sp, color: Colors.white),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 4.h),
-
-                /// Input Fields
-                buildInputField(
-                  controller: nameController,
-                  hint: 'Full Name',
-                  keyboardType: TextInputType.name,
-                  errorText: nameError,
-                  focusNode: nameFocusNode,
-                  nextFocusNode: interestFocusNode,
-                  validator: FormValidationUtils.validateName,
-                  enableRealTimeValidation: true,
-                ),
-                SizedBox(height: 2.h),
-                buildInputField(
-                  controller: interestController,
-                  hint: 'Interests (comma separated)',
-                  keyboardType: TextInputType.text,
-                  focusNode: interestFocusNode,
-                  nextFocusNode: aboutFocusNode,
-                ),
-                SizedBox(height: 2.h),
-                buildInputField(
-                  controller: aboutController,
-                  hint: 'About',
-                  keyboardType: TextInputType.text,
-                  focusNode: aboutFocusNode,
-                  nextFocusNode: phoneFocusNode,
-                ),
-                SizedBox(height: 2.h),
-                buildInputField(
-                  controller: phoneController,
-                  hint: 'Phone Number',
-                  keyboardType: TextInputType.phone,
-                  errorText: phoneError,
-                  focusNode: phoneFocusNode,
-                  validator: FormValidationUtils.validatePhone,
-                  enableRealTimeValidation: true,
-                ),
-                SizedBox(height: 4.h),
-
-                /// Update Button
-                Obx(() {
-                  final bool isUpdating = profileController.isLoading.value;
-                  return ButtonWidget(
-                    text: isUpdating ? "Updating..." : "Update Profile",
-                    onPressed: isUpdating ? null : handleUpdateProfile,
-                    backgroundColor: AppColors.blueColor,
-                    borderRadius: 4.h,
-                  );
-                }),
               ],
             ),
           ),
-        ),
+
+          /// Form card (Glassmorphic)
+          Expanded(
+            child: Transform.translate(
+              offset: const Offset(0, -24),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.signinoptioncolor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                  border: Border.all(
+                    color: AppColors.signinoptionbordercolor,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(6.w, 4.h, 6.w, 6.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Profile Information',
+                        style: TextStyles.heading.copyWith(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 0.5.h),
+                      Text(
+                        'Update your personal details below',
+                        style: TextStyles.regularwhite.copyWith(
+                          fontSize: 12.sp,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+
+                      /// Input Fields (consistent with Auth)
+                      _buildLabeledField(
+                        label: 'Full Name',
+                        child: buildInputField(
+                          controller: nameController,
+                          hint: 'Enter your name',
+                          keyboardType: TextInputType.name,
+                          errorText: nameError,
+                          focusNode: nameFocusNode,
+                          nextFocusNode: interestFocusNode,
+                          validator: FormValidationUtils.validateName,
+                          enableRealTimeValidation: true,
+                        ),
+                      ),
+                      SizedBox(height: 2.5.h),
+
+                      _buildLabeledField(
+                        label: 'Interests',
+                        child: buildInputField(
+                          controller: interestController,
+                          hint: 'e.g. Music, Sports, Art',
+                          keyboardType: TextInputType.text,
+                          focusNode: interestFocusNode,
+                          nextFocusNode: aboutFocusNode,
+                        ),
+                      ),
+                      SizedBox(height: 2.5.h),
+
+                      _buildLabeledField(
+                        label: 'About Me',
+                        child: buildInputField(
+                          controller: aboutController,
+                          hint: 'Write a short bio...',
+                          keyboardType: TextInputType.text,
+                          focusNode: aboutFocusNode,
+                          nextFocusNode: phoneFocusNode,
+                        ),
+                      ),
+                      SizedBox(height: 2.5.h),
+
+                      _buildLabeledField(
+                        label: 'Phone Number',
+                        child: buildInputField(
+                          controller: phoneController,
+                          hint: 'Enter your phone number',
+                          keyboardType: TextInputType.phone,
+                          errorText: phoneError,
+                          focusNode: phoneFocusNode,
+                          validator: FormValidationUtils.validatePhone,
+                          enableRealTimeValidation: true,
+                        ),
+                      ),
+                      SizedBox(height: 5.h),
+
+                      /// Update Button
+                      Obx(() {
+                        final bool isUpdating =
+                            profileController.isLoading.value;
+                        return ButtonWidget(
+                          text: isUpdating ? "Updating..." : "Update Profile",
+                          onPressed: isUpdating
+                              ? null
+                              : () {
+                                  HapticUtils.buttonPress();
+                                  handleUpdateProfile();
+                                },
+                          backgroundColor: AppColors.blueColor,
+                          borderRadius: 14,
+                          isLoading: isUpdating,
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildLabeledField({
+    required String label,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyles.regularwhite.copyWith(
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.white70,
+          ),
+        ),
+        SizedBox(height: 1.h),
+        child,
+      ],
     );
   }
 
@@ -259,44 +422,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
       textInputAction:
           nextFocusNode != null ? TextInputAction.next : TextInputAction.done,
-    );
-  }
-
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              onPressed: () {
-                HapticUtils.navigation();
-                Navigator.pop(context);
-              },
-            ),
-            Expanded(
-              child: Center(
-                child: Text('Edit Profile', style: TextStyles.heading),
-              ),
-            ),
-            const SizedBox(width: 48),
-          ],
-        ),
-        SizedBox(height: 1.h),
-        Container(
-          height: 1,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.06),
-                Colors.white.withValues(alpha: 0.02),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/View/ProfileScreen/profile_tab/about_tab.dart';
 import 'package:event_app/MVVM/View/ProfileScreen/profile_tab/event_tab.dart';
@@ -105,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     onPressed: () => Get.toNamed(RouteName.signupScreen),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      side: BorderSide(color: AppColors.blueColor),
+                      side: const BorderSide(color: AppColors.blueColor),
                       padding: EdgeInsets.symmetric(vertical: 2.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(2.h),
@@ -160,54 +161,82 @@ class _ProfileScreenState extends State<ProfileScreen>
       }
       return Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        body: SafeArea(
-          child: Obx(() {
-            if (controller.isLoading.value) {
-              return _buildLoadingState();
-            } else if (controller.error.isNotEmpty) {
-              return _buildErrorState();
-            } else if (controller.userProfile.value == null) {
-              return _buildEmptyState();
-            }
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            return _buildLoadingState();
+          } else if (controller.error.isNotEmpty) {
+            return _buildErrorState();
+          } else if (controller.userProfile.value == null) {
+            return _buildEmptyState();
+          }
 
-            final profile = controller.userProfile.value!;
-            return RefreshIndicator(
-              onRefresh: _refreshProfile,
-              color: AppColors.blueColor,
-              backgroundColor: AppColors.signinoptioncolor,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _buildHeader(context),
-                    SizedBox(height: 3.h),
-                    _buildProfileImage(profile),
-                    SizedBox(height: 2.h),
-                    _buildUserName(profile),
-                    SizedBox(height: 2.h),
-                    _buildFollowCounts(profile),
-                    SizedBox(height: 2.h),
-                    Row(
-                      children: [
-                        Expanded(child: _buildEditProfileButton(context)),
-                        SizedBox(width: 3.w),
-                        Expanded(child: _buildCreateEventButton(context)),
-                      ],
+          final profile = controller.userProfile.value!;
+          final profileImageUrl = profile.data?.profileImageUrl != null &&
+                  profile.data!.profileImageUrl!.isNotEmpty
+              ? 'https://eventgo-live.com/${profile.data!.profileImageUrl}'
+              : null;
+
+          return Stack(
+            children: [
+              // Dynamic Blurred Background
+              if (profileImageUrl != null)
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: 0.15,
+                    child: CachedNetworkImage(
+                      imageUrl: profileImageUrl,
+                      fit: BoxFit.cover,
                     ),
-                    SizedBox(height: 3.h),
-                    _buildTabBar(),
-                    SizedBox(height: 2.h),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.5,
-                      child: _buildTabBarView(),
-                    ),
-                  ],
+                  ),
+                ),
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+                  child: Container(color: Colors.transparent),
                 ),
               ),
-            );
-          }),
-        ),
+
+              // Main Content
+              RefreshIndicator(
+                onRefresh: _refreshProfile,
+                color: AppColors.blueColor,
+                backgroundColor: AppColors.signinoptioncolor,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(
+                      4.w, MediaQuery.of(context).padding.top + 2.h, 4.w, 4.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _buildHeader(context),
+                      SizedBox(height: 3.h),
+                      _buildProfileImage(profile),
+                      SizedBox(height: 2.5.h),
+                      _buildUserName(profile),
+                      SizedBox(height: 3.h),
+                      _buildFollowCounts(profile),
+                      SizedBox(height: 3.h),
+                      Row(
+                        children: [
+                          Expanded(child: _buildEditProfileButton(context)),
+                          SizedBox(width: 3.w),
+                          Expanded(child: _buildCreateEventButton(context)),
+                        ],
+                      ),
+                      SizedBox(height: 4.h),
+                      _buildTabBar(),
+                      SizedBox(height: 3.h),
+                      SizedBox(
+                        height: 80.h,
+                        child: _buildTabBarView(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        }),
       );
     });
   }
@@ -420,33 +449,64 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildHeader(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Spacer(),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.2),
-              width: 1,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'MY PROFILE',
+              style: TextStyle(
+                fontSize: 8.sp,
+                color: Colors.white38,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 2.0,
+              ),
             ),
-          ),
-          child: IconButton(
-            onPressed: () {
-              HapticUtils.light();
-              showModalBottomSheet(
-                context: context,
-                backgroundColor: AppColors.signinoptioncolor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            Container(
+              height: 2,
+              width: 20.w,
+              margin: EdgeInsets.only(top: 0.5.h),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.blueColor, Colors.transparent],
                 ),
-                builder: (_) => _buildBottomSheetMenu(context),
-              );
-            },
-            icon: Icon(
-              Icons.more_vert,
-              color: Colors.white,
-              size: 16.sp,
+              ),
+            ),
+          ],
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(1.5.h),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(1.5.h),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 1,
+                ),
+              ),
+              child: IconButton(
+                onPressed: () {
+                  HapticUtils.light();
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: AppColors.signinoptioncolor,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(25)),
+                    ),
+                    builder: (_) => _buildBottomSheetMenu(context),
+                  );
+                },
+                icon: Icon(
+                  Icons.settings_suggest_rounded,
+                  color: Colors.white,
+                  size: 18.sp,
+                ),
+              ),
             ),
           ),
         ),
@@ -456,79 +516,118 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildProfileImage(profile) {
     return Container(
+      padding: EdgeInsets.all(1.w),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [
-            AppColors.blueColor,
-            AppColors.blueColor.withValues(alpha: 0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        border: Border.all(
+          color: AppColors.blueColor.withValues(alpha: 0.3),
+          width: 2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.blueColor.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
-      padding: EdgeInsets.all(4),
-      child: CircleAvatar(
-        radius: 60,
-        backgroundColor: Colors.grey.shade800,
-        backgroundImage: (profile.data?.profileImageUrl != null &&
-                profile.data!.profileImageUrl!.isNotEmpty)
-            ? CachedNetworkImageProvider(
-                'https://eventgo-live.com/${profile.data!.profileImageUrl}',
-              )
-            : null,
-        child: profile.data?.profileImageUrl == null
-            ? Icon(
-                Icons.person,
-                size: 32.sp,
-                color: Colors.grey.shade400,
-              )
-            : null,
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.blueColor.withValues(alpha: 0.2),
+              blurRadius: 30,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
+        padding: EdgeInsets.all(1.w),
+        child: Hero(
+          tag: 'profile_image',
+          child: CircleAvatar(
+            radius: 65,
+            backgroundColor: Colors.white.withValues(alpha: 0.05),
+            backgroundImage: (profile.data?.profileImageUrl != null &&
+                    profile.data!.profileImageUrl!.isNotEmpty)
+                ? CachedNetworkImageProvider(
+                    'https://eventgo-live.com/${profile.data!.profileImageUrl}',
+                  )
+                : null,
+            child: profile.data?.profileImageUrl == null
+                ? Icon(
+                    Icons.person_rounded,
+                    size: 40.sp,
+                    color: Colors.white24,
+                  )
+                : null,
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildUserName(profile) {
-    return Text(
-      '${profile.data?.name ?? 'User Name'}',
-      style: TextStyles.heading,
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-      textAlign: TextAlign.center,
+    return Column(
+      children: [
+        Text(
+          '${profile.data?.name ?? 'User Name'}',
+          style: TextStyle(
+            fontSize: 22.sp,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            letterSpacing: -0.5,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+        if (profile.data?.email != null)
+          Text(
+            profile.data!.email!.toLowerCase(),
+            style: TextStyle(
+              fontSize: 10.sp,
+              color: Colors.white38,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+      ],
     );
   }
 
   Widget _buildFollowCounts(profile) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildFollowColumn(
-              '${profile.data?.followingCount ?? 0}', 'Following'),
-          Container(
-            height: 4.h,
-            width: 1,
-            color: Colors.white.withValues(alpha: 0.2),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2.5.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(2.5.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1.5,
+            ),
           ),
-          _buildFollowColumn(
-              '${profile.data?.followersCount ?? 0}', 'Followers'),
-        ],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildFollowColumn(
+                  '${profile.data?.followingCount ?? 0}', 'Following'),
+              Container(
+                height: 4.h,
+                width: 1.5,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.white.withValues(alpha: 0.1),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+              _buildFollowColumn(
+                  '${profile.data?.followersCount ?? 0}', 'Followers'),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -538,13 +637,21 @@ class _ProfileScreenState extends State<ProfileScreen>
       children: [
         Text(
           count,
-          style: TextStyles.regularhometext2,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            letterSpacing: -0.5,
+          ),
         ),
-        SizedBox(height: 0.5.h),
+        SizedBox(height: 0.2.h),
         Text(
-          label,
-          style: TextStyles.regularwhite.copyWith(
-            color: Colors.white70,
+          label.toUpperCase(),
+          style: TextStyle(
+            fontSize: 7.sp,
+            color: Colors.white38,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
           ),
         ),
       ],
@@ -557,7 +664,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         gradient: LinearGradient(
           colors: [
             AppColors.blueColor,
-            AppColors.blueColor.withValues(alpha: 0.8),
+            AppColors.blueColor.withValues(alpha: 0.7),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -566,8 +673,8 @@ class _ProfileScreenState extends State<ProfileScreen>
         boxShadow: [
           BoxShadow(
             color: AppColors.blueColor.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -584,20 +691,23 @@ class _ProfileScreenState extends State<ProfileScreen>
           },
           borderRadius: BorderRadius.circular(2.h),
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 1.5.h, horizontal: 4.w),
+            padding: EdgeInsets.symmetric(vertical: 1.8.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  Icons.edit,
+                  Icons.edit_note_rounded,
                   color: Colors.white,
-                  size: 14.sp,
+                  size: 16.sp,
                 ),
                 SizedBox(width: 2.w),
                 Text(
                   'Edit Profile',
-                  style: TextStyles.buttontext,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -608,58 +718,107 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildCreateEventButton(BuildContext context) {
-    return ElevatedButton.icon(
-      icon: const Icon(Icons.add, size: 18, color: Colors.white),
-      label: Text(
-        'Create Event',
-        style: TextStyles.buttontext.copyWith(
-          color: Colors.white,
-          fontSize: 12.sp,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(2.h),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1.5,
         ),
       ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.blueColor.withValues(alpha: 0.85),
-        foregroundColor: Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 1.4.h),
-        shape: RoundedRectangleBorder(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            HapticUtils.buttonPress();
+            NavigationUtils.push(
+              context,
+              const CreateEvent(),
+              routeName: '/create-event',
+            );
+          },
           borderRadius: BorderRadius.circular(2.h),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 1.8.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.add_circle_outline_rounded,
+                  color: Colors.white70,
+                  size: 16.sp,
+                ),
+                SizedBox(width: 2.w),
+                Text(
+                  'Create Event',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      onPressed: () {
-        HapticUtils.buttonPress();
-        NavigationUtils.push(
-          context,
-          const CreateEvent(),
-          routeName: '/create-event',
-        );
-      },
     );
   }
 
   Widget _buildTabBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(2.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1.5,
+            ),
+          ),
+          child: TabBar(
+            controller: _tabController,
+            indicator: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.blueColor,
+                  AppColors.blueColor.withValues(alpha: 0.6),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(1.5.h),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.blueColor.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorPadding: EdgeInsets.all(0.8.h),
+            labelPadding: EdgeInsets.symmetric(vertical: 0.5.h),
+            dividerColor: Colors.transparent,
+            labelStyle: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontSize: 10.sp,
+              fontWeight: FontWeight.w600,
+            ),
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white38,
+            tabs: [
+              _buildTabItem('About', 0),
+              _buildTabItem('Events', 1),
+              _buildTabItem('Ads', 2),
+            ],
+          ),
         ),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: AppColors.blueColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        labelPadding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
-        dividerColor: Colors.transparent,
-        tabs: [
-          _buildTabItem('About', 0),
-          _buildTabItem('Events', 1),
-          _buildTabItem('Ads', 2),
-        ],
       ),
     );
   }
@@ -682,7 +841,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       physics:
           const NeverScrollableScrollPhysics(), // Disable swipe, use tabs only
       children: [
-        AboutTab(),
+        const AboutTab(),
         EventTab(),
         _buildMyAdsTab(),
       ],
@@ -696,25 +855,42 @@ class _ProfileScreenState extends State<ProfileScreen>
     return Obx(() {
       if (adVM.isLoading.value && adVM.ads.isEmpty) {
         return const Center(
-            child: CircularProgressIndicator(color: AppColors.blueColor));
+          child: CircularProgressIndicator(color: AppColors.blueColor),
+        );
       }
       if (adVM.error.isNotEmpty) {
         return Center(
-          child: Text(adVM.error.value,
-              style: TextStyles.regularwhite.copyWith(color: Colors.red)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline_rounded,
+                  color: Colors.red.withValues(alpha: 0.5), size: 40.sp),
+              SizedBox(height: 2.h),
+              Text(adVM.error.value,
+                  style: TextStyle(color: Colors.white60, fontSize: 10.sp)),
+            ],
+          ),
         );
       }
       if (currentUserId == null) {
         return Center(
-          child: Text('Not signed in', style: TextStyles.regularwhite),
+          child: Text('Not signed in',
+              style: TextStyle(color: Colors.white38, fontSize: 12.sp)),
         );
       }
 
       final myAds = adVM.ads.where((a) => a.userId == currentUserId).toList();
       if (myAds.isEmpty) {
         return Center(
-          child: Text('You have not created any ads yet',
-              style: TextStyles.regularwhite.copyWith(color: Colors.white70)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.ads_click_rounded, color: Colors.white10, size: 50.sp),
+              SizedBox(height: 2.h),
+              Text('You have not created any ads yet',
+                  style: TextStyle(color: Colors.white24, fontSize: 11.sp)),
+            ],
+          ),
         );
       }
 
@@ -726,9 +902,9 @@ class _ProfileScreenState extends State<ProfileScreen>
         backgroundColor: AppColors.signinoptioncolor,
         child: ListView.separated(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: EdgeInsets.only(top: 1.h),
+          padding: EdgeInsets.symmetric(horizontal: 1.w, vertical: 1.h),
           itemCount: myAds.length,
-          separatorBuilder: (_, __) => SizedBox(height: 1.2.h),
+          separatorBuilder: (_, __) => SizedBox(height: 1.5.h),
           itemBuilder: (context, index) {
             final ad = myAds[index];
             final imagePath = ad.imageUrl ?? '';
@@ -739,68 +915,83 @@ class _ProfileScreenState extends State<ProfileScreen>
             final desc = (ad.description ?? '').toString();
 
             return Container(
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                color: AppColors.signinoptioncolor,
-                borderRadius: BorderRadius.circular(2.h),
+                color: Colors.white.withValues(alpha: 0.04),
+                borderRadius: BorderRadius.circular(2.5.h),
                 border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08), width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+                  color: Colors.white.withValues(alpha: 0.08),
+                  width: 1.5,
+                ),
               ),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(2.h),
-                      bottomLeft: Radius.circular(2.h),
-                    ),
-                    child: CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      width: 28.w,
-                      height: 14.h,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: Colors.grey.shade800,
-                        child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2)),
+                  Stack(
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: 32.w,
+                        height: 15.h,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          width: 32.w,
+                          height: 15.h,
+                          color: Colors.white.withValues(alpha: 0.05),
+                          child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2)),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          width: 32.w,
+                          height: 15.h,
+                          color: Colors.white.withValues(alpha: 0.1),
+                          child: const Icon(Icons.broken_image,
+                              color: Colors.white24),
+                        ),
                       ),
-                      errorWidget: (context, url, error) => Container(
-                        color: Colors.grey.shade800,
-                        child: const Icon(Icons.broken_image,
-                            color: Colors.white70),
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withValues(alpha: 0.3),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 3.w, vertical: 1.2.h),
+                      padding: EdgeInsets.all(4.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             title.isNotEmpty
                                 ? '${title[0].toUpperCase()}${title.substring(1)}'
-                                : 'Untitled',
-                            style: TextStyles.homeheadingtext,
+                                : 'Untitled Ad',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: -0.5,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: 0.6.h),
+                          SizedBox(height: 0.8.h),
                           Text(
-                            desc.isNotEmpty
-                                ? (desc.length > 100
-                                    ? '${desc.substring(0, 100)}…'
-                                    : desc)
-                                : 'No description provided',
-                            style: TextStyles.regularwhite
-                                .copyWith(color: Colors.white70),
-                            maxLines: 3,
+                            desc.isNotEmpty ? desc : 'No description provided.',
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                              color: Colors.white60,
+                              height: 1.4,
+                            ),
+                            maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
@@ -827,16 +1018,33 @@ class _ProfileScreenState extends State<ProfileScreen>
       leading: Container(
         padding: EdgeInsets.all(2.w),
         decoration: BoxDecoration(
-          color: iconColor.withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(10),
+          color: iconColor.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(1.2.h),
+          border: Border.all(
+            color: iconColor.withValues(alpha: 0.2),
+            width: 1,
+          ),
         ),
         child: Icon(icon, color: iconColor, size: 16.sp),
       ),
       title: Text(
         title,
-        style: TextStyles.regularhometext2.copyWith(color: Colors.white),
+        style: TextStyle(
+          fontSize: 11.sp,
+          fontWeight: FontWeight.w600,
+          color: Colors.white.withValues(alpha: 0.9),
+          letterSpacing: 0.3,
+        ),
       ),
-      onTap: onTap,
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        color: Colors.white12,
+        size: 18.sp,
+      ),
+      onTap: () {
+        HapticUtils.light();
+        onTap();
+      },
     );
   }
 

@@ -103,7 +103,8 @@ class _SearchScreenState extends State<SearchScreen>
                       _showFilters = false;
                     });
                   },
-                  icon: Icon(Icons.clear, color: AppColors.blueColor, size: 24.sp),
+                  icon: Icon(Icons.clear,
+                      color: AppColors.blueColor, size: 24.sp),
                 ),
               ],
             ),
@@ -224,7 +225,7 @@ class _SearchScreenState extends State<SearchScreen>
   }
 
   Widget _buildCategoryTabs() {
-    return Container(
+    return SizedBox(
       height: 6.h,
       child: Obx(() => ListView.builder(
             scrollDirection: Axis.horizontal,
@@ -247,7 +248,7 @@ class _SearchScreenState extends State<SearchScreen>
                     border: Border.all(
                       color: isSelected
                           ? AppColors.blueColor
-                          : Colors.grey.withOpacity(0.3),
+                          : Colors.grey.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -376,7 +377,7 @@ class _SearchScreenState extends State<SearchScreen>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.blueColor,
                 ),
-                child: Text('Enable Location'),
+                child: const Text('Enable Location'),
               ),
             ],
           ),
@@ -452,7 +453,7 @@ class _SearchScreenState extends State<SearchScreen>
         decoration: BoxDecoration(
           color: AppColors.signinoptioncolor,
           borderRadius: BorderRadius.circular(2.h),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
                 color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))
           ],
@@ -481,13 +482,15 @@ class _SearchScreenState extends State<SearchScreen>
                       Expanded(
                         child: Text(
                           capitalize(event.eventTitle ?? ''),
-                          style: TextStyles.homeheadingtext.copyWith(fontSize: 12.sp),
+                          style: TextStyles.homeheadingtext
+                              .copyWith(fontSize: 12.sp),
                         ),
                       ),
                       if (event.isPromotionActive) ...[
                         SizedBox(width: 1.w),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 2.w, vertical: 0.5.h),
                           decoration: BoxDecoration(
                             color: AppColors.blueColor,
                             borderRadius: BorderRadius.circular(1.h),

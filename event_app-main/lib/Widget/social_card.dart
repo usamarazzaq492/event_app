@@ -11,14 +11,14 @@ class SocialCard extends StatelessWidget {
   final bool isLoading;
 
   const SocialCard({
-    Key? key,
+    super.key,
     required this.image,
     required this.onPressed,
     this.backgroundColor,
     this.textColor,
     this.borderRadius = 8.0,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

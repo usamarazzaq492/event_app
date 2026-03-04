@@ -86,7 +86,7 @@ class FormValidationUtils {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
@@ -99,7 +99,7 @@ class FormValidationUtils {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),

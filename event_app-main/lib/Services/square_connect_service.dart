@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class SquareConnectService {
   static const String baseUrl = 'https://eventgo-live.com';
@@ -8,10 +9,13 @@ class SquareConnectService {
   /// Check if Square account is connected
   static Future<Map<String, dynamic>> checkConnectionStatus() async {
     try {
+      debugPrint(
+          'Square Service: Checking status at $baseUrl/api/v1/square/status');
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       if (token == null) {
+        debugPrint('Square Service: No token found');
         return {'connected': false, 'error': 'Not authenticated'};
       }
 
@@ -22,6 +26,9 @@ class SquareConnectService {
           'Authorization': 'Bearer $token',
         },
       );
+
+      debugPrint('Square Service: Status code: ${response.statusCode}');
+      debugPrint('Square Service: Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -35,6 +42,7 @@ class SquareConnectService {
         return {'connected': false, 'error': 'Failed to check status'};
       }
     } catch (e) {
+      debugPrint('Square Service: Exception: $e');
       return {'connected': false, 'error': e.toString()};
     }
   }
@@ -103,21 +111,24 @@ class SquareConnectService {
           };
         }
       } else {
-        print('Square Connect: API returned error status ${response.statusCode}');
+        debugPrint(
+            'Square Connect: API returned error status ${response.statusCode}');
         String errorMessage = 'Server returned error ${response.statusCode}';
         Map<String, dynamic>? errorData;
-        
+
         try {
           errorData = jsonDecode(response.body) as Map<String, dynamic>?;
           if (errorData != null) {
-            errorMessage = errorData['message'] ?? errorData['error'] ?? errorMessage;
+            errorMessage =
+                errorData['message'] ?? errorData['error'] ?? errorMessage;
           }
           print('Error details: $errorData');
         } catch (e) {
           print('Could not parse error response: $e');
-          errorMessage = 'Server error ${response.statusCode}: ${response.body}';
+          errorMessage =
+              'Server error ${response.statusCode}: ${response.body}';
         }
-        
+
         return {
           'success': false,
           'error': errorMessage,

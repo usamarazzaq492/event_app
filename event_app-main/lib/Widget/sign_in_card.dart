@@ -12,7 +12,7 @@ class SignInCard extends StatelessWidget {
   final bool isLoading;
 
   const SignInCard({
-    Key? key,
+    super.key,
     required this.text,
     required this.image,
     required this.onPressed,
@@ -20,7 +20,7 @@ class SignInCard extends StatelessWidget {
     this.textColor,
     this.borderRadius = 8.0,
     this.isLoading = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

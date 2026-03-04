@@ -6,7 +6,7 @@ class AdsDetailModel {
   AdsDetailModel({this.ad, this.totalRaised, this.progress});
 
   AdsDetailModel.fromJson(Map<String, dynamic> json) {
-    ad = json['ad'] != null ? new Ad.fromJson(json['ad']) : null;
+    ad = json['ad'] != null ? Ad.fromJson(json['ad']) : null;
     totalRaised = json['total_raised'] is int
         ? json['total_raised']
         : int.tryParse(json['total_raised']?.toString() ?? '');
@@ -16,12 +16,12 @@ class AdsDetailModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.ad != null) {
-      data['ad'] = this.ad!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (ad != null) {
+      data['ad'] = ad!.toJson();
     }
-    data['total_raised'] = this.totalRaised;
-    data['progress'] = this.progress;
+    data['total_raised'] = totalRaised;
+    data['progress'] = progress;
     return data;
   }
 }
@@ -67,16 +67,16 @@ class Ad {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['donationId'] = this.donationId;
-    data['userId'] = this.userId;
-    data['title'] = this.title;
-    data['imageUrl'] = this.imageUrl;
-    data['description'] = this.description;
-    data['amount'] = this.amount;
-    data['isActive'] = this.isActive;
-    data['addDate'] = this.addDate;
-    data['updated_at'] = this.updatedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['donationId'] = donationId;
+    data['userId'] = userId;
+    data['title'] = title;
+    data['imageUrl'] = imageUrl;
+    data['description'] = description;
+    data['amount'] = amount;
+    data['isActive'] = isActive;
+    data['addDate'] = addDate;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }

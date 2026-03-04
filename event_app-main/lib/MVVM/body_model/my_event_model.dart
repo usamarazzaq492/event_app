@@ -69,28 +69,28 @@ class MyEventModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['eventId'] = this.eventId;
-    data['userId'] = this.userId;
-    data['eventTitle'] = this.eventTitle;
-    data['startDate'] = this.startDate;
-    data['endDate'] = this.endDate;
-    data['startTime'] = this.startTime;
-    data['endTime'] = this.endTime;
-    data['eventPrice'] = this.eventPrice;
-    data['vipPrice'] = this.vipPrice;
-    data['description'] = this.description;
-    data['category'] = this.category;
-    data['address'] = this.address;
-    data['city'] = this.city;
-    data['eventImage'] = this.eventImage;
-    data['isActive'] = this.isActive;
-    data['addDate'] = this.addDate;
-    data['editDate'] = this.editDate;
-    data['isPromoted'] = this.isPromoted;
-    data['promotionStartDate'] = this.promotionStartDate;
-    data['promotionEndDate'] = this.promotionEndDate;
-    data['promotionPackage'] = this.promotionPackage;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['eventId'] = eventId;
+    data['userId'] = userId;
+    data['eventTitle'] = eventTitle;
+    data['startDate'] = startDate;
+    data['endDate'] = endDate;
+    data['startTime'] = startTime;
+    data['endTime'] = endTime;
+    data['eventPrice'] = eventPrice;
+    data['vipPrice'] = vipPrice;
+    data['description'] = description;
+    data['category'] = category;
+    data['address'] = address;
+    data['city'] = city;
+    data['eventImage'] = eventImage;
+    data['isActive'] = isActive;
+    data['addDate'] = addDate;
+    data['editDate'] = editDate;
+    data['isPromoted'] = isPromoted;
+    data['promotionStartDate'] = promotionStartDate;
+    data['promotionEndDate'] = promotionEndDate;
+    data['promotionPackage'] = promotionPackage;
     return data;
   }
 

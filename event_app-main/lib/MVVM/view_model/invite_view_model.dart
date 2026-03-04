@@ -42,10 +42,10 @@ class InviteViewModel extends GetxController {
       );
 
       responseMessage.value = result['message'] ?? "Invitations sent successfully.";
-      print("✅ Invite API response: ${result}");
+      print("✅ Invite API response: $result");
 
       Get.snackbar("Success", responseMessage.value);
-      Get.offAll(() => BottomNavBar());
+      Get.offAll(() => const BottomNavBar());
     } catch (e) {
       responseMessage.value = "Failed to send invitations.";
       print("❌ Error sending invites: $e");

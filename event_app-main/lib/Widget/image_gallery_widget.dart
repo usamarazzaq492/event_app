@@ -12,11 +12,11 @@ class ImageGalleryWidget extends StatefulWidget {
   final int initialIndex;
 
   const ImageGalleryWidget({
-    Key? key,
+    super.key,
     required this.imageUrls,
     this.title,
     this.initialIndex = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<ImageGalleryWidget> createState() => _ImageGalleryWidgetState();
@@ -87,7 +87,7 @@ class _ImageGalleryWidgetState extends State<ImageGalleryWidget> {
           ),
           SizedBox(height: 2.h),
         ],
-        Container(
+        SizedBox(
           height: 20.h,
           child: Stack(
             children: [
@@ -107,7 +107,7 @@ class _ImageGalleryWidgetState extends State<ImageGalleryWidget> {
                         margin: EdgeInsets.symmetric(horizontal: 1.w),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(2.h),
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
                               color: Colors.black26,
                               blurRadius: 8,
@@ -122,7 +122,7 @@ class _ImageGalleryWidgetState extends State<ImageGalleryWidget> {
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Container(
                               color: AppColors.signinoptioncolor,
-                              child: Center(
+                              child: const Center(
                                 child: CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                     AppColors.blueColor,
@@ -175,7 +175,7 @@ class _ImageGalleryWidgetState extends State<ImageGalleryWidget> {
                         decoration: BoxDecoration(
                           color: _currentIndex == index
                               ? AppColors.blueColor
-                              : Colors.white.withOpacity(0.5),
+                              : Colors.white.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(1.h),
                         ),
                       ),
@@ -205,7 +205,7 @@ class _ImageGalleryWidgetState extends State<ImageGalleryWidget> {
                   right: 2.w,
                   child: Container(
                     padding: EdgeInsets.all(1.w),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.black54,
                       shape: BoxShape.circle,
                     ),
@@ -231,11 +231,11 @@ class FullScreenGallery extends StatefulWidget {
   final String? title;
 
   const FullScreenGallery({
-    Key? key,
+    super.key,
     required this.imageUrls,
     required this.initialIndex,
     this.title,
-  }) : super(key: key);
+  });
 
   @override
   State<FullScreenGallery> createState() => _FullScreenGalleryState();
@@ -265,7 +265,7 @@ class _FullScreenGalleryState extends State<FullScreenGallery> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close, color: Colors.white),
           onPressed: () {
             HapticUtils.light();
             Navigator.of(context).pop();
@@ -308,7 +308,7 @@ class _FullScreenGalleryState extends State<FullScreenGallery> {
                   child: CachedNetworkImage(
                     imageUrl: widget.imageUrls[index],
                     fit: BoxFit.contain,
-                    placeholder: (context, url) => Center(
+                    placeholder: (context, url) => const Center(
                       child: CircularProgressIndicator(
                         valueColor: AlwaysStoppedAnimation<Color>(
                           AppColors.blueColor,

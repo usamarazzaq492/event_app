@@ -10,12 +10,12 @@ class EventCard extends StatelessWidget {
   final String imagePath;
 
   const EventCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.date,
     required this.location,
     required this.imagePath,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class EventCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: TextStyle(color: AppColors.whiteColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                      Text(title, style: const TextStyle(color: AppColors.whiteColor, fontSize: 13, fontWeight: FontWeight.bold)),
                       SizedBox(height: 1.h),
                       Text(date, style: const TextStyle(color: AppColors.blueColor, fontSize: 13)),
                       SizedBox(height: 1.h),

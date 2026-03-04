@@ -3,6 +3,8 @@ import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/Widget/button_widget.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
+import 'package:event_app/app/config/app_asset.dart';
+import 'package:event_app/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -25,7 +27,7 @@ class OTPScreen extends StatefulWidget {
 class _OTPScreenState extends State<OTPScreen> {
   TextEditingController otpController = TextEditingController();
   final authViewModel = Get.put(AuthViewModel());
-  
+
   Timer? _timer;
   int _countdown = 60; // Start with 60 seconds
   bool _canResend = false;
@@ -77,6 +79,7 @@ class _OTPScreenState extends State<OTPScreen> {
     if (!_canResend) return;
 
     try {
+      HapticUtils.light();
       // Show loading
       Get.snackbar(
         "Sending",
@@ -116,131 +119,210 @@ class _OTPScreenState extends State<OTPScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: Padding(
-        padding: EdgeInsets.only(top: 7.h, left: 5.w, right: 5.w, bottom: 3.h),
-        child: Column(
-          children: [
-            Row(
+      body: Column(
+        children: [
+          /// Gradient header (App style)
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 2.h,
+              left: 4.w,
+              right: 4.w,
+              bottom: 6.h,
+            ),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.primaryColor,
+                  AppColors.backgroundColor,
+                  AppColors.signinoptioncolor,
+                ],
+              ),
+            ),
+            child: Column(
               children: [
-                GestureDetector(
-                  onTap: () => Get.back(),
-                  child: const Icon(Icons.arrow_back, color: Colors.white),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: AppColors.whiteColor,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        HapticUtils.navigation();
+                        Get.back();
+                      },
+                    ),
+                  ],
                 ),
-                SizedBox(width: 5.w),
-                Text('Verify OTP', style: TextStyles.profiletext),
+                SizedBox(height: 4.h),
+                Hero(
+                  tag: 'app-logo',
+                  child: Image.asset(
+                    AppImages.logo2,
+                    height: 10.h,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                SizedBox(height: 1.h),
+                Text(
+                  'Verification',
+                  style: TextStyles.heading.copyWith(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
-            SizedBox(height: 5.h),
-            Text('Code has been sent to ${widget.email}',
-                style: TextStyles.regularwhite),
-            SizedBox(height: 5.h),
-            PinCodeTextField(
-              keyboardType: TextInputType.number,
-              length: 4,
-              obscureText: false,
-              animationType: AnimationType.fade,
-              cursorColor: AppColors.blueColor,
-              pinTheme: PinTheme(
-                shape: PinCodeFieldShape.box,
-                borderRadius: BorderRadius.circular(10),
-                fieldHeight: 8.h,
-                fieldWidth: 8.h,
-                activeFillColor: AppColors.signinoptioncolor,
-                activeColor: AppColors.signinoptionbordercolor,
-                selectedFillColor: AppColors.signinoptionbordercolor,
-                selectedColor: AppColors.blueColor,
-                inactiveColor: AppColors.signinoptionbordercolor,
-                inactiveFillColor: AppColors.signinoptionbordercolor,
-              ),
-              textStyle: TextStyles.regularwhite,
-              animationDuration: const Duration(milliseconds: 300),
-              backgroundColor: Colors.transparent,
-              enableActiveFill: true,
-              controller: otpController,
-              onCompleted: (v) {
-                print("Completed");
-              },
-              onChanged: (value) {
-                print(value);
-              },
-              beforeTextPaste: (text) {
-                print("Allowing to paste $text");
-                return true;
-              },
-              appContext: context,
-            ),
-            SizedBox(height: 5.h),
-            // Resend code section
-            _canResend
-                ? GestureDetector(
-                    onTap: _resendCode,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.refresh,
-                          color: AppColors.blueColor,
-                          size: 16.sp,
-                        ),
-                        SizedBox(width: 1.w),
-                        Text(
-                          'Resend Code',
-                          style: TextStyles.regularwhite.copyWith(
-                            color: AppColors.blueColor,
-                            fontWeight: FontWeight.w600,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ],
+          ),
+
+          /// Verification content
+          Expanded(
+            child: Transform.translate(
+              offset: const Offset(0, -24),
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.signinoptioncolor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                  border: Border.all(
+                    color: AppColors.signinoptionbordercolor,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
                     ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(6.w, 4.h, 6.w, 4.h),
+                  child: Column(
                     children: [
                       Text(
-                        'Resend code in ',
-                        style: TextStyles.regularwhite,
-                      ),
-                      Text(
-                        '$_countdown',
-                        style: TextStyles.regularwhite.copyWith(
-                          color: AppColors.blueColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.sp,
+                        'Verify OTP',
+                        style: TextStyles.heading.copyWith(
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
+                      SizedBox(height: 1.h),
                       Text(
-                        's',
-                        style: TextStyles.regularwhite,
+                        'Code has been sent to ${widget.email}',
+                        textAlign: TextAlign.center,
+                        style: TextStyles.regularwhite.copyWith(
+                          fontSize: 12.sp,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      SizedBox(height: 5.h),
+                      PinCodeTextField(
+                        keyboardType: TextInputType.number,
+                        length: 4,
+                        obscureText: false,
+                        animationType: AnimationType.fade,
+                        cursorColor: AppColors.blueColor,
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(10),
+                          fieldHeight: 8.h,
+                          fieldWidth: 8.h,
+                          activeFillColor: AppColors.signinoptioncolor,
+                          activeColor: AppColors.signinoptionbordercolor,
+                          selectedFillColor: AppColors.signinoptionbordercolor,
+                          selectedColor: AppColors.blueColor,
+                          inactiveColor: AppColors.signinoptionbordercolor,
+                          inactiveFillColor: AppColors.signinoptionbordercolor,
+                        ),
+                        textStyle: TextStyles.regularwhite,
+                        animationDuration: const Duration(milliseconds: 300),
+                        backgroundColor: Colors.transparent,
+                        enableActiveFill: true,
+                        controller: otpController,
+                        appContext: context,
+                        onChanged: (value) {},
+                      ),
+                      SizedBox(height: 5.h),
+                      // Resend code section
+                      _canResend
+                          ? GestureDetector(
+                              onTap: _resendCode,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.refresh,
+                                    color: AppColors.blueColor,
+                                    size: 16.sp,
+                                  ),
+                                  SizedBox(width: 1.w),
+                                  Text(
+                                    'Resend Code',
+                                    style: TextStyles.regularwhite.copyWith(
+                                      color: AppColors.blueColor,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Resend code in ',
+                                  style: TextStyles.regularwhite,
+                                ),
+                                Text(
+                                  '$_countdown',
+                                  style: TextStyles.regularwhite.copyWith(
+                                    color: AppColors.blueColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.sp,
+                                  ),
+                                ),
+                                Text(
+                                  's',
+                                  style: TextStyles.regularwhite,
+                                ),
+                              ],
+                            ),
+                      const Spacer(),
+                      ButtonWidget(
+                        text: 'Verify',
+                        onPressed: () {
+                          HapticUtils.medium();
+                          final otp = otpController.text.trim();
+                          if (otp.length == 4) {
+                            authViewModel.verifyPasswordOtp(otp);
+                          } else {
+                            Get.snackbar(
+                              "Error",
+                              "Please enter the complete 4-digit code",
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                          }
+                        },
+                        backgroundColor: AppColors.blueColor,
+                        borderRadius: 4.h,
                       ),
                     ],
                   ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ButtonWidget(
-                  text: 'Verify',
-                  onPressed: () {
-                    final otp = otpController.text.trim();
-                    if (otp.length == 4) {
-                      authViewModel.verifyPasswordOtp(otp);
-                    } else {
-                      Get.snackbar(
-                        "Error",
-                        "Please enter the complete 4-digit code",
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.red,
-                        colorText: Colors.white,
-                      );
-                    }
-                  },
-                  backgroundColor: AppColors.blueColor,
-                  borderRadius: 4.h,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

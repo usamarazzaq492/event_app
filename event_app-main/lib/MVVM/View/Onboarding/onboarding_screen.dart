@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:event_app/MVVM/View/Onboarding/permissions_screen.dart';
+import 'package:event_app/utils/haptic_utils.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -38,6 +39,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void onNextPressed() async {
+    HapticUtils.light();
     if (currentIndex == onboardData.length - 1) {
       // Go to permissions screen (Eventbrite-style) before login
       if (mounted) {
@@ -85,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: SmoothPageIndicator(
                   controller: _controller,
                   count: onboardData.length,
-                  effect: ExpandingDotsEffect(
+                  effect: const ExpandingDotsEffect(
                     activeDotColor: AppColors.blueColor,
                     dotColor: Colors.grey,
                     dotHeight: 8,
@@ -131,13 +133,35 @@ class OnboardingContent extends StatelessWidget {
       children: [
         /// Image area covering remaining height above bottom container
         Expanded(
-          child: SizedBox(
-            width: double.infinity,
-            child: Image.asset(
-              image,
-              fit: BoxFit.cover,
-              semanticLabel: title,
-            ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                image,
+                fit: BoxFit.cover,
+                semanticLabel: title,
+              ),
+              // Subtle gradient overlay to blend into the bottom container
+              Positioned(
+                bottom: -2, // Slight overlap to prevent gaps
+                left: 0,
+                right: 0,
+                height: 10.h,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.5),
+                        Colors.black,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
 

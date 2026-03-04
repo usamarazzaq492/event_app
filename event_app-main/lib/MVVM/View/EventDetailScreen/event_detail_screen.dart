@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart'; // Commented out - map functionality disabled
+import 'package:shimmer/shimmer.dart';
 import '../../view_model/public_profile_controller.dart';
 import '../ProfileScreen/public_profile_screen.dart';
 import '../UsersData/invite_user_list.dart';
@@ -27,215 +27,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:event_app/Services/moderation_service.dart';
-
-/// Safe Google Map Widget with error handling - COMMENTED OUT
-/*
-class _SafeMapStatefulWidget extends StatefulWidget {
-  final LatLng location;
-  final EventDetailModel event;
-
-  const _SafeMapStatefulWidget({
-    required this.location,
-    required this.event,
-  });
-
-  @override
-  State<_SafeMapStatefulWidget> createState() => _SafeMapStatefulWidgetState();
-}
-*/
-
-/*
-class _SafeMapStatefulWidgetState extends State<_SafeMapStatefulWidget> {
-  bool _mapInitialized = false;
-  bool _hasError = false;
-
-  @override
-  Widget build(BuildContext context) {
-    // Temporarily show fallback until API key is configured
-    // Uncomment the GoogleMap widget below once API key is added to Info.plist
-    return _buildMapFallback(widget.location, widget.event);
-    
-    // Uncomment this once Google Maps API key is configured in Info.plist
-    /*
-    if (_hasError) {
-      return _buildMapFallback(widget.location, widget.event);
-    }
-
-    return GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: widget.location,
-        zoom: 15.0,
-      ),
-      markers: {
-        Marker(
-          markerId: MarkerId('event_location'),
-          position: widget.location,
-          infoWindow: InfoWindow(
-            title: widget.event.eventTitle ?? 'Event Location',
-            snippet: '${widget.event.address ?? ''}, ${widget.event.city ?? ''}',
-          ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueBlue,
-          ),
-        ),
-      },
-      mapType: MapType.normal,
-      zoomControlsEnabled: false,
-      myLocationButtonEnabled: false,
-      compassEnabled: false,
-      mapToolbarEnabled: false,
-      onMapCreated: (GoogleMapController controller) {
-        if (mounted) {
-          setState(() {
-            _mapInitialized = true;
-          });
-        }
-      },
-    );
-    */
-  }
-*/
-
-// COMMENTED OUT - Map functionality disabled
-/*
-  Widget _buildMapFallback(LatLng location, EventDetailModel event) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.grey.shade900,
-            Colors.grey.shade800,
-          ],
-        ),
-      ),
-      child: Stack(
-        children: [
-          // Background pattern
-          Center(
-            child: Opacity(
-              opacity: 0.3,
-              child: Icon(
-                Icons.map,
-                size: 50.sp,
-                color: Colors.grey.shade700,
-              ),
-            ),
-          ),
-          // Content - made scrollable to prevent overflow
-          SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.symmetric(vertical: 1.h),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(1.5.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.blueColor.withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.location_on,
-                      size: 24.sp,
-                      color: AppColors.blueColor,
-                    ),
-                  ),
-                  SizedBox(height: 1.h),
-                  Text(
-                    'Event Location',
-                    style: TextStyles.regularwhite.copyWith(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 0.8.h),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
-                    margin: EdgeInsets.symmetric(horizontal: 3.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.signinoptioncolor,
-                      borderRadius: BorderRadius.circular(1.h),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.navigation,
-                              size: 10.sp,
-                              color: AppColors.blueColor,
-                            ),
-                            SizedBox(width: 1.w),
-                            Flexible(
-                              child: Text(
-                                'Lat: ${location.latitude.toStringAsFixed(6)}',
-                                style: TextStyles.regularwhite.copyWith(
-                                  fontSize: 9.sp,
-                                  color: Colors.white70,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 0.3.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.navigation,
-                              size: 10.sp,
-                              color: AppColors.blueColor,
-                            ),
-                            SizedBox(width: 1.w),
-                            Flexible(
-                              child: Text(
-                                'Lng: ${location.longitude.toStringAsFixed(6)}',
-                                style: TextStyles.regularwhite.copyWith(
-                                  fontSize: 9.sp,
-                                  color: Colors.white70,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 0.8.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 3.w),
-                    child: Text(
-                      'Configure Google Maps API key\nto view interactive map',
-                      textAlign: TextAlign.center,
-                      style: TextStyles.regularwhite.copyWith(
-                        fontSize: 8.sp,
-                        color: Colors.white60,
-                      ),
-                      maxLines: 2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  */
+import 'dart:ui';
 
 class EventDetailScreen extends StatefulWidget {
   final String eventId;
@@ -254,6 +46,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   final PaymentQrService _qrService = PaymentQrService();
   List<dynamic> _qrCodes = [];
   bool _isLoadingQrCodes = false;
+  bool _isDescriptionExpanded = false;
 
   @override
   void initState() {
@@ -305,14 +98,24 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
     if (reason == null) return;
     try {
-      final res = await ModerationService.reportEvent(eventId, reason: reason.isEmpty ? null : reason);
+      final res = await ModerationService.reportEvent(eventId,
+          reason: reason.isEmpty ? null : reason);
       if (res['statusCode'] == 201 || res['statusCode'] == 200) {
-        Get.snackbar('Reported', res['message'] ?? 'Report submitted.', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.signinoptioncolor, colorText: Colors.white);
+        Get.snackbar('Reported', res['message'] ?? 'Report submitted.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: AppColors.signinoptioncolor,
+            colorText: Colors.white);
       } else {
-        Get.snackbar('Error', res['message'] ?? 'Could not submit report.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+        Get.snackbar('Error', res['message'] ?? 'Could not submit report.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
     }
   }
 
@@ -354,6 +157,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         final isBooked = event.isBooked ?? false;
 
         return CustomScrollView(
+          physics: const BouncingScrollPhysics(),
           slivers: [
             // Hero Image with App Bar
             _buildHeroImage(event, hostProfile, isCreator),
@@ -367,7 +171,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   children: [
                     // Event Title and Category
                     _buildEventHeader(event),
-                    SizedBox(height: 3.h),
+                    SizedBox(height: 2.h),
 
                     // Host Information
                     if (hostProfile != null) _buildHostSection(hostProfile),
@@ -413,20 +217,58 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   Widget _buildLoadingState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.blueColor),
-            strokeWidth: 3,
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[900]!,
+      highlightColor: Colors.grey[800]!,
+      child: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 40.h,
+            backgroundColor: Colors.grey[900],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(color: Colors.grey[900]),
+            ),
           ),
-          SizedBox(height: 3.h),
-          Text(
-            'Loading event details...',
-            style: TextStyles.regularwhite.copyWith(
-              fontSize: 12.sp,
-              color: Colors.white70,
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(4.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 60.w,
+                    height: 3.h,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(1.h),
+                    ),
+                  ),
+                  SizedBox(height: 1.5.h),
+                  Container(
+                    width: 40.w,
+                    height: 2.h,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(1.h),
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  ...List.generate(
+                      3,
+                      (index) => Padding(
+                            padding: EdgeInsets.only(bottom: 2.h),
+                            child: Container(
+                              width: double.infinity,
+                              height: 10.h,
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(2.h),
+                              ),
+                            ),
+                          )),
+                ],
+              ),
             ),
           ),
         ],
@@ -489,72 +331,134 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       elevation: 0,
       leading: Container(
         margin: EdgeInsets.all(1.h),
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(1.h),
-        ),
-        child: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 16.sp),
-          onPressed: () {
-            HapticUtils.navigation();
-            NavigationUtils.pop(context);
-          },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(1.2.h),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              ),
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white, size: 14.sp),
+                onPressed: () {
+                  HapticUtils.navigation();
+                  NavigationUtils.pop(context);
+                },
+              ),
+            ),
+          ),
         ),
       ),
       actions: [
-        Container(
-          margin: EdgeInsets.all(1.h),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(1.h),
-          ),
-          child: PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: Colors.white, size: 16.sp),
-            color: AppColors.signinoptioncolor,
-            onSelected: (value) async {
-              HapticUtils.light();
-              if (value == 'share') {
-                ShareUtils.shareEvent(
-                eventTitle: event.eventTitle ?? 'Event',
-                eventDescription: event.description ?? '',
-                eventDate: event.startDate ?? '',
-                eventTime: event.startTime ?? '',
-                eventLocation: '${event.address} ${event.city}',
-                eventImageUrl: 'https://eventgo-live.com/${event.eventImage}',
-                eventUrl: 'https://eventgo-live.com/event/${event.eventId}',
-                organizerName: hostProfile?.name,
-              );
-              } else if (value == 'report') {
-                if (!authViewModel.isLoggedIn.value) {
-                  Get.snackbar('Sign in required', 'Please sign in to report.', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.blueColor, colorText: Colors.white, mainButton: TextButton(onPressed: () { Get.closeCurrentSnackbar(); Get.toNamed(RouteName.loginScreen); }, child: Text('Sign in', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))));
-                  return;
-                }
-                await _showReportEventSheet(event.eventId!);
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'share', child: Row(children: [Icon(Icons.share, color: Colors.white, size: 18), SizedBox(width: 8), Text('Share', style: TextStyle(color: Colors.white))])),
-              PopupMenuItem(value: 'report', child: Row(children: [Icon(Icons.flag, color: Colors.orange, size: 18), SizedBox(width: 8), Text('Report', style: TextStyle(color: Colors.white))])),
-            ],
+        ClipRRect(
+          borderRadius: BorderRadius.circular(1.2.h),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              margin: EdgeInsets.all(1.h),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(1.2.h),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              ),
+              child: PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert_rounded,
+                    color: Colors.white, size: 16.sp),
+                color: AppColors.signinoptioncolor,
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(2.h)),
+                onSelected: (value) async {
+                  HapticUtils.light();
+                  if (value == 'share') {
+                    ShareUtils.shareEvent(
+                      eventTitle: event.eventTitle ?? 'Event',
+                      eventDescription: event.description ?? '',
+                      eventDate: event.startDate ?? '',
+                      eventTime: event.startTime ?? '',
+                      eventLocation: '${event.address} ${event.city}',
+                      eventImageUrl:
+                          'https://eventgo-live.com/${event.eventImage}',
+                      eventUrl:
+                          'https://eventgo-live.com/event/${event.eventId}',
+                      organizerName: hostProfile?.name,
+                    );
+                  } else if (value == 'report') {
+                    if (!authViewModel.isLoggedIn.value) {
+                      Get.snackbar(
+                          'Sign in required', 'Please sign in to report.',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: AppColors.blueColor,
+                          colorText: Colors.white,
+                          mainButton: TextButton(
+                              onPressed: () {
+                                Get.closeCurrentSnackbar();
+                                Get.toNamed(RouteName.loginScreen);
+                              },
+                              child: const Text('Sign in',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold))));
+                      return;
+                    }
+                    await _showReportEventSheet(event.eventId!);
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                      value: 'share',
+                      child: Row(children: [
+                        Icon(Icons.share_rounded,
+                            color: Colors.white, size: 16.sp),
+                        const SizedBox(width: 8),
+                        Text('Share',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 11.sp))
+                      ])),
+                  PopupMenuItem(
+                      value: 'report',
+                      child: Row(children: [
+                        Icon(Icons.flag_rounded,
+                            color: Colors.orange, size: 16.sp),
+                        const SizedBox(width: 8),
+                        Text('Report',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 11.sp))
+                      ])),
+                ],
+              ),
+            ),
           ),
         ),
         if (isCreator)
-          Container(
-            margin: EdgeInsets.all(1.h),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(1.h),
-            ),
-            child: IconButton(
-              icon: Icon(Icons.person_add, color: Colors.white, size: 16.sp),
-              onPressed: () {
-                HapticUtils.light();
-                NavigationUtils.push(
-                  context,
-                  InviteUserList(eventId: event.eventId!),
-                  routeName: '/invite-users',
-                );
-              },
+          ClipRRect(
+            borderRadius: BorderRadius.circular(1.2.h),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                margin: EdgeInsets.all(1.h),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(1.2.h),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.person_add_rounded,
+                      color: Colors.white, size: 16.sp),
+                  onPressed: () {
+                    HapticUtils.light();
+                    NavigationUtils.push(
+                      context,
+                      InviteUserList(eventId: event.eventId!),
+                      routeName: '/invite-users',
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         SizedBox(width: 2.w),
@@ -636,36 +540,106 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     child: Text(
                       event.category?.toUpperCase() ?? 'EVENT',
                       style: TextStyles.regularwhite.copyWith(
-                        fontSize: 9.sp,
+                        fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
                     ),
                   ),
-                  if (event.eventPrice != null && event.eventPrice != '0.00')
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(2.h),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (event.eventPrice != null &&
+                          event.eventPrice != '0.00')
+                        Container(
+                          margin: EdgeInsets.only(bottom: 1.h),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 3.w, vertical: 0.8.h),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(2.h),
+                            border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                width: 1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Text(
-                        '\$${event.eventPrice}',
-                        style: TextStyles.regularwhite.copyWith(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'REGULAR: ',
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 10.sp,
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '\$${event.eventPrice}',
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
+                      if (event.vipPrice != null && event.vipPrice != '0.00')
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 3.w, vertical: 0.8.h),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.amber.shade900.withValues(alpha: 0.9),
+                                Colors.black.withValues(alpha: 0.9),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(2.h),
+                            border: Border.all(
+                                color: Colors.amber.withValues(alpha: 0.3),
+                                width: 1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'VIP: ',
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 10.sp,
+                                  color: Colors.amber,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '\$${event.vipPrice}',
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -725,78 +699,95 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           );
         }
       },
-      child: Container(
-        padding: EdgeInsets.all(3.w),
-        decoration: BoxDecoration(
-          color: AppColors.signinoptioncolor,
-          borderRadius: BorderRadius.circular(2.h),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
-            width: 1,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(2.5.h),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Container(
+            padding: EdgeInsets.all(4.w),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(2.5.h),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [AppColors.blueColor, Colors.transparent],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl:
+                          'https://eventgo-live.com/${hostProfile.profileImageUrl}',
+                      width: 55,
+                      height: 55,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: Colors.white.withValues(alpha: 0.05),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.white.withValues(alpha: 0.05),
+                        child: Icon(
+                          Icons.person_rounded,
+                          color: Colors.white24,
+                          size: 25.sp,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 4.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'HOSTED BY',
+                        style: TextStyle(
+                          fontSize: 8.sp,
+                          color: Colors.white38,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      SizedBox(height: 0.2.h),
+                      Text(
+                        hostProfile.name ?? 'Host Name',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13.sp,
+                          color: Colors.white,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(1.2.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.blueColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 10.sp,
+                    color: AppColors.blueColor,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.blueColor,
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.blueColor.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: CircleAvatar(
-                radius: 25,
-                backgroundImage: NetworkImage(
-                  'https://eventgo-live.com/${hostProfile.profileImageUrl}',
-                ),
-                backgroundColor: Colors.grey,
-              ),
-            ),
-            SizedBox(width: 3.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hosted by',
-                    style: TextStyles.regularwhite.copyWith(
-                      fontSize: 9.sp,
-                      color: Colors.white60,
-                    ),
-                  ),
-                  SizedBox(height: 0.5.h),
-                  Text(
-                    hostProfile.name ?? 'Host Name',
-                    style: TextStyles.regularhometext1.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                  SizedBox(height: 0.5.h),
-                  Text(
-                    'Tap to view profile',
-                    style: TextStyles.regularwhite.copyWith(
-                      color: AppColors.blueColor,
-                      fontSize: 9.sp,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 12.sp,
-              color: AppColors.blueColor,
-            ),
-          ],
         ),
       ),
     );
@@ -871,6 +862,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 InkWell(
                   borderRadius: BorderRadius.circular(1.h),
                   onTap: () async {
+                    HapticUtils.light();
                     final latStr = event.latitude;
                     final lonStr = event.longitude;
                     if (latStr == null || lonStr == null) return;
@@ -958,15 +950,84 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (event.eventPrice != null && event.eventPrice != '0.00')
-                Text(
-                  '\$${event.eventPrice}',
-                  style: TextStyles.regularhometext1.copyWith(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Regular Access',
+                      style: TextStyles.regularwhite.copyWith(
+                        fontSize: 11.sp,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    Text(
+                      '\$${event.eventPrice}',
+                      style: TextStyles.regularhometext1.copyWith(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
+              if (event.eventPrice != null &&
+                  event.eventPrice != '0.00' &&
+                  event.vipPrice != null &&
+                  event.vipPrice != '0.00')
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 0.8.h),
+                  child: Divider(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    thickness: 1,
                   ),
-                )
-              else
+                ),
+              if (event.vipPrice != null && event.vipPrice != '0.00')
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'VIP Access',
+                          style: TextStyles.regularwhite.copyWith(
+                            fontSize: 11.sp,
+                            color: Colors.amber.shade200,
+                          ),
+                        ),
+                        SizedBox(width: 2.w),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 1.5.w, vertical: 0.2.h),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(0.5.h),
+                            border: Border.all(
+                                color: Colors.amber.withValues(alpha: 0.5),
+                                width: 0.5),
+                          ),
+                          child: Text(
+                            'BEST VALUE',
+                            style: TextStyle(
+                              fontSize: 9.sp,
+                              color: Colors.amber,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '\$${event.vipPrice}',
+                      style: TextStyles.regularhometext1.copyWith(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber,
+                      ),
+                    ),
+                  ],
+                ),
+              if ((event.eventPrice == null || event.eventPrice == '0.00') &&
+                  (event.vipPrice == null || event.vipPrice == '0.00'))
                 Text(
                   'Free Event',
                   style: TextStyles.regularhometext1.copyWith(
@@ -995,380 +1056,210 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     required String title,
     required Widget content,
   }) {
-    return Container(
-      padding: EdgeInsets.all(3.w),
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor,
-        borderRadius: BorderRadius.circular(2.h),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(2.w),
-            decoration: BoxDecoration(
-              color: AppColors.blueColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(1.h),
-            ),
-            child: Icon(
-              icon,
-              color: AppColors.blueColor,
-              size: 16.sp,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2.5.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(2.5.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1.5,
             ),
           ),
-          SizedBox(width: 3.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyles.regularwhite.copyWith(
-                    fontSize: 9.sp,
-                    color: Colors.white60,
-                    fontWeight: FontWeight.w500,
-                  ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: EdgeInsets.all(2.w),
+                decoration: BoxDecoration(
+                  color: AppColors.blueColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(1.2.h),
                 ),
-                SizedBox(height: 1.h),
-                content,
-              ],
-            ),
+                child: Icon(
+                  icon,
+                  color: AppColors.blueColor,
+                  size: 16.sp,
+                ),
+              ),
+              SizedBox(width: 4.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 8.sp,
+                        color: Colors.white38,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    SizedBox(height: 1.h),
+                    content,
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildAboutSection(EventDetailModel event) {
-    return Container(
-      padding: EdgeInsets.all(3.w),
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor,
-        borderRadius: BorderRadius.circular(2.h),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    final description = event.description ?? 'No description available.';
+    final isLongDescription = description.length > 200;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2.5.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(2.5.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.info_outline,
-                color: AppColors.blueColor,
-                size: 16.sp,
-              ),
-              SizedBox(width: 2.w),
-              Text(
-                'About This Event',
-                style: TextStyles.regularhometext1.copyWith(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 2.h),
-          Text(
-            event.description ?? 'No description available.',
-            style: TextStyles.regularwhite.copyWith(
-              fontSize: 11.sp,
-              height: 1.6,
-              color: Colors.white70,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Safe Google Map widget with error handling - COMMENTED OUT
-  /*
-  Widget _SafeGoogleMapWidget({
-    required LatLng location,
-    required EventDetailModel event,
-  }) {
-    return _SafeMapStatefulWidget(location: location, event: event);
-  }
-  */
-
-  // COMMENTED OUT - Map functionality disabled
-  /*
-  Widget _buildLocationSection(EventDetailModel event) {
-    final lat = double.tryParse(event.latitude ?? '');
-    final lng = double.tryParse(event.longitude ?? '');
-
-    if (lat == null || lng == null) {
-      return const SizedBox.shrink();
-    }
-
-    final eventLocation = LatLng(lat, lng);
-
-    return Container(
-      padding: EdgeInsets.all(3.w),
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor,
-        borderRadius: BorderRadius.circular(2.h),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.map_outlined,
-                color: AppColors.blueColor,
-                size: 16.sp,
-              ),
-              SizedBox(width: 2.w),
-              Text(
-                'Location Details',
-                style: TextStyles.regularhometext1.copyWith(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 2.h),
-          Container(
-            height: 20.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(1.h),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.1),
-                width: 1,
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(1.h),
-              child: _SafeGoogleMapWidget(
-                location: eventLocation,
-                event: event,
-              ),
-            ),
-          ),
-          SizedBox(height: 1.h),
-          if (event.address != null || event.city != null)
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 1.w),
-              child: Row(
+              Row(
                 children: [
                   Icon(
-                    Icons.location_on,
-                    size: 12.sp,
+                    Icons.info_outline_rounded,
                     color: AppColors.blueColor,
+                    size: 16.sp,
                   ),
-                  SizedBox(width: 1.w),
-                  Expanded(
-                    child: Text(
-                      '${event.address ?? ''}${event.address != null && event.city != null ? ', ' : ''}${event.city ?? ''}',
-                      style: TextStyles.regularwhite.copyWith(
-                        fontSize: 10.sp,
-                        color: Colors.white70,
-                      ),
+                  SizedBox(width: 3.w),
+                  Text(
+                    'ABOUT THIS EVENT',
+                    style: TextStyle(
+                      fontSize: 8.sp,
+                      color: Colors.white38,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
                     ),
                   ),
                 ],
               ),
-            ),
-        ],
-      ),
-    );
-  }
-  */
-
-  /// Fallback UI when Google Maps fails to load - COMMENTED OUT
-  /*
-  Widget _buildMapFallback(LatLng location, EventDetailModel event) {
-    return Container(
-      color: Colors.grey.shade900,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.map_outlined,
-              size: 24.sp,
-              color: AppColors.blueColor,
-            ),
-            SizedBox(height: 1.h),
-            Text(
-              'Map unavailable',
-              style: TextStyles.regularwhite.copyWith(
-                fontSize: 11.sp,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 0.5.h),
-            Text(
-              'Coordinates: ${location.latitude.toStringAsFixed(6)}, ${location.longitude.toStringAsFixed(6)}',
-              style: TextStyles.regularwhite.copyWith(
-                fontSize: 9.sp,
-                color: Colors.white60,
-              ),
-            ),
-            SizedBox(height: 1.h),
-            GestureDetector(
-              onTap: () {
-                // Open in external maps app
-                final url = 'https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}';
-                // You can use url_launcher here if available
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
-                decoration: BoxDecoration(
-                  color: AppColors.blueColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(1.h),
-                  border: Border.all(
-                    color: AppColors.blueColor,
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  'Open in Maps',
-                  style: TextStyles.regularwhite.copyWith(
-                    fontSize: 9.sp,
-                    color: AppColors.blueColor,
-                  ),
+              SizedBox(height: 2.h),
+              Text(
+                description,
+                maxLines: _isDescriptionExpanded ? null : 4,
+                overflow: _isDescriptionExpanded
+                    ? TextOverflow.visible
+                    : TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 11.sp,
+                  height: 1.6,
                 ),
               ),
-            ),
-          ],
+              if (isLongDescription) ...[
+                SizedBox(height: 1.h),
+                InkWell(
+                  onTap: () {
+                    HapticUtils.light();
+                    setState(() {
+                      _isDescriptionExpanded = !_isDescriptionExpanded;
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        _isDescriptionExpanded ? 'Read Less' : 'Read More',
+                        style: TextStyles.regularwhite.copyWith(
+                          color: AppColors.blueColor,
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Icon(
+                        _isDescriptionExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: AppColors.blueColor,
+                        size: 14.sp,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
   }
-  */
 
   Widget _buildEventStatusSection(EventDetailModel event, bool isCreator,
       bool isBooked, bool hasEventStarted, bool hasEventEnded) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 2.w),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.signinoptioncolor,
-            AppColors.signinoptioncolor.withValues(alpha: 0.8),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(3.h),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: AppColors.blueColor.withValues(alpha: 0.05),
-            blurRadius: 30,
-            offset: const Offset(0, 12),
-            spreadRadius: 0,
-          ),
-        ],
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.15),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        children: [
-          // Status Header with Gradient
-          Container(
-            padding: EdgeInsets.all(4.w),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  AppColors.blueColor.withValues(alpha: 0.1),
-                  AppColors.blueColor.withValues(alpha: 0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(3.h),
-                topRight: Radius.circular(3.h),
-              ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(3.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 2.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(3.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1.5,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Status Header
+              Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.02),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(3.h),
+                    topRight: Radius.circular(3.h),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(1.5.w),
-                      decoration: BoxDecoration(
-                        color: hasEventEnded
-                            ? Colors.red.withValues(alpha: 0.2)
-                            : hasEventStarted
-                                ? Colors.orange.withValues(alpha: 0.2)
-                                : Colors.green.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(1.h),
-                        border: Border.all(
-                          color: hasEventEnded
-                              ? Colors.red.withValues(alpha: 0.4)
-                              : hasEventStarted
-                                  ? Colors.orange.withValues(alpha: 0.4)
-                                  : Colors.green.withValues(alpha: 0.4),
-                          width: 1,
-                        ),
-                      ),
-                      child: Icon(
-                        hasEventEnded
-                            ? Icons.event_busy
-                            : hasEventStarted
-                                ? Icons.play_arrow
-                                : Icons.schedule,
-                        size: 14.sp,
-                        color: hasEventEnded
-                            ? Colors.red
-                            : hasEventStarted
-                                ? Colors.orange
-                                : Colors.green,
-                      ),
-                    ),
-                    SizedBox(width: 3.w),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(
-                          'Event Status',
-                          style: TextStyles.regularwhite.copyWith(
-                            fontSize: 9.sp,
-                            color: Colors.white60,
-                            fontWeight: FontWeight.w500,
+                        Container(
+                          padding: EdgeInsets.all(1.5.w),
+                          decoration: BoxDecoration(
+                            color: (hasEventEnded
+                                    ? Colors.red
+                                    : hasEventStarted
+                                        ? Colors.orange
+                                        : Colors.green)
+                                .withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(1.h),
                           ),
-                        ),
-                        SizedBox(height: 0.3.h),
-                        Text(
-                          hasEventEnded
-                              ? 'Event Ended'
-                              : hasEventStarted
-                                  ? 'Event Started'
-                                  : 'Upcoming Event',
-                          style: TextStyles.regularhometext1.copyWith(
-                            fontSize: 13.sp,
-                            fontWeight: FontWeight.bold,
+                          child: Icon(
+                            hasEventEnded
+                                ? Icons.event_busy_rounded
+                                : hasEventStarted
+                                    ? Icons.play_circle_rounded
+                                    : Icons.schedule_rounded,
+                            size: 16.sp,
                             color: hasEventEnded
                                 ? Colors.red
                                 : hasEventStarted
@@ -1376,382 +1267,186 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     : Colors.green,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                if (isBooked)
-                  Container(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.2.h),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.green.withValues(alpha: 0.2),
-                          Colors.green.withValues(alpha: 0.1),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(2.h),
-                      border: Border.all(
-                        color: Colors.green.withValues(alpha: 0.6),
-                        width: 1.5,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.green.withValues(alpha: 0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.check_circle,
-                          size: 12.sp,
-                          color: Colors.green,
-                        ),
-                        SizedBox(width: 1.5.w),
-                        Text(
-                          'Booked',
-                          style: TextStyles.regularwhite.copyWith(
-                            fontSize: 10.sp,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
-          // Action Button Section
-          Padding(
-            padding: EdgeInsets.all(4.w),
-            child: Column(
-              children: [
-                // Primary Action Button
-                Container(
-                  width: double.infinity,
-                  height: 5.h,
-                  decoration: BoxDecoration(
-                    gradient: hasEventEnded
-                        ? LinearGradient(
-                            colors: [
-                              Colors.grey.shade600,
-                              Colors.grey.shade700
-                            ],
-                          )
-                        : hasEventStarted
-                            ? LinearGradient(
-                                colors: [
-                                  Colors.orange.shade600,
-                                  Colors.orange.shade700
-                                ],
-                              )
-                            : isBooked
-                                ? LinearGradient(
-                                    colors: [
-                                      Colors.green.shade600,
-                                      Colors.green.shade700
-                                    ],
-                                  )
-                                : isCreator
-                                    ? LinearGradient(
-                                        colors: [
-                                          Colors.purple.shade600,
-                                          Colors.purple.shade700
-                                        ],
-                                      )
-                                    : LinearGradient(
-                                        colors: [
-                                          AppColors.blueColor,
-                                          AppColors.blueColor
-                                              .withValues(alpha: 0.8)
-                                        ],
-                                      ),
-                    borderRadius: BorderRadius.circular(2.h),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (hasEventEnded
-                                ? Colors.grey
-                                : hasEventStarted
-                                    ? Colors.orange
-                                    : isBooked
-                                        ? Colors.green
-                                        : isCreator
-                                            ? Colors.purple
-                                            : AppColors.blueColor)
-                            .withValues(alpha: 0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                        spreadRadius: 0,
-                      ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: (hasEventStarted ||
-                              isBooked ||
-                              hasEventEnded ||
-                              isCreator)
-                          ? null
-                          : () {
-                              HapticUtils.buttonPress();
-                              if (!authViewModel.isLoggedIn.value) {
-                                Get.snackbar(
-                                  'Sign in to get tickets',
-                                  'Create an account to purchase tickets.',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: AppColors.signinoptioncolor,
-                                  colorText: Colors.white,
-                                  mainButton: TextButton(
-                                    onPressed: () =>
-                                        Get.toNamed(RouteName.loginScreen),
-                                    child: Text(
-                                      'Sign in',
-                                      style: TextStyle(
-                                        color: AppColors.blueColor,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                                return;
-                              }
-                              NavigationUtils.push(
-                                context,
-                                BookEventScreen(id: event.eventId),
-                                routeName: '/book-event',
-                              );
-                            },
-                      borderRadius: BorderRadius.circular(2.h),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2.h),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        SizedBox(width: 3.w),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: EdgeInsets.all(1.w),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(1.h),
-                              ),
-                              child: Icon(
-                                hasEventEnded
-                                    ? Icons.event_busy
-                                    : hasEventStarted
-                                        ? Icons.play_arrow
-                                        : isBooked
-                                            ? Icons.check_circle
-                                            : isCreator
-                                                ? Icons.person
-                                                : Icons.shopping_cart,
-                                size: 14.sp,
-                                color: Colors.white,
+                            Text(
+                              'EVENT STATUS',
+                              style: TextStyle(
+                                fontSize: 8.sp,
+                                color: Colors.white38,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.2,
                               ),
                             ),
-                            SizedBox(width: 3.w),
+                            SizedBox(height: 0.2.h),
                             Text(
                               hasEventEnded
                                   ? 'Event Ended'
                                   : hasEventStarted
                                       ? 'Event Started'
-                                      : isBooked
-                                          ? 'Already Booked'
-                                          : isCreator
-                                              ? 'Your Event'
-                                              : 'Get Tickets',
+                                      : 'Upcoming Event',
                               style: TextStyle(
-                                fontSize: 12.sp,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                fontSize: 13.sp,
+                                color: hasEventEnded
+                                    ? Colors.red
+                                    : hasEventStarted
+                                        ? Colors.orange
+                                        : Colors.green,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    if (isBooked)
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 3.w, vertical: 1.2.h),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(2.h),
+                          border: Border.all(
+                            color: Colors.green.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.verified_rounded,
+                              size: 12.sp,
+                              color: Colors.green,
+                            ),
+                            SizedBox(width: 1.5.w),
+                            Text(
+                              'BOOKED',
+                              style: TextStyle(
+                                fontSize: 9.sp,
+                                color: Colors.green,
+                                fontWeight: FontWeight.w800,
                                 letterSpacing: 0.5,
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ),
+                  ],
                 ),
+              ),
 
-                // Promotion Status or Promote Button (for organizers)
-                if (isCreator && !hasEventEnded) ...[
-                  SizedBox(height: 2.h),
-                  // Check if promotion is active
-                  Builder(
-                    builder: (context) {
-                      if (event.isPromotionActive) {
-                        // Show promotion active message
-                        return Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.all(3.w),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(2.h),
-                            border: Border.all(
-                              color: Colors.green.withValues(alpha: 0.5),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.verified,
-                                color: Colors.green,
-                                size: 20.sp,
-                              ),
-                              SizedBox(width: 3.w),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Event is Currently Promoted',
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(height: 0.5.h),
-                                    Text(
-                                      'You can promote again after this promotion expires.',
-                                      style: TextStyle(
-                                        fontSize: 10.sp,
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                  ],
+              // Action Button Section
+              Padding(
+                padding: EdgeInsets.all(4.w),
+                child: Column(
+                  children: [
+                    // Primary Action Button (Get Tickets)
+                    _buildActionButton(
+                      title: hasEventEnded
+                          ? 'EVENT ENDED'
+                          : hasEventStarted
+                              ? 'EVENT STARTED'
+                              : isBooked
+                                  ? 'ALREADY BOOKED'
+                                  : isCreator
+                                      ? 'YOUR EVENT'
+                                      : 'GET TICKETS',
+                      icon: hasEventEnded
+                          ? Icons.event_busy_rounded
+                          : hasEventStarted
+                              ? Icons.play_circle_fill_rounded
+                              : isBooked
+                                  ? Icons.check_circle_rounded
+                                  : isCreator
+                                      ? Icons.person_rounded
+                                      : Icons.shopping_bag_rounded,
+                      color: hasEventEnded
+                          ? Colors.grey
+                          : hasEventStarted
+                              ? Colors.orange
+                              : isBooked
+                                  ? Colors.green
+                                  : isCreator
+                                      ? Colors.purple
+                                      : AppColors.blueColor,
+                      isDisabled: hasEventStarted ||
+                          isBooked ||
+                          hasEventEnded ||
+                          isCreator,
+                      onTap: () {
+                        HapticUtils.buttonPress();
+                        if (!authViewModel.isLoggedIn.value) {
+                          Get.snackbar(
+                            'Sign in to get tickets',
+                            'Create an account to purchase tickets.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: AppColors.signinoptioncolor,
+                            colorText: Colors.white,
+                            mainButton: TextButton(
+                              onPressed: () =>
+                                  Get.toNamed(RouteName.loginScreen),
+                              child: const Text(
+                                'Sign in',
+                                style: TextStyle(
+                                  color: AppColors.blueColor,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          );
+                          return;
+                        }
+                        NavigationUtils.push(
+                          context,
+                          BookEventScreen(id: event.eventId),
+                          routeName: '/book-event',
                         );
-                      } else {
-                        // Show promote button
-                        return Container(
-                          width: double.infinity,
-                          height: 5.h,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.orange.shade600,
-                                Colors.orange.shade700,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(2.h),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.orange.withValues(alpha: 0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                                spreadRadius: 0,
-                              ),
-                            ],
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                HapticUtils.buttonPress();
-                                // Open boost screen (now uses single boost option: $35 for 10 days)
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => PromoteEventScreen(
-                                      eventId: event.eventId!,
-                                      eventTitle: event.eventTitle ?? 'Event',
-                                    ),
-                                  ),
-                                ).then((_) {
-                                  // Refresh event details after boost
-                                  controller
-                                      .fetchEventDetailById(widget.eventId);
-                                });
-                              },
-                              borderRadius: BorderRadius.circular(2.h),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(2.h),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.2),
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(1.w),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Colors.white.withValues(alpha: 0.2),
-                                        borderRadius:
-                                            BorderRadius.circular(1.h),
-                                      ),
-                                      child: Icon(
-                                        Icons.trending_up,
-                                        size: 14.sp,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(width: 3.w),
-                                    Text(
-                                      'Boost Event',
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-
-                  // Generate Payment QR Button (for organizers)
-                  SizedBox(height: 2.h),
-                  Container(
-                    width: double.infinity,
-                    height: 5.h,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.blueColor,
-                          AppColors.lightColor,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(2.h),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.blueColor.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                          spreadRadius: 0,
-                        ),
-                      ],
+                      },
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
+
+                    if (isCreator && !hasEventEnded) ...[
+                      SizedBox(height: 2.h),
+
+                      // Boost Event
+                      if (event.isPromotionActive)
+                        _buildStatusIndicator(
+                          title: 'PROMOTION ACTIVE',
+                          subtitle: 'Boosting your reach',
+                          icon: Icons.verified_rounded,
+                          color: Colors.green,
+                        )
+                      else
+                        _buildActionButton(
+                          title: 'BOOST EVENT',
+                          icon: Icons.bolt_rounded,
+                          color: Colors.orange,
+                          onTap: () {
+                            HapticUtils.buttonPress();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PromoteEventScreen(
+                                  eventId: event.eventId!,
+                                  eventTitle: event.eventTitle ?? 'Event',
+                                ),
+                              ),
+                            ).then((_) {
+                              controller.fetchEventDetailById(widget.eventId);
+                            });
+                          },
+                        ),
+
+                      SizedBox(height: 2.h),
+
+                      // Generate Payment QR
+                      _buildActionButton(
+                        title: 'GENERATE PAYMENT QR',
+                        icon: Icons.qr_code_rounded,
+                        color: AppColors.blueColor,
                         onTap: () {
                           HapticUtils.buttonPress();
                           Navigator.push(
@@ -1762,76 +1457,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               ),
                             ),
                           ).then((_) {
-                            // Reload QR codes after generating
                             _loadQrCodes();
                           });
                         },
-                        borderRadius: BorderRadius.circular(2.h),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(2.h),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(1.w),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(1.h),
-                                ),
-                                child: Icon(
-                                  Icons.qr_code_scanner,
-                                  size: 14.sp,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(width: 3.w),
-                              Text(
-                                'Generate Payment QR',
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
-                    ),
-                  ),
 
-                  // Check In Tickets Button (for organizers)
-                  SizedBox(height: 2.h),
-                  Container(
-                    width: double.infinity,
-                    height: 5.h,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.green.shade600,
-                          Colors.green.shade700,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(2.h),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.green.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                          spreadRadius: 0,
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
+                      SizedBox(height: 2.h),
+
+                      // Check-in Tickets
+                      _buildActionButton(
+                        title: 'CHECK IN TICKETS',
+                        icon: Icons.qr_code_scanner_rounded,
+                        color: Colors.green,
                         onTap: () {
                           HapticUtils.buttonPress();
                           Navigator.push(
@@ -1841,51 +1478,141 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             ),
                           );
                         },
-                        borderRadius: BorderRadius.circular(2.h),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(2.h),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(1.w),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(1.h),
-                                ),
-                                child: Icon(
-                                  Icons.qr_code_scanner,
-                                  size: 14.sp,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(width: 3.w),
-                              Text(
-                                'Check In Tickets',
-                                style: TextStyle(
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
-                    ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+    bool isDisabled = false,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 6.h,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDisabled
+              ? [color.withValues(alpha: 0.5), color.withValues(alpha: 0.7)]
+              : [color, color.withValues(alpha: 0.8)],
+        ),
+        borderRadius: BorderRadius.circular(2.h),
+        boxShadow: [
+          if (!isDisabled)
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isDisabled ? null : onTap,
+          borderRadius: BorderRadius.circular(2.h),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(2.h),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.15),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 16.sp, color: Colors.white),
+                SizedBox(width: 3.w),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
                   ),
-                ],
+                ),
               ],
             ),
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusIndicator({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(2.h),
+            border: Border.all(
+              color: color.withValues(alpha: 0.2),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(2.w),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: color, size: 18.sp),
+              ),
+              SizedBox(width: 4.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 8.sp,
+                        color: color,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    SizedBox(height: 0.2.h),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1909,58 +1636,96 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   Widget _buildQrCodesSection() {
-    return Container(
-      padding: EdgeInsets.all(3.w),
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor,
-        borderRadius: BorderRadius.circular(2.h),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(3.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(3.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1.5,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.qr_code_scanner,
-                color: AppColors.blueColor,
-                size: 18.sp,
+              Row(
+                children: [
+                  Icon(
+                    Icons.qr_code_2_rounded,
+                    color: AppColors.blueColor,
+                    size: 16.sp,
+                  ),
+                  SizedBox(width: 3.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ORGANIZER TOOLS',
+                        style: TextStyle(
+                          fontSize: 8.sp,
+                          color: Colors.white38,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      Text(
+                        'Payment QR Codes',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              SizedBox(width: 2.w),
-              Text(
-                'Payment QR Codes',
-                style: TextStyles.homeheadingtext.copyWith(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
+              SizedBox(height: 3.h),
+              if (_isLoadingQrCodes)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else if (_qrCodes.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Text(
+                      'No payment QR codes generated yet.',
+                      style: TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10.sp,
+                      ),
+                    ),
+                  ),
+                )
+              else
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 3.w,
+                    mainAxisSpacing: 2.h,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemCount: _qrCodes.length,
+                  itemBuilder: (context, index) {
+                    final qr = _qrCodes[index];
+                    return _buildQrCodeItem(qr);
+                  },
                 ),
-              ),
             ],
           ),
-          SizedBox(height: 2.h),
-          if (_isLoadingQrCodes)
-            const Center(
-              child: CircularProgressIndicator(),
-            )
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 2.w,
-                mainAxisSpacing: 2.h,
-                childAspectRatio: 0.8,
-              ),
-              itemCount: _qrCodes.length,
-              itemBuilder: (context, index) {
-                final qr = _qrCodes[index];
-                return _buildQrCodeItem(qr);
-              },
-            ),
-        ],
+        ),
       ),
     );
   }
@@ -1975,82 +1740,91 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       qrDataMap = {'web': qrCodeData, 'app': qrCodeData};
     }
 
-    // Use web URL for QR code (works with all scanners, including iPhone)
     final qrString = qrDataMap['web'] ?? (qrDataMap['app'] ?? qrCodeData);
     final ticketType = qr['ticketType'] ?? 'general';
     final currentUses = qr['currentUses'] ?? 0;
     final maxUses = qr['maxUses'];
     final isLimitReached = maxUses != null && currentUses >= maxUses;
 
-    Color badgeColor;
-    Color textColor;
+    Color badgeColor = ticketType.toLowerCase() == 'vip'
+        ? const Color(0xFFFFD700)
+        : AppColors.blueColor;
 
-    switch (ticketType.toLowerCase()) {
-      case 'vip':
-        badgeColor = const Color(0xFFFFD700);
-        textColor = Colors.black87;
-        break;
-      default:
-        badgeColor = const Color(0xFF6C757D);
-        textColor = Colors.white;
-    }
-
-    return Container(
-      padding: EdgeInsets.all(2.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(1.5.h),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: EdgeInsets.all(3.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(2.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+              width: 1,
+            ),
+          ),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Badge
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 0.5.h),
                 decoration: BoxDecoration(
-                  color: badgeColor,
-                  borderRadius: BorderRadius.circular(1.h),
+                  color: badgeColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(0.8.h),
+                  border: Border.all(
+                    color: badgeColor.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   ticketType.toUpperCase(),
                   style: TextStyle(
-                    fontSize: 8.sp,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
+                    fontSize: 7.sp,
+                    fontWeight: FontWeight.w800,
+                    color: badgeColor,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ),
-              if (isLimitReached) ...[
-                SizedBox(width: 1.w),
-                Container(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 1.5.w, vertical: 0.3.h),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(1.h),
-                  ),
-                  child: Text(
-                    'LIMIT',
-                    style: TextStyle(
-                      fontSize: 6.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+              SizedBox(height: 1.5.h),
+              // QR Card
+              Container(
+                padding: EdgeInsets.all(2.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(1.5.h),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
+                  ],
+                ),
+                child: QrImageView(
+                  data: qrString,
+                  version: QrVersions.auto,
+                  size: 22.w,
+                  padding: EdgeInsets.zero,
+                  backgroundColor: Colors.transparent,
+                ),
+              ),
+              if (isLimitReached) ...[
+                SizedBox(height: 1.h),
+                Text(
+                  'LIMIT REACHED',
+                  style: TextStyle(
+                    fontSize: 6.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
                   ),
                 ),
               ],
             ],
           ),
-          SizedBox(height: 1.h),
-          QrImageView(
-            data: qrString,
-            version: QrVersions.auto,
-            size: 20.w,
-            backgroundColor: Colors.white,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -2058,109 +1832,156 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Widget _buildLiveStreamSection(EventDetailModel event) {
     final hasAccess = event.hasLiveStreamAccess ?? false;
 
-    return Container(
-      padding: EdgeInsets.all(3.w),
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor,
-        borderRadius: BorderRadius.circular(2.h),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.video_library,
-                color: AppColors.blueColor,
-                size: 16.sp,
-              ),
-              SizedBox(width: 2.w),
-              Text(
-                'Live Stream',
-                style: TextStyles.regularhometext1.copyWith(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 2.h),
-          if (hasAccess && event.liveStreamEmbedUrl != null) ...[
-            // Show live stream player
-            LiveStreamWidget(
-              embedUrl: event.liveStreamEmbedUrl!,
-              platform: _getPlatformFromUrl(event.liveStreamUrl!),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(3.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(3.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+              width: 1.5,
             ),
-          ] else ...[
-            // Show access denied message
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.lock,
-                      size: 48,
-                      color: Colors.grey[600],
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      'Live Stream is available for ticket holders only.',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.video_collection_rounded,
+                    color: AppColors.blueColor,
+                    size: 16.sp,
+                  ),
+                  SizedBox(width: 3.w),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'EVENT CONTENT',
+                        style: TextStyle(
+                          fontSize: 8.sp,
+                          color: Colors.white38,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
+                      Text(
+                        'Live Stream',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 3.h),
+              if (hasAccess && event.liveStreamEmbedUrl != null) ...[
+                // Show live stream player
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2.h),
+                  child: LiveStreamWidget(
+                    embedUrl: event.liveStreamEmbedUrl!,
+                    platform: _getPlatformFromUrl(event.liveStreamUrl!),
+                  ),
+                ),
+              ] else ...[
+                // Show access denied message
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.02),
+                    borderRadius: BorderRadius.circular(2.h),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      width: 1,
                     ),
-                    SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        HapticUtils.buttonPress();
-                        if (!authViewModel.isLoggedIn.value) {
-                          Get.snackbar(
-                            'Sign in to get tickets',
-                            'Create an account to purchase tickets.',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: AppColors.signinoptioncolor,
-                            colorText: Colors.white,
-                            mainButton: TextButton(
-                              onPressed: () =>
-                                  Get.toNamed(RouteName.loginScreen),
-                              child: Text(
-                                'Sign in',
-                                style: TextStyle(
-                                  color: AppColors.blueColor,
-                                  fontWeight: FontWeight.w600,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(4.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.blueColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.lock_person_rounded,
+                          size: 32.sp,
+                          color: AppColors.blueColor,
+                        ),
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        'Exclusive Content',
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 1.h),
+                      Text(
+                        'This live stream is available for ticket holders only.',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: Colors.white38,
+                          height: 1.5,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 3.h),
+                      _buildActionButton(
+                        title: 'GET TICKETS',
+                        icon: Icons.shopping_bag_rounded,
+                        color: AppColors.blueColor,
+                        onTap: () {
+                          HapticUtils.buttonPress();
+                          if (!authViewModel.isLoggedIn.value) {
+                            Get.snackbar(
+                              'Sign in to get tickets',
+                              'Create an account to purchase tickets.',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: AppColors.signinoptioncolor,
+                              colorText: Colors.white,
+                              mainButton: TextButton(
+                                onPressed: () =>
+                                    Get.toNamed(RouteName.loginScreen),
+                                child: const Text(
+                                  'Sign in',
+                                  style: TextStyle(
+                                    color: AppColors.blueColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            ),
+                            );
+                            return;
+                          }
+                          NavigationUtils.push(
+                            context,
+                            BookEventScreen(id: event.eventId),
+                            routeName: '/book-event',
                           );
-                          return;
-                        }
-                        NavigationUtils.push(
-                          context,
-                          BookEventScreen(id: event.eventId),
-                          routeName: '/book-event',
-                        );
-                      },
-                      child: Text('Get Tickets'),
-                    ),
-                  ],
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ],
-        ],
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -2180,7 +2001,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
 class _ReportEventReasonDialog extends StatefulWidget {
   @override
-  State<_ReportEventReasonDialog> createState() => _ReportEventReasonDialogState();
+  State<_ReportEventReasonDialog> createState() =>
+      _ReportEventReasonDialogState();
 }
 
 class _ReportEventReasonDialogState extends State<_ReportEventReasonDialog> {
@@ -2196,30 +2018,38 @@ class _ReportEventReasonDialogState extends State<_ReportEventReasonDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.signinoptioncolor,
-      title: Text('Report Event', style: TextStyle(color: Colors.white)),
+      title: const Text('Report Event', style: TextStyle(color: Colors.white)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Optionally describe the issue:', style: TextStyle(color: Colors.white70, fontSize: 12)),
-          SizedBox(height: 8),
+          const Text('Optionally describe the issue:',
+              style: TextStyle(color: Colors.white70, fontSize: 12)),
+          const SizedBox(height: 8),
           TextField(
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Reason (optional)',
-              hintStyle: TextStyle(color: Colors.white38),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              hintStyle: const TextStyle(color: Colors.white38),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
               fillColor: Colors.white.withValues(alpha: 0.1),
             ),
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text('Cancel', style: TextStyle(color: Colors.white70))),
-        TextButton(onPressed: () => Navigator.pop(context, _controller.text.trim()), child: Text('Submit', style: TextStyle(color: AppColors.blueColor))),
+        TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+                const Text('Cancel', style: TextStyle(color: Colors.white70))),
+        TextButton(
+            onPressed: () => Navigator.pop(context, _controller.text.trim()),
+            child: const Text('Submit',
+                style: TextStyle(color: AppColors.blueColor))),
       ],
     );
   }

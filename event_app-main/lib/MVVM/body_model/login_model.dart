@@ -10,16 +10,16 @@ class LoginModel {
     message = json['message'];
     token = json['token'];
     expiresAt = json['expires_at'];
-    user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    user = json['user'] != null ? User.fromJson(json['user']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['message'] = this.message;
-    data['token'] = this.token;
-    data['expires_at'] = this.expiresAt;
-    if (this.user != null) {
-      data['user'] = this.user!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['message'] = message;
+    data['token'] = token;
+    data['expires_at'] = expiresAt;
+    if (user != null) {
+      data['user'] = user!.toJson();
     }
     return data;
   }
@@ -39,10 +39,10 @@ class User {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['userId'] = this.userId;
-    data['name'] = this.name;
-    data['email'] = this.email;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['userId'] = userId;
+    data['name'] = name;
+    data['email'] = email;
     return data;
   }
 }

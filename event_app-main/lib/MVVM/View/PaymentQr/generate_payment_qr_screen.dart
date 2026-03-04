@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui' as ui;
+import 'dart:ui';
 import 'package:event_app/Services/payment_qr_service.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
@@ -20,7 +21,8 @@ class GeneratePaymentQrScreen extends StatefulWidget {
   const GeneratePaymentQrScreen({super.key, required this.eventId});
 
   @override
-  State<GeneratePaymentQrScreen> createState() => _GeneratePaymentQrScreenState();
+  State<GeneratePaymentQrScreen> createState() =>
+      _GeneratePaymentQrScreenState();
 }
 
 class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
@@ -28,7 +30,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
   final GlobalKey _qrCodeKey = GlobalKey();
   final TextEditingController _expiresAtController = TextEditingController();
   final TextEditingController _maxUsesController = TextEditingController();
-  
+
   String? _selectedTicketType = 'general';
   DateTime? _selectedExpiresAt;
   int? _maxUses;
@@ -56,286 +58,336 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
+      body: Stack(
+        children: [
+          // Background Glow
+          Positioned(
+            top: -10.h,
+            left: -10.w,
+            child: Container(
+              width: 50.w,
+              height: 50.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.blueColor.withValues(alpha: 0.1),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Description
+                        Text(
+                          'Generate a QR code for your event. Users can scan it to quickly purchase tickets.',
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            color: Colors.white60,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 3.h),
+
+                        // Success Message
+                        if (_successMessage != null)
+                          _buildStatusMessage(_successMessage!, true),
+
+                        // Error Message
+                        if (_errorMessage != null)
+                          _buildStatusMessage(_errorMessage!, false),
+
+                        // Generate Form
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(2.5.h),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              padding: EdgeInsets.all(5.w),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.05),
+                                borderRadius: BorderRadius.circular(2.5.h),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _buildLabel('Ticket Type'),
+                                  SizedBox(height: 1.5.h),
+                                  _buildDropdown(),
+                                  SizedBox(height: 3.h),
+
+                                  _buildLabel('Expires At (Optional)'),
+                                  SizedBox(height: 1.5.h),
+                                  _buildDatePicker(),
+                                  SizedBox(height: 3.h),
+
+                                  _buildLabel('Max Uses (Optional)'),
+                                  SizedBox(height: 1.5.h),
+                                  _buildTextField(),
+                                  SizedBox(height: 4.h),
+
+                                  // Generate Button
+                                  _buildGenerateButton(),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // New QR Code Display
+                        if (_newQrData != null) ...[
+                          SizedBox(height: 4.h),
+                          _buildQrCodeDisplay(_newQrData!),
+                          SizedBox(height: 3.h),
+                          _buildActionButtons(_newQrData!),
+                        ],
+
+                        // Existing QR Codes List
+                        if (_existingQrCodes.isNotEmpty) ...[
+                          SizedBox(height: 5.h),
+                          _buildSectionHeader('Existing QR Codes'),
+                          SizedBox(height: 2.h),
+                          _buildExistingQrCodesList(),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusMessage(String message, bool isSuccess) {
+    final color = isSuccess ? Colors.greenAccent : Colors.redAccent;
+    return Container(
+      padding: EdgeInsets.all(4.w),
+      margin: EdgeInsets.only(bottom: 2.5.h),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(2.h),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(isSuccess ? Icons.check_circle_rounded : Icons.error_rounded,
+              color: color, size: 18.sp),
+          SizedBox(width: 3.w),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                  color: color.withValues(alpha: 0.9),
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.close_rounded, color: color, size: 18.sp),
+            onPressed: () => setState(() {
+              if (isSuccess) {
+                _successMessage = null;
+              } else {
+                _errorMessage = null;
+              }
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLabel(String label) {
+    return Text(
+      label,
+      style: TextStyle(
+        fontSize: 12.sp,
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        letterSpacing: -0.5,
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.5,
+          ),
         ),
-        title: Text(
-          'Generate Payment QR',
-          style: TextStyles.heading,
+        SizedBox(width: 4.w),
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white24, Colors.transparent],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(1.5.h),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: DropdownButtonFormField<String>(
+        initialValue: _selectedTicketType,
+        dropdownColor: const Color(0xFF1C1C23),
+        decoration: InputDecoration(
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+          border: InputBorder.none,
+        ),
+        style: TextStyle(color: Colors.white, fontSize: 11.sp),
+        items: const [
+          DropdownMenuItem(value: 'general', child: Text('General Admission')),
+          DropdownMenuItem(value: 'vip', child: Text('VIP Ticket')),
+        ],
+        onChanged: (value) => setState(() => _selectedTicketType = value),
+      ),
+    );
+  }
+
+  Widget _buildDatePicker() {
+    return GestureDetector(
+      onTap: _selectExpiresAt,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(1.5.h),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.calendar_today_rounded,
+                color: AppColors.blueColor, size: 16.sp),
+            SizedBox(width: 3.w),
+            Expanded(
+              child: Text(
+                _selectedExpiresAt != null
+                    ? DateFormat('MMM d, yyyy  •  HH:mm')
+                        .format(_selectedExpiresAt!)
+                    : 'Set expiration date',
+                style: TextStyle(
+                  color: _selectedExpiresAt != null
+                      ? Colors.white
+                      : Colors.white38,
+                  fontSize: 11.sp,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(5.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Description
-            Text(
-              'Generate a QR code for your event. Users can scan it to quickly purchase tickets.',
-              style: TextStyles.regularwhite.copyWith(
-                fontSize: 11.sp,
-                color: Colors.white70,
-              ),
+    );
+  }
+
+  Widget _buildTextField() {
+    return TextField(
+      controller: _maxUsesController,
+      keyboardType: TextInputType.number,
+      style: TextStyle(color: Colors.white, fontSize: 11.sp),
+      decoration: InputDecoration(
+        hintText: 'Unlimited uses',
+        hintStyle: TextStyle(color: Colors.white24, fontSize: 11.sp),
+        filled: true,
+        fillColor: Colors.white.withValues(alpha: 0.05),
+        contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(1.5.h),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(1.5.h),
+          borderSide:
+              BorderSide(color: AppColors.blueColor.withValues(alpha: 0.5)),
+        ),
+      ),
+      onChanged: (value) =>
+          setState(() => _maxUses = value.isEmpty ? null : int.tryParse(value)),
+    );
+  }
+
+  Widget _buildGenerateButton() {
+    return SizedBox(
+      height: 6.5.h,
+      child: GestureDetector(
+        onTap: _isGenerating ? null : _generateQrCode,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.blueColor,
+                AppColors.blueColor.withValues(alpha: 0.8),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            SizedBox(height: 3.h),
-
-            // Success Message
-            if (_successMessage != null)
-              Container(
-                padding: EdgeInsets.all(3.w),
-                margin: EdgeInsets.only(bottom: 2.h),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(2.h),
-                  border: Border.all(color: Colors.green),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: Colors.green),
-                    SizedBox(width: 2.w),
-                    Expanded(
-                      child: Text(
-                        _successMessage!,
-                        style: TextStyles.regularwhite.copyWith(color: Colors.green),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.green, size: 20),
-                      onPressed: () {
-                        setState(() {
-                          _successMessage = null;
-                        });
-                      },
-                    ),
-                  ],
-                ),
+            borderRadius: BorderRadius.circular(1.5.h),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.blueColor.withValues(alpha: 0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
               ),
-
-            // Error Message
-            if (_errorMessage != null)
-              Container(
-                padding: EdgeInsets.all(3.w),
-                margin: EdgeInsets.only(bottom: 2.h),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(2.h),
-                  border: Border.all(color: Colors.red),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.error, color: Colors.red),
-                    SizedBox(width: 2.w),
-                    Expanded(
-                      child: Text(
-                        _errorMessage!,
-                        style: TextStyles.regularwhite.copyWith(color: Colors.red),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.red, size: 20),
-                      onPressed: () {
-                        setState(() {
-                          _errorMessage = null;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-
-            // Generate Form
-            Container(
-              padding: EdgeInsets.all(4.w),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1C1C23),
-                borderRadius: BorderRadius.circular(2.h),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Ticket Type Dropdown
-                  Text(
-                    'Ticket Type',
-                    style: TextStyles.regularwhite.copyWith(fontSize: 12.sp),
-                  ),
-                  SizedBox(height: 1.h),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundColor,
-                      borderRadius: BorderRadius.circular(2.h),
-                    ),
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedTicketType,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.5.h),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(2.h),
-                          borderSide: BorderSide.none,
+            ],
+          ),
+          child: Center(
+            child: _isGenerating
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.qr_code_rounded,
+                          color: Colors.white, size: 18.sp),
+                      SizedBox(width: 3.w),
+                      Text(
+                        'Generate QR',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      dropdownColor: AppColors.backgroundColor,
-                      style: TextStyles.regularwhite,
-                      items: const [
-                        DropdownMenuItem(value: 'general', child: Text('General Admission')),
-                        DropdownMenuItem(value: 'vip', child: Text('VIP (Very Important Person)')),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedTicketType = value;
-                        });
-                      },
-                    ),
+                    ],
                   ),
-                  SizedBox(height: 3.h),
-
-                  // Expires At (Optional)
-                  Text(
-                    'Expires At (Optional)',
-                    style: TextStyles.regularwhite.copyWith(fontSize: 12.sp),
-                  ),
-                  SizedBox(height: 1.h),
-                  GestureDetector(
-                    onTap: _selectExpiresAt,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.5.h),
-                      decoration: BoxDecoration(
-                        color: AppColors.backgroundColor,
-                        borderRadius: BorderRadius.circular(2.h),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _selectedExpiresAt != null
-                                  ? DateFormat('yyyy-MM-dd HH:mm').format(_selectedExpiresAt!)
-                                  : 'Leave empty for no expiration',
-                              style: TextStyles.regularwhite.copyWith(
-                                color: _selectedExpiresAt != null ? Colors.white : Colors.white54,
-                              ),
-                            ),
-                          ),
-                          if (_selectedExpiresAt != null)
-                            IconButton(
-                              icon: const Icon(Icons.clear, color: Colors.white54, size: 20),
-                              onPressed: () {
-                                setState(() {
-                                  _selectedExpiresAt = null;
-                                  _expiresAtController.clear();
-                                });
-                              },
-                            ),
-                          const Icon(Icons.calendar_today, color: Colors.white54),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 1.h),
-                  Text(
-                    'Leave empty for no expiration',
-                    style: TextStyles.regularwhite.copyWith(
-                      fontSize: 9.sp,
-                      color: Colors.white54,
-                    ),
-                  ),
-                  SizedBox(height: 3.h),
-
-                  // Max Uses (Optional)
-                  Text(
-                    'Max Uses (Optional)',
-                    style: TextStyles.regularwhite.copyWith(fontSize: 12.sp),
-                  ),
-                  SizedBox(height: 1.h),
-                  TextField(
-                    controller: _maxUsesController,
-                    keyboardType: TextInputType.number,
-                    style: TextStyles.regularwhite,
-                    decoration: InputDecoration(
-                      hintText: 'Leave empty for unlimited uses',
-                      hintStyle: TextStyles.regularwhite.copyWith(color: Colors.white54),
-                      filled: true,
-                      fillColor: AppColors.backgroundColor,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.5.h),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(2.h),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _maxUses = value.isEmpty ? null : int.tryParse(value);
-                      });
-                    },
-                  ),
-                  SizedBox(height: 1.h),
-                  Text(
-                    'Leave empty for unlimited uses',
-                    style: TextStyles.regularwhite.copyWith(
-                      fontSize: 9.sp,
-                      color: Colors.white54,
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-
-                  // Generate Button
-                  ElevatedButton(
-                    onPressed: _isGenerating ? null : _generateQrCode,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.blueColor,
-                      padding: EdgeInsets.symmetric(vertical: 2.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(2.h),
-                      ),
-                    ),
-                    child: _isGenerating
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.qr_code, color: Colors.white),
-                              SizedBox(width: 2.w),
-                              Text(
-                                'Generate QR Code',
-                                style: TextStyles.buttontext.copyWith(fontSize: 14.sp),
-                              ),
-                            ],
-                          ),
-                  ),
-                ],
-              ),
-            ),
-
-            // New QR Code Display (if just generated)
-            if (_newQrData != null) ...[
-              SizedBox(height: 3.h),
-              _buildQrCodeDisplay(_newQrData!),
-              SizedBox(height: 2.h),
-              _buildActionButtons(_newQrData!),
-            ],
-
-            // Existing QR Codes List
-            if (_existingQrCodes.isNotEmpty) ...[
-              SizedBox(height: 4.h),
-              Divider(color: Colors.white24),
-              SizedBox(height: 2.h),
-              Text(
-                'Existing QR Codes',
-                style: TextStyles.subheading,
-              ),
-              SizedBox(height: 2.h),
-              _buildExistingQrCodesList(),
-            ],
-          ],
+          ),
         ),
       ),
     );
@@ -344,30 +396,29 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
   Future<void> _selectExpiresAt() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: _selectedExpiresAt ?? DateTime.now().add(const Duration(days: 1)),
+      initialDate:
+          _selectedExpiresAt ?? DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
+    if (pickedDate == null || !mounted) return;
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
 
-    if (pickedDate != null) {
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
+    if (pickedTime == null || !mounted) return;
+    setState(() {
+      _selectedExpiresAt = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
       );
-
-      if (pickedTime != null) {
-        setState(() {
-          _selectedExpiresAt = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-          _expiresAtController.text = DateFormat('yyyy-MM-dd HH:mm').format(_selectedExpiresAt!);
-        });
-      }
-    }
+      _expiresAtController.text =
+          DateFormat('yyyy-MM-dd HH:mm').format(_selectedExpiresAt!);
+    });
   }
 
   Future<void> _loadExistingQrCodes() async {
@@ -396,79 +447,139 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     }
   }
 
+  Widget _buildHeader() {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor.withValues(alpha: 0.8),
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  HapticUtils.navigation();
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  padding: EdgeInsets.all(1.2.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 16.sp,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Event QR Codes',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 44),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildQrCodeDisplay(Map<String, dynamic> qrData) {
     final qrCodeData = qrData['qrCodeData'];
     Map<String, dynamic> qrDataMap;
-    
+
     try {
       qrDataMap = json.decode(qrCodeData);
     } catch (e) {
       qrDataMap = {'web': qrCodeData, 'app': qrCodeData};
     }
-    
-    // Use web URL for QR code (works with all scanners, including iPhone)
+
     final qrString = qrDataMap['web'] ?? (qrDataMap['app'] ?? qrCodeData);
 
     return RepaintBoundary(
       key: _qrCodeKey,
-      child: Container(
-        padding: EdgeInsets.all(5.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(2.h),
-        ),
-        child: Column(
-          children: [
-            QrImageView(
-              data: qrString,
-              version: QrVersions.auto,
-              size: 60.w,
-              backgroundColor: Colors.white,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(2.5.h),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Container(
+            padding: EdgeInsets.all(6.w),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(2.5.h),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
-            SizedBox(height: 2.h),
-            _buildTicketTypeBadge(qrData['ticketType']),
-            SizedBox(height: 1.h),
-            Text(
-              'Price: \$${qrData['price'].toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 11.sp,
-                color: Colors.black87,
-                fontFamily: 'Montserrat',
-              ),
+            child: Column(
+              children: [
+                QrImageView(
+                  data: qrString,
+                  version: QrVersions.auto,
+                  size: 65.w,
+                  backgroundColor: Colors.white,
+                  padding: EdgeInsets.zero,
+                ),
+                SizedBox(height: 3.h),
+                _buildTicketTypeBadge(qrData['ticketType']),
+                SizedBox(height: 1.5.h),
+                Text(
+                  'USD ${qrData['price'].toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTicketTypeBadge(String ticketType) {
-    Color badgeColor;
-    Color textColor;
-    
-    switch (ticketType.toLowerCase()) {
-      case 'vip':
-        badgeColor = const Color(0xFFFFD700);
-        textColor = Colors.black87;
-        break;
-      default:
-        badgeColor = const Color(0xFF6C757D);
-        textColor = Colors.white;
-    }
-
+    bool isVip = ticketType.toLowerCase() == 'vip';
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
       decoration: BoxDecoration(
-        color: badgeColor,
-        borderRadius: BorderRadius.circular(2.h),
+        color: isVip ? AppColors.blueColor : Colors.black12,
+        borderRadius: BorderRadius.circular(1.2.h),
       ),
       child: Text(
         ticketType.toUpperCase(),
         style: TextStyle(
-          fontSize: 12.sp,
+          fontSize: 10.sp,
           fontWeight: FontWeight.bold,
-          color: textColor,
-          fontFamily: 'Montserrat',
+          color: isVip ? Colors.white : Colors.black54,
+          letterSpacing: 1,
         ),
       ),
     );
@@ -478,35 +589,43 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     return Row(
       children: [
         Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _downloadQrCode,
-            icon: const Icon(Icons.download, color: Colors.white),
-            label: Text('Download', style: TextStyles.buttontext),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blueColor,
-              padding: EdgeInsets.symmetric(vertical: 2.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.h),
-              ),
-            ),
-          ),
+          child: _buildActionButton(
+              Icons.download_rounded, 'Download', _downloadQrCode),
         ),
-        SizedBox(width: 3.w),
+        SizedBox(width: 4.w),
         Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _shareQrCode,
-            icon: const Icon(Icons.share, color: Colors.white),
-            label: Text('Share', style: TextStyles.buttontext),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blueColor,
-              padding: EdgeInsets.symmetric(vertical: 2.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.h),
-              ),
-            ),
-          ),
+          child: _buildActionButton(Icons.share_rounded, 'Share', _shareQrCode),
         ),
       ],
+    );
+  }
+
+  Widget _buildActionButton(
+      IconData icon, String label, VoidCallback onPressed) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        height: 6.h,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(1.5.h),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 16.sp),
+            SizedBox(width: 2.w),
+            Text(
+              label,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11.sp),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -531,14 +650,13 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
   Widget _buildQrCodeCard(Map<String, dynamic> qr) {
     final qrCodeData = qr['qrCodeData'];
     Map<String, dynamic> qrDataMap;
-    
+
     try {
       qrDataMap = json.decode(qrCodeData);
     } catch (e) {
       qrDataMap = {'web': qrCodeData, 'app': qrCodeData};
     }
-    
-    // Use web URL for QR code (works with all scanners, including iPhone)
+
     final qrString = qrDataMap['web'] ?? (qrDataMap['app'] ?? qrCodeData);
     final ticketType = qr['ticketType'] ?? 'general';
     final currentUses = qr['currentUses'] ?? 0;
@@ -546,73 +664,102 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     final expiresAt = qr['expiresAt'];
 
     return Container(
-      margin: EdgeInsets.only(bottom: 2.h),
-      padding: EdgeInsets.all(4.w),
+      margin: EdgeInsets.only(bottom: 2.5.h),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(2.h),
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(2.5.h),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
-      child: Column(
-        children: [
-          QrImageView(
-            data: qrString,
-            version: QrVersions.auto,
-            size: 50.w,
-            backgroundColor: Colors.white,
-          ),
-          SizedBox(height: 2.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildTicketTypeBadge(ticketType),
-              if (maxUses != null && currentUses >= maxUses) ...[
-                SizedBox(width: 2.w),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 0.8.h),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(1.h),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(2.h),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Padding(
+            padding: EdgeInsets.all(4.w),
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2.h),
+                  child: Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.all(4.w),
+                    child: QrImageView(
+                      data: qrString,
+                      version: QrVersions.auto,
+                      size: 45.w,
+                      backgroundColor: Colors.white,
+                      padding: EdgeInsets.zero,
+                    ),
                   ),
-                  child: Text(
-                    'LIMIT REACHED',
-                    style: TextStyle(
-                      fontSize: 9.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontFamily: 'Montserrat',
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildTicketTypeBadge(ticketType),
+                    if (maxUses != null && currentUses >= maxUses) ...[
+                      SizedBox(width: 2.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 3.w, vertical: 0.8.h),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(1.h),
+                          border: Border.all(
+                              color: Colors.redAccent.withValues(alpha: 0.5)),
+                        ),
+                        child: Text(
+                          'LIMIT REACHED',
+                          style: TextStyle(
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                if (expiresAt != null) ...[
+                  SizedBox(height: 1.h),
+                  Text(
+                    'Expires: ${DateFormat('MMM d, y HH:mm').format(DateTime.parse(expiresAt))}',
+                    style: TextStyle(fontSize: 9.sp, color: Colors.white38),
+                  ),
+                ],
+                SizedBox(height: 2.h),
+                GestureDetector(
+                  onTap: () => _deactivateQrCode(qr['qrId']),
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.2.h),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(2.h),
+                      border: Border.all(
+                          color: Colors.redAccent.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.power_settings_new_rounded,
+                            color: Colors.redAccent, size: 14.sp),
+                        SizedBox(width: 2.w),
+                        Text(
+                          'Deactivate',
+                          style: TextStyle(
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10.sp),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ],
-            ],
-          ),
-          if (expiresAt != null) ...[
-            SizedBox(height: 0.5.h),
-            Text(
-              'Expires: ${DateFormat('MMM d, y HH:mm').format(DateTime.parse(expiresAt))}',
-              style: TextStyle(
-                fontSize: 10.sp,
-                color: Colors.black87,
-                fontFamily: 'Montserrat',
-              ),
-            ),
-          ],
-          SizedBox(height: 2.h),
-          ElevatedButton(
-            onPressed: () => _deactivateQrCode(qr['qrId']),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.h),
-              ),
-            ),
-            child: Text(
-              'Deactivate',
-              style: TextStyles.buttontext.copyWith(fontSize: 11.sp),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -627,10 +774,11 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
 
     try {
       HapticUtils.buttonPress();
-      
+
       String? expiresAtString;
       if (_selectedExpiresAt != null) {
-        expiresAtString = DateFormat('yyyy-MM-dd HH:mm:ss').format(_selectedExpiresAt!);
+        expiresAtString =
+            DateFormat('yyyy-MM-dd HH:mm:ss').format(_selectedExpiresAt!);
       }
 
       final response = await _qrService.generatePaymentQr(
@@ -657,7 +805,8 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
         _loadExistingQrCodes();
       } else {
         setState(() {
-          _errorMessage = responseData['message'] ?? 'Failed to generate QR code';
+          _errorMessage =
+              responseData['message'] ?? 'Failed to generate QR code';
           _isGenerating = false;
         });
       }
@@ -744,12 +893,13 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
       if (image == null) return;
 
       final directory = await getApplicationDocumentsDirectory();
-      final imagePath = '${directory.path}/payment_qr_${DateTime.now().millisecondsSinceEpoch}.png';
+      final imagePath =
+          '${directory.path}/payment_qr_${DateTime.now().millisecondsSinceEpoch}.png';
       final imageFile = File(imagePath);
-      
+
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
-      
+
       await imageFile.writeAsBytes(byteData.buffer.asUint8List());
 
       Get.snackbar(
@@ -777,12 +927,13 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
       if (image == null) return;
 
       final directory = await getTemporaryDirectory();
-      final imagePath = '${directory.path}/payment_qr_${DateTime.now().millisecondsSinceEpoch}.png';
+      final imagePath =
+          '${directory.path}/payment_qr_${DateTime.now().millisecondsSinceEpoch}.png';
       final imageFile = File(imagePath);
-      
+
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
-      
+
       await imageFile.writeAsBytes(byteData.buffer.asUint8List());
 
       await Share.shareXFiles(
@@ -802,8 +953,8 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
 
   Future<ui.Image?> _captureWidget() async {
     try {
-      final RenderRepaintBoundary boundary =
-          _qrCodeKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      final RenderRepaintBoundary boundary = _qrCodeKey.currentContext!
+          .findRenderObject() as RenderRepaintBoundary;
       final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
       return image;
     } catch (e) {
@@ -812,4 +963,3 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     }
   }
 }
-

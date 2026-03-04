@@ -205,7 +205,7 @@ class AuthViewModel extends GetxController {
       if (response['statusCode'] == 201) {
         await _prefs.setString('registered_email', email);
         _showSuccess(response['message']);
-        Get.off(() => VerifyEmail());
+        Get.off(() => const VerifyEmail());
       } else if (response['statusCode'] == 422) {
         final errors = response['errors'];
         nameError.value = errors['name']?.first ?? '';
@@ -238,7 +238,7 @@ class AuthViewModel extends GetxController {
 
       if (result.containsKey('message')) {
         _showSuccess(result['message']);
-        Get.offAll(() => SigninScreen());
+        Get.offAll(() => const SigninScreen());
       } else {
         throw Exception('Unknown response');
       }
@@ -315,8 +315,8 @@ class AuthViewModel extends GetxController {
           await AuthService.verifyPasswordOtp(email: email, otp: otp);
 
       if (result.containsKey('message')) {
-        Get.to(() => PasswordSetting());
-        Future.delayed(Duration(milliseconds: 300), () {
+        Get.to(() => const PasswordSetting());
+        Future.delayed(const Duration(milliseconds: 300), () {
           _showSuccess(result['message'] ?? "OTP Verified");
         });
       } else {
@@ -357,7 +357,7 @@ class AuthViewModel extends GetxController {
 
       if (result.containsKey('message')) {
         _showSuccess(result['message']);
-        Get.offAll(() => SigninScreen());
+        Get.offAll(() => const SigninScreen());
       } else {
         throw Exception("Unexpected response from server");
       }
@@ -522,9 +522,4 @@ class AuthViewModel extends GetxController {
     }
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-    // Dispose resources if needed
-  }
 }

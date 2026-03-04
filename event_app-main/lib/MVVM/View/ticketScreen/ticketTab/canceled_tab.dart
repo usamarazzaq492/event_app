@@ -10,6 +10,8 @@ import '../../../../Widget/ticket_card.dart';
 class CancelledTab extends StatelessWidget {
   final TicketViewModel ticketVM = Get.find<TicketViewModel>();
 
+  CancelledTab({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -103,7 +105,7 @@ class CancelledTab extends StatelessWidget {
                 : 'https://eventgo-live.com$eventImage';
           }
 
-          return TicketCard(
+          return ticketCard(
             title: eventTitle,
             date: formattedDate,
             location: location,

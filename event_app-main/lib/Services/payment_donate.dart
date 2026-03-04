@@ -150,7 +150,7 @@ class _DonatePaymentPageState extends State<DonatePaymentPage> {
   Widget build(BuildContext context) {
     print('amount ${widget.donate}');
     return Scaffold(
-      appBar: AppBar(title: Text('Complete Payment')),
+      appBar: AppBar(title: const Text('Complete Payment')),
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),

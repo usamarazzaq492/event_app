@@ -14,8 +14,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import '../../../Services/location_service.dart';
 
-import '../bottombar/bottom_navigation_bar.dart';
-
 class EventUpdateScreen extends StatefulWidget {
   final String eventId;
 

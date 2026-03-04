@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class PromotionService {
   final String baseUrl = "https://eventgo-live.com/api/v1";
@@ -31,16 +32,18 @@ class PromotionService {
         },
       );
 
-      print('Promotion packages response: ${response.statusCode} - ${response.body}');
+      debugPrint(
+          'Promotion packages response: ${response.statusCode} - ${response.body}');
 
       if (response.statusCode == 200) {
         final decoded = json.decode(response.body);
         return decoded;
       } else {
-        final errorBody = response.body.isNotEmpty 
-            ? json.decode(response.body) 
+        final errorBody = response.body.isNotEmpty
+            ? json.decode(response.body)
             : {'message': 'Server error ${response.statusCode}'};
-        throw Exception(errorBody['message'] ?? 'Failed to load packages: ${response.statusCode}');
+        throw Exception(errorBody['message'] ??
+            'Failed to load packages: ${response.statusCode}');
       }
     } catch (e) {
       print('Promotion service error: $e');
@@ -98,4 +101,3 @@ class PromotionService {
     }
   }
 }
-

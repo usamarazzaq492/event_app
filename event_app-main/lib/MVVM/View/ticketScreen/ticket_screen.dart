@@ -1,21 +1,21 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/view_model/ticket_view_model.dart';
 import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/app/config/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:sizer/sizer.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../../../utils/haptic_utils.dart';
 import '../../../Services/ticket_pdf_service.dart';
 
 class TicketScreen extends StatefulWidget {
-  const TicketScreen({Key? key}) : super(key: key);
+  const TicketScreen({super.key});
 
   @override
   State<TicketScreen> createState() => _TicketScreenState();
@@ -38,49 +38,71 @@ class _TicketScreenState extends State<TicketScreen> {
   Widget _buildGuestPrompt() {
     return Center(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8.w),
+        padding: EdgeInsets.symmetric(horizontal: 10.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.confirmation_number_outlined,
-              size: 64.sp,
-              color: Colors.white54,
+            Container(
+              padding: EdgeInsets.all(4.h),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.03),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+              ),
+              child: Icon(
+                Icons.confirmation_number_rounded,
+                size: 50.sp,
+                color: AppColors.blueColor.withValues(alpha: 0.5),
+              ),
             ),
-            SizedBox(height: 3.h),
+            SizedBox(height: 4.h),
             Text(
-              "Sign in to view your tickets",
-              style: TextStyles.tickettext.copyWith(
+              "Join the EventGo Community",
+              style: TextStyle(
+                color: Colors.white,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
               ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 1.5.h),
             Text(
-              "Purchase event tickets and they will appear here.",
+              "Sign in to view your tickets and upcoming experiences.",
               style: TextStyle(
-                color: Colors.white70,
-                fontSize: 13.sp,
+                color: Colors.white38,
+                fontSize: 12.sp,
+                height: 1.4,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 4.h),
-            ElevatedButton(
-              onPressed: () => Get.toNamed(RouteName.loginScreen),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.blueColor,
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(2.h),
+            SizedBox(height: 5.h),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  HapticUtils.light();
+                  Get.toNamed(RouteName.loginScreen);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.blueColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 2.h),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(1.5.h),
+                  ),
+                  elevation: 0,
+                ).copyWith(
+                  shadowColor: WidgetStateProperty.all(
+                      AppColors.blueColor.withValues(alpha: 0.4)),
+                  elevation: WidgetStateProperty.all(8),
                 ),
-              ),
-              child: Text(
-                "Sign in",
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
+                child: Text(
+                  "Sign In to Continue",
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -96,21 +118,11 @@ class _TicketScreenState extends State<TicketScreen> {
       if (!authViewModel.isLoggedIn.value) {
         return Scaffold(
           backgroundColor: AppColors.backgroundColor,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(top: 5.h, left: 5.w, right: 5.w),
-                  child: Row(
-                    children: [
-                      Text("My Tickets", style: TextStyles.tickettext),
-                      const Spacer(),
-                    ],
-                  ),
-                ),
-                Expanded(child: _buildGuestPrompt()),
-              ],
-            ),
+          body: Column(
+            children: [
+              _buildPremiumHeader("My Tickets"),
+              Expanded(child: _buildGuestPrompt()),
+            ],
           ),
         );
       }
@@ -118,37 +130,19 @@ class _TicketScreenState extends State<TicketScreen> {
         length: 2,
         child: Scaffold(
           backgroundColor: AppColors.backgroundColor,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(top: 5.h, left: 5.w, right: 5.w),
-                  child: Row(
-                    children: [
-                      Text("My Tickets", style: TextStyles.tickettext),
-                      const Spacer(),
-                    ],
-                  ),
-                ),
-                const TabBar(
-                  labelColor: Colors.white,
-                  indicatorColor: AppColors.blueColor,
-                  unselectedLabelColor: Colors.grey,
-                  tabs: [
-                    Tab(text: 'General Admission'),
-                    Tab(text: 'VIP'),
+          body: Column(
+            children: [
+              _buildPremiumHeader("My Tickets"),
+              _buildTabBar(),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _buildTicketList('general'),
+                    _buildTicketList('vip'),
                   ],
                 ),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      _buildTicketList('general'),
-                      _buildTicketList('vip'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );
@@ -171,12 +165,13 @@ class _TicketScreenState extends State<TicketScreen> {
         return Center(
           child: Text(
             "No $type tickets",
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white38),
           ),
         );
       }
 
       return ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
         itemCount: filtered.length,
         itemBuilder: (context, index) {
           final t = filtered[index];
@@ -187,178 +182,190 @@ class _TicketScreenState extends State<TicketScreen> {
               : eventTitle;
           final ticketType = t['ticketType'] ?? 'Unknown';
           final startDate = t['startDate'] ?? '';
-          final endDate = t['endDate'] ?? '';
           final startTime = t['startTime'] ?? '';
-          final endTime = t['endTime'] ?? '';
           final ticketNumber = t['ticketNumber'] ?? 'N/A';
-          final eventPrice = t['eventPrice']?.toString() ?? 'N/A';
-          final qrCodeData = t['qrCodeData'] ?? ''; // Get QR code data from API
+          final qrCodeData = t['qrCodeData'] ?? '';
 
-          // 🔷 Format dates and times
-          String formattedStartDate = startDate.isNotEmpty
-              ? DateFormat('dd MMM yyyy').format(DateTime.parse(startDate))
-              : 'N/A';
-          String formattedEndDate = endDate.isNotEmpty
-              ? DateFormat('dd MMM yyyy').format(DateTime.parse(endDate))
+          String formattedDate = startDate.isNotEmpty
+              ? DateFormat('EEE, MMM d, yyyy').format(DateTime.parse(startDate))
               : 'N/A';
           String formattedStartTime = startTime.isNotEmpty
               ? DateFormat.jm().format(DateFormat("HH:mm:ss").parse(startTime))
               : 'N/A';
-          String formattedEndTime = endTime.isNotEmpty
-              ? DateFormat.jm().format(DateFormat("HH:mm:ss").parse(endTime))
-              : 'N/A';
 
-          return Card(
-            color: AppColors.signinoptioncolor,
-            margin: const EdgeInsets.all(10),
+          return Container(
+            margin: EdgeInsets.only(bottom: 2.5.h),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(2.5.h),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 1,
+              ),
+            ),
             child: Column(
               children: [
-                ListTile(
-                  leading: CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        color: Colors.grey[300],
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => const Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                    ),
-                  ),
-                  title: Text(
-                    capitalizedTitle,
-                    style: TextStyle(
-                      color: AppColors.blueColor, // 🔷 Attractive title color
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Padding(
+                  padding: EdgeInsets.all(2.h),
+                  child: Row(
                     children: [
-                      const SizedBox(height: 4),
-                      Text(
-                        "${ticketType[0].toUpperCase()}${ticketType.substring(1)} | $formattedStartDate - $formattedEndDate",
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        "Time: $formattedStartTime - $formattedEndTime",
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        "Price: \$$eventPrice",
-                        style: const TextStyle(
-                          color: Colors.green,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 18,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(1.5.h),
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          width: 15.w,
+                          height: 8.h,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.white.withValues(alpha: 0.05),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            child: Icon(Icons.confirmation_number_rounded,
+                                color: Colors.white24, size: 20.sp),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        "Ticket #: $ticketNumber",
-                        style: const TextStyle(
-                          color: Colors.white60,
-                          fontSize: 12,
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              capitalizedTitle.trim(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: -0.2,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 0.5.h),
+                            Text(
+                              "$formattedDate • $formattedStartTime",
+                              style: TextStyle(
+                                  color: Colors.white38, fontSize: 9.sp),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 2.5.w, vertical: 0.6.h),
+                        decoration: BoxDecoration(
+                          color: AppColors.blueColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(1.h),
+                        ),
+                        child: Text(
+                          ticketType.toUpperCase(),
+                          style: TextStyle(
+                              color: AppColors.blueColor,
+                              fontSize: 7.sp,
+                              fontWeight: FontWeight.w800),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Divider(color: Colors.white24, height: 1),
-                
-                // QR Code Display
                 if (qrCodeData.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1,
+                  Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.symmetric(horizontal: 2.h),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 3.h, horizontal: 4.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.02),
+                      borderRadius: BorderRadius.circular(2.h),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(1.5.h),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: QrImageView(
+                            data: qrCodeData is String
+                                ? qrCodeData
+                                : jsonEncode(qrCodeData),
+                            version: QrVersions.auto,
+                            size: 40.w,
+                            backgroundColor: Colors.white,
+                          ),
                         ),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            'Scan for verification',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: QrImageView(
-                              data: qrCodeData is String ? qrCodeData : jsonEncode(qrCodeData),
-                              version: QrVersions.auto,
-                              size: 150,
-                              backgroundColor: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Ticket: $ticketNumber',
-                            style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 10.sp,
-                            ),
-                          ),
-                        ],
-                      ),
+                        SizedBox(height: 2.h),
+                        Text(
+                          "SCAN TO ENTER",
+                          style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 9.sp,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2),
+                        ),
+                      ],
                     ),
                   ),
-                
-                const Divider(color: Colors.white24, height: 1),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: AppColors.blueColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  padding: EdgeInsets.all(2.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("ADMIT ONE",
+                              style: TextStyle(
+                                  color: Colors.white24,
+                                  fontSize: 7.sp,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1)),
+                          Text(ticketNumber,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10.sp,
+                                  fontWeight: FontWeight.w600)),
+                        ],
                       ),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 130),
-                      elevation: 4,
-                    ),
-                    icon: const Icon(Icons.download),
-                    label: const Text(
-                      "Download Ticket",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                    onPressed: () async {
-                      try {
-                        await generateTicketPdf(t);
-                        Get.snackbar("Download Complete",
-                            "Ticket saved to Downloads folder");
-                      } catch (e) {
-                        print(e.toString());
-                      }
-                    },
+                      TextButton.icon(
+                        onPressed: () async {
+                          HapticUtils.light();
+                          try {
+                            await generateTicketPdf(t);
+                            HapticUtils.success();
+                            Get.snackbar(
+                                "Success", "Ticket saved to Downloads");
+                          } catch (e) {
+                            HapticUtils.error();
+                          }
+                        },
+                        icon: Icon(Icons.file_download_outlined,
+                            size: 14.sp, color: AppColors.blueColor),
+                        label: Text(
+                          "SAVE PDF",
+                          style: TextStyle(
+                              color: AppColors.blueColor,
+                              fontSize: 9.sp,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              AppColors.blueColor.withValues(alpha: 0.1),
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(1.h)),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -367,5 +374,70 @@ class _TicketScreenState extends State<TicketScreen> {
         },
       );
     });
+  }
+
+  Widget _buildPremiumHeader(String title) {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+              6.w, MediaQuery.of(context).padding.top + 2.h, 6.w, 1.5.h),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor.withValues(alpha: 0.8),
+            border: Border(
+                bottom:
+                    BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+          ),
+          child: Row(
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(1.5.h),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: TabBar(
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.white38,
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        onTap: (index) => HapticUtils.selection(),
+        indicator: BoxDecoration(
+          color: AppColors.blueColor,
+          borderRadius: BorderRadius.circular(1.2.h),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.blueColor.withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        tabs: const [
+          Tab(text: 'General Admission'),
+          Tab(text: 'VIP'),
+        ],
+      ),
+    );
   }
 }

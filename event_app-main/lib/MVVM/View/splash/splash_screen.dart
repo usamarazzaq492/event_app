@@ -35,7 +35,22 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       body: Center(
-        child: Image.asset(AppImages.logo2, height: 15.h),
+        child: TweenAnimationBuilder<double>(
+          duration: const Duration(seconds: 1),
+          tween: Tween(begin: 0.8, end: 1.0),
+          curve: Curves.easeOutBack,
+          builder: (context, value, child) {
+            final opacity = ((value - 0.8) * 5).clamp(0.0, 1.0);
+            return Opacity(
+              opacity: opacity,
+              child: Transform.scale(
+                scale: value,
+                child: child,
+              ),
+            );
+          },
+          child: Image.asset(AppImages.logo2, height: 15.h),
+        ),
       ),
     );
   }

@@ -1,7 +1,6 @@
+import 'dart:ui';
 import 'package:event_app/MVVM/View/paymentMethod/payment_method.dart';
-import 'package:event_app/Widget/button_widget.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -70,209 +69,341 @@ class _BookEventScreenState extends State<BookEventScreen>
 
   @override
   Widget build(BuildContext context) {
-    print('event id ${widget.id}');
-
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding:
-              EdgeInsets.only(top: 4.h, left: 5.w, right: 5.w, bottom: 4.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              SizedBox(height: 4.h),
-              // 🔷 TabBar Card
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1C1C23),
-                  borderRadius: BorderRadius.circular(2.h),
-                ),
-                child: TabBar(
-                  controller: _tabController,
-                  labelColor: AppColors.blueColor,
-                  unselectedLabelColor: Colors.white54,
-                  indicatorColor: AppColors.blueColor,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelStyle: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Montserrat',
-                  ),
-                  tabs: const [
-                    Tab(text: 'General Admission'),
-                    Tab(text: 'VIP'),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          // Background Glow
+          Positioned(
+            top: -15.h,
+            left: -15.w,
+            child: Container(
+              width: 60.w,
+              height: 60.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.blueColor.withValues(alpha: 0.1),
               ),
-              SizedBox(height: 4.h),
-
-              // 🔷 Pre-filled price display (if from QR scan)
-              if (widget.preFilledPrice != null && widget.preFilledPrice! > 0)
-                Container(
-                  padding: EdgeInsets.all(3.w),
-                  margin: EdgeInsets.only(bottom: 2.h),
-                  decoration: BoxDecoration(
-                    color: AppColors.blueColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(2.h),
-                    border: Border.all(
-                      color: AppColors.blueColor,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.qr_code_scanner,
-                        color: AppColors.blueColor,
-                        size: 20.sp,
-                      ),
-                      SizedBox(width: 2.w),
-                      Text(
-                        'Price: \$${widget.preFilledPrice!.toStringAsFixed(2)} per ticket',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          fontFamily: 'Montserrat',
-                          color: AppColors.blueColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-              // 🔷 Seat selection label
-              Text(
-                'Choose number of tickets',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontFamily: 'Montserrat',
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                child: Container(color: Colors.transparent),
               ),
-              const SizedBox(height: 20),
+            ),
+          ),
 
-              // 🔷 Counter with Text Input
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1C1C23),
-                  borderRadius: BorderRadius.circular(2.h),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildCounterButton(Icons.remove, () {
-                      _updateSeatCount(seatCount - 1);
-                    }),
-                    const SizedBox(width: 20),
-                    // TextField for direct input
-                    Expanded(
-                      child: TextField(
-                        controller: _seatCountController,
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28.sp,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
-                        ),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          hintText: '0',
-                          hintStyle: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 28.sp,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Montserrat',
+          SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 🔷 TabBar Card
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(2.h),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.05),
+                                  borderRadius: BorderRadius.circular(2.h),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                  ),
+                                ),
+                                child: TabBar(
+                                  controller: _tabController,
+                                  labelColor: Colors.white,
+                                  unselectedLabelColor: Colors.white38,
+                                  indicator: BoxDecoration(
+                                    color: AppColors.blueColor,
+                                    borderRadius: BorderRadius.circular(1.8.h),
+                                  ),
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  dividerColor: Colors.transparent,
+                                  labelStyle: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: -0.2,
+                                  ),
+                                  tabs: const [
+                                    Tab(text: 'General'),
+                                    Tab(text: 'VIP'),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                        onChanged: (value) {
-                          // Allow typing without immediate validation
-                          // Only update if it's a valid number
-                          final intValue = int.tryParse(value);
-                          if (intValue != null && intValue >= 1) {
-                            setState(() {
-                              seatCount = intValue;
-                            });
-                          }
-                        },
-                        onEditingComplete: () {
-                          // Validate when user finishes editing
-                          final intValue =
-                              int.tryParse(_seatCountController.text);
-                          if (intValue == null || intValue < 1) {
-                            _updateSeatCount(1);
-                          } else {
-                            _updateSeatCount(intValue);
-                          }
-                          FocusScope.of(context).unfocus();
-                        },
-                        onSubmitted: (value) {
-                          // Handle when user presses done/enter
-                          final intValue = int.tryParse(value);
-                          if (intValue == null || intValue < 1) {
-                            _updateSeatCount(1);
-                          } else {
-                            _updateSeatCount(intValue);
-                          }
-                          FocusScope.of(context).unfocus();
-                        },
+                          SizedBox(height: 4.h),
+
+                          // 🔷 Pre-filled price display
+                          if (widget.preFilledPrice != null &&
+                              widget.preFilledPrice! > 0)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(2.h),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                child: Container(
+                                  padding: EdgeInsets.all(4.w),
+                                  margin: EdgeInsets.only(top: 3.h),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.blueColor
+                                        .withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(2.h),
+                                    border: Border.all(
+                                      color: AppColors.blueColor
+                                          .withValues(alpha: 0.2),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.qr_code_scanner_rounded,
+                                        color: AppColors.blueColor,
+                                        size: 18.sp,
+                                      ),
+                                      SizedBox(width: 3.w),
+                                      Text(
+                                        'Price: \$${widget.preFilledPrice!.toStringAsFixed(2)} per ticket',
+                                        style: TextStyle(
+                                          fontSize: 11.sp,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          SizedBox(height: 4.h),
+
+                          // 🔷 Seat selection label
+                          Text(
+                            'How many tickets?',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+
+                          // 🔷 Counter with Text Input
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(2.5.h),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8.w, vertical: 3.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.03),
+                                  borderRadius: BorderRadius.circular(2.5.h),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.08),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    _buildCounterButton(Icons.remove_rounded,
+                                        () {
+                                      HapticUtils.light();
+                                      _updateSeatCount(seatCount - 1);
+                                    }),
+                                    const SizedBox(width: 30),
+                                    // TextField for direct input
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _seatCountController,
+                                        textAlign: TextAlign.center,
+                                        keyboardType: TextInputType.number,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 32.sp,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: -1,
+                                        ),
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          contentPadding: EdgeInsets.zero,
+                                          hintText: '0',
+                                          hintStyle:
+                                              TextStyle(color: Colors.white24),
+                                        ),
+                                        onChanged: (value) {
+                                          final intValue = int.tryParse(value);
+                                          if (intValue != null &&
+                                              intValue >= 1) {
+                                            setState(() {
+                                              seatCount = intValue;
+                                            });
+                                          }
+                                        },
+                                        onEditingComplete: () {
+                                          final intValue = int.tryParse(
+                                              _seatCountController.text);
+                                          if (intValue == null ||
+                                              intValue < 1) {
+                                            _updateSeatCount(1);
+                                          } else {
+                                            _updateSeatCount(intValue);
+                                          }
+                                          FocusScope.of(context).unfocus();
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 30),
+                                    _buildCounterButton(Icons.add_rounded, () {
+                                      HapticUtils.light();
+                                      _updateSeatCount(seatCount + 1);
+                                    }),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 6.h),
+
+                          // 🔷 Continue Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 6.5.h,
+                            child: GestureDetector(
+                              onTap: () {
+                                HapticUtils.buttonPress();
+                                String ticketType;
+                                switch (_tabController.index) {
+                                  case 0:
+                                    ticketType = 'general';
+                                    break;
+                                  case 1:
+                                    ticketType = 'vip';
+                                    break;
+                                  default:
+                                    ticketType = 'general';
+                                }
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PaymentMethodScreen(
+                                      category: ticketType,
+                                      seats: seatCount,
+                                      id: widget.id,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      AppColors.blueColor,
+                                      AppColors.blueColor
+                                          .withValues(alpha: 0.8),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(4.h),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.blueColor
+                                          .withValues(alpha: 0.3),
+                                      blurRadius: 15,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Continue to Payment',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 20),
-                    _buildCounterButton(Icons.add, () {
-                      _updateSeatCount(seatCount + 1);
-                    }),
-                  ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor.withValues(alpha: 0.8),
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  HapticUtils.navigation();
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  padding: EdgeInsets.all(1.2.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 16.sp,
+                  ),
                 ),
               ),
-              SizedBox(height: 6.h),
-
-              // 🔷 Continue Button
-              ButtonWidget(
-                text: 'Continue',
-                onPressed: () {
-                  String ticketType;
-                  switch (_tabController.index) {
-                    case 0:
-                      ticketType = 'general';
-                      break;
-                    case 1:
-                      ticketType = 'vip';
-                      break;
-                    default:
-                      ticketType = 'general';
-                  }
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentMethodScreen(
-                        category: ticketType,
-                        seats: seatCount,
-                        id: widget.id,
-                      ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Book Event',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
                     ),
-                  );
-                },
-                backgroundColor: AppColors.blueColor,
-                textColor: AppColors.whiteColor,
-                borderRadius: 4.h,
+                  ),
+                ),
               ),
+              const SizedBox(width: 44),
             ],
           ),
         ),
@@ -280,56 +411,21 @@ class _BookEventScreenState extends State<BookEventScreen>
     );
   }
 
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              onPressed: () {
-                HapticUtils.navigation();
-                Navigator.pop(context);
-              },
-            ),
-            Expanded(
-              child: Center(
-                child: Text('Book Event', style: TextStyles.heading),
-              ),
-            ),
-            const SizedBox(width: 48),
-          ],
-        ),
-        SizedBox(height: 1.h),
-        Container(
-          height: 1,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.06),
-                Colors.white.withValues(alpha: 0.02),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   // Counter Button Widget
   Widget _buildCounterButton(IconData icon, VoidCallback onPressed) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.blueColor, width: 1),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: AppColors.blueColor),
-        onPressed: onPressed,
-        iconSize: 28,
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: EdgeInsets.all(1.2.h),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(1.2.h),
+          border: Border.all(
+            color: AppColors.blueColor.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Icon(icon, color: AppColors.blueColor, size: 20.sp),
       ),
     );
   }

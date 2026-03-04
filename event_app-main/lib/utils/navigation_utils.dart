@@ -269,7 +269,7 @@ class NavigationUtils {
       backgroundColor: backgroundColor,
       elevation: elevation,
       shape: shape ??
-          RoundedRectangleBorder(
+          const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
       clipBehavior: clipBehavior,
@@ -342,14 +342,14 @@ class NavigationUtils {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(
+              const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
               ),
               if (message != null) ...[
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Text(
                   message,
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
               ],

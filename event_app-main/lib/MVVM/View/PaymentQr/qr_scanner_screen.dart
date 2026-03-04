@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart';
 import 'package:event_app/Services/payment_qr_service.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,11 +36,13 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     });
     if (!_hasPermission) {
       Get.snackbar(
-        'Camera Permission Required',
-        'Please grant camera permission to scan QR codes',
+        'Camera Access',
+        'Camera permission is needed to scan QR codes.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.redAccent.withValues(alpha: 0.8),
         colorText: Colors.white,
+        margin: EdgeInsets.all(4.w),
+        borderRadius: 1.5.h,
       );
     }
   }
@@ -62,27 +64,23 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
 
     try {
       String deepLinkUrl = rawValue;
-      
-      // Check if the scanned value is JSON (in case QR code contains JSON)
+
       try {
         final jsonData = json.decode(rawValue);
         if (jsonData is Map && jsonData.containsKey('app')) {
           deepLinkUrl = jsonData['app'] as String;
         } else if (jsonData is Map && jsonData.containsKey('web')) {
-          // Fallback to web URL if app link not available
           deepLinkUrl = jsonData['web'] as String;
         }
       } catch (e) {
-        // Not JSON, use raw value as-is
         deepLinkUrl = rawValue;
       }
 
-      // Parse the deep link
-      // Format: eventgo://pay?eventId=123&ticketType=general&token=abc123...
       final uri = Uri.parse(deepLinkUrl);
-      
+
       if (uri.scheme != 'eventgo' || uri.host != 'pay') {
-        throw Exception('Invalid QR code format. Please scan a valid EventGo payment QR code.');
+        throw Exception(
+            'Invalid QR code format. Please scan a valid EventGo payment QR code.');
       }
 
       final eventId = int.parse(uri.queryParameters['eventId'] ?? '0');
@@ -93,7 +91,6 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         throw Exception('Missing required parameters in QR code');
       }
 
-      // Validate QR code with backend
       final response = await _qrService.validatePaymentQr(
         token: token,
         eventId: eventId,
@@ -104,9 +101,8 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
 
       if (response.statusCode == 200 && responseData['success'] == true) {
         final eventData = responseData['data'];
-        
-        // Navigate to booking screen with pre-filled data
-        Get.back(); // Close scanner
+
+        Get.back();
         Get.to(
           () => BookEventScreen(
             id: eventId,
@@ -119,17 +115,20 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       }
     } catch (e) {
       Get.snackbar(
-        'Error',
+        'Scan Error',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.redAccent,
         colorText: Colors.white,
-        duration: const Duration(seconds: 3),
+        margin: EdgeInsets.all(4.w),
+        borderRadius: 1.5.h,
       );
     } finally {
-      setState(() {
-        _isProcessing = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
     }
   }
 
@@ -137,18 +136,6 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Scan Payment QR Code',
-          style: TextStyles.heading,
-        ),
-      ),
       body: Stack(
         children: [
           if (_hasPermission)
@@ -165,62 +152,60 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               },
             )
           else
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.camera_alt_outlined,
-                    size: 80,
-                    color: Colors.white54,
-                  ),
-                  SizedBox(height: 3.h),
-                  Text(
-                    'Camera Permission Required',
-                    style: TextStyles.heading,
-                  ),
-                  SizedBox(height: 2.h),
-                  ElevatedButton(
-                    onPressed: _checkCameraPermission,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.blueColor,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 5.w,
-                        vertical: 2.h,
-                      ),
-                    ),
-                    child: Text(
-                      'Grant Permission',
-                      style: TextStyles.buttontext,
-                    ),
-                  ),
-                ],
-              ),
+            _buildPermissionPlaceholder(),
+
+          // 🔷 Custom Glassmorphic Overlay
+          if (_hasPermission) ...[
+            _buildScannerOverlay(),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: _buildHeader(),
             ),
-          
-          // Overlay with scanning frame
-          if (_hasPermission)
-            Center(
-              child: Container(
-                width: 70.w,
-                height: 70.w,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AppColors.blueColor,
-                    width: 3,
+            Positioned(
+              bottom: 10.h,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.5.h),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(3.h),
+                    border: Border.all(color: Colors.white12),
                   ),
-                  borderRadius: BorderRadius.circular(2.h),
+                  child: Text(
+                    'Align QR code within the frame',
+                    style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 10.sp,
+                        fontWeight: FontWeight.w500),
+                  ),
                 ),
               ),
             ),
+          ],
 
-          // Processing indicator
+          // 🔷 Processing indicator
           if (_isProcessing)
             Container(
               color: Colors.black54,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.blueColor),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(color: AppColors.blueColor),
+                      SizedBox(height: 2.h),
+                      const Text('Validating...',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -228,5 +213,198 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       ),
     );
   }
-}
 
+  Widget _buildHeader() {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              bottom: 1.5.h,
+              left: 4.w,
+              right: 4.w),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.4),
+            border: const Border(
+              bottom: BorderSide(color: Colors.white10, width: 0.5),
+            ),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  HapticUtils.navigation();
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  padding: EdgeInsets.all(1.2.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white10),
+                  ),
+                  child: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white, size: 16.sp),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Scan QR Code',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 44),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScannerOverlay() {
+    return Stack(
+      children: [
+        ColorFiltered(
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.7),
+            BlendMode.srcOut,
+          ),
+          child: Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  backgroundBlendMode: BlendMode.dstOut,
+                ),
+              ),
+              Center(
+                child: Container(
+                  width: 70.w,
+                  height: 70.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(3.h),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Center(
+          child: Container(
+            width: 70.w,
+            height: 70.w,
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.blueColor, width: 2),
+              borderRadius: BorderRadius.circular(3.h),
+            ),
+            child: Stack(
+              children: [
+                // Corner Accents
+                _buildCorner(0, 0, 0, 0), // Top Left
+                _buildCorner(0, null, null, 0), // Top Right
+                _buildCorner(null, 0, 0, null), // Bottom Left
+                _buildCorner(null, null, null, null), // Bottom Right
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCorner(
+      double? top, double? bottom, double? left, double? right) {
+    return Positioned(
+      top: top,
+      bottom: bottom,
+      left: left,
+      right: right,
+      child: Container(
+        width: 10.w,
+        height: 10.w,
+        decoration: BoxDecoration(
+          border: Border(
+            top: top == 0
+                ? const BorderSide(color: Colors.white, width: 4)
+                : BorderSide.none,
+            bottom: bottom == 0
+                ? const BorderSide(color: Colors.white, width: 4)
+                : BorderSide.none,
+            left: left == 0
+                ? const BorderSide(color: Colors.white, width: 4)
+                : BorderSide.none,
+            right: right == 0
+                ? const BorderSide(color: Colors.white, width: 4)
+                : BorderSide.none,
+          ),
+          borderRadius: BorderRadius.only(
+            topLeft: top == 0 && left == 0 ? Radius.circular(3.h) : Radius.zero,
+            topRight:
+                top == 0 && right == 0 ? Radius.circular(3.h) : Radius.zero,
+            bottomLeft:
+                bottom == 0 && left == 0 ? Radius.circular(3.h) : Radius.zero,
+            bottomRight:
+                bottom == 0 && right == 0 ? Radius.circular(3.h) : Radius.zero,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPermissionPlaceholder() {
+    return Container(
+      width: double.infinity,
+      color: AppColors.backgroundColor,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.all(6.w),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.camera_alt_rounded,
+                size: 60.sp, color: Colors.white24),
+          ),
+          SizedBox(height: 4.h),
+          Text('Camera Access Needed',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold)),
+          SizedBox(height: 2.h),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10.w),
+            child: Text(
+              'We need camera permission to scan ticket QR codes and process your payment.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white54, fontSize: 11.sp),
+            ),
+          ),
+          SizedBox(height: 5.h),
+          GestureDetector(
+            onTap: _checkCameraPermission,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(4.h),
+              ),
+              child: const Text('Grant Permission',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

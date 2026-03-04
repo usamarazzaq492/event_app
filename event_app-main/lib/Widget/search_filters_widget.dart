@@ -9,10 +9,10 @@ class SearchFiltersWidget extends StatefulWidget {
   final Map<String, dynamic> initialFilters;
 
   const SearchFiltersWidget({
-    Key? key,
+    super.key,
     required this.onFiltersChanged,
     this.initialFilters = const {},
-  }) : super(key: key);
+  });
 
   @override
   State<SearchFiltersWidget> createState() => _SearchFiltersWidgetState();
@@ -65,7 +65,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
       _filters['maxPrice']?.toDouble() ?? 1000.0,
     );
     _startDate = _filters['startDate'] ?? DateTime.now();
-    _endDate = _filters['endDate'] ?? DateTime.now().add(Duration(days: 30));
+    _endDate = _filters['endDate'] ?? DateTime.now().add(const Duration(days: 30));
     _selectedCategory = _filters['category'] ?? 'All';
     _selectedSortBy = _filters['sortBy'] ?? 'Date';
   }
@@ -99,9 +99,9 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
     setState(() {
       _searchController.clear();
       _locationController.clear();
-      _priceRange = RangeValues(0.0, 1000.0);
+      _priceRange = const RangeValues(0.0, 1000.0);
       _startDate = DateTime.now();
-      _endDate = DateTime.now().add(Duration(days: 30));
+      _endDate = DateTime.now().add(const Duration(days: 30));
       _selectedCategory = 'All';
       _selectedSortBy = 'Date';
     });
@@ -146,7 +146,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
                       backgroundColor: AppColors.blueColor,
                       foregroundColor: Colors.white,
                     ),
-                    child: Text('Apply'),
+                    child: const Text('Apply'),
                   ),
                 ],
               ),
@@ -191,7 +191,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
           controller: _searchController,
           decoration: InputDecoration(
             hintText: 'Search events...',
-            prefixIcon: Icon(Icons.search, color: AppColors.blueColor),
+            prefixIcon: const Icon(Icons.search, color: AppColors.blueColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(2.h),
               borderSide: BorderSide.none,
@@ -205,7 +205,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
           controller: _locationController,
           decoration: InputDecoration(
             hintText: 'Location (city, state)',
-            prefixIcon: Icon(Icons.location_on, color: AppColors.blueColor),
+            prefixIcon: const Icon(Icons.location_on, color: AppColors.blueColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(2.h),
               borderSide: BorderSide.none,
@@ -329,7 +329,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
                     context: context,
                     initialDate: _startDate,
                     firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(Duration(days: 365)),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
                   if (date != null) {
                     setState(() {
@@ -367,7 +367,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
                     context: context,
                     initialDate: _endDate,
                     firstDate: _startDate,
-                    lastDate: DateTime.now().add(Duration(days: 365)),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
                   if (date != null) {
                     setState(() {
@@ -413,7 +413,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
         ),
         SizedBox(height: 2.h),
         DropdownButtonFormField<String>(
-          value: _selectedSortBy,
+          initialValue: _selectedSortBy,
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(2.h),

@@ -48,39 +48,39 @@ class _CreatEventTabState extends State<CreatEventTab> {
               fillColor: Colors.transparent,
               filled: true,
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Color(0xffD0D5DD),
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
               errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.red,
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              errorStyle: TextStyle(),
-              hintStyle: TextStyle(
+              errorStyle: const TextStyle(),
+              hintStyle: const TextStyle(
                 color: Color.fromRGBO(116, 118, 136, 1),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.black,
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.black,
                 ),
                 borderRadius: BorderRadius.circular(15),
               ),
               focusColor: Colors.black,
               contentPadding:
-                  EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             ),
             cursorColor: Colors.black,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.black,
               fontSize: 14,
             ),
@@ -106,7 +106,8 @@ class _CreatEventTabState extends State<CreatEventTab> {
             controller: dateController,
             readOnly: true,
             enableInteractiveSelection: false,
-            contextMenuBuilder: (context, editableTextState) => const SizedBox.shrink(),
+            contextMenuBuilder: (context, editableTextState) =>
+                const SizedBox.shrink(),
             decoration: InputDecoration(
               fillColor: Colors.transparent,
               filled: true,
@@ -116,43 +117,43 @@ class _CreatEventTabState extends State<CreatEventTab> {
                   _selectDate(context);
                 },
                 child: Padding(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: Image.asset('assets/images/clock_icon.png'),
                 ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Color(0xffD0D5DD),
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
               errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.red,
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
-              errorStyle: TextStyle(),
-              hintStyle: TextStyle(
+              errorStyle: const TextStyle(),
+              hintStyle: const TextStyle(
                 color: Color.fromRGBO(116, 118, 136, 1),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.black,
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.black,
                 ),
                 borderRadius: BorderRadius.circular(15),
               ),
               focusColor: Colors.black,
-              contentPadding: EdgeInsets.symmetric(horizontal: 20),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
             ),
             cursorColor: Colors.black,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.black,
               fontSize: 14,
             ),
@@ -172,20 +173,20 @@ class _CreatEventTabState extends State<CreatEventTab> {
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: Color(0xffD0D5DD),
+                    color: const Color(0xffD0D5DD),
                   )),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("${_startTime}",
-                      style: TextStyle(
+                  Text(_startTime,
+                      style: const TextStyle(
                         color: Color.fromRGBO(116, 118, 136, 1),
                       )),
                   InkWell(
                       onTap: () {
                         _starTime(context);
                       },
-                      child: Icon(
+                      child: const Icon(
                         Icons.keyboard_arrow_down_outlined,
                         color: Color.fromRGBO(116, 118, 136, 1),
                       ))
@@ -200,14 +201,14 @@ class _CreatEventTabState extends State<CreatEventTab> {
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: Color(0xffD0D5DD),
+                    color: const Color(0xffD0D5DD),
                   )),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "${_endTime}",
-                    style: TextStyle(
+                    _endTime,
+                    style: const TextStyle(
                       color: Color.fromRGBO(116, 118, 136, 1),
                     ),
                   ),
@@ -215,7 +216,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
                       onTap: () {
                         _selectTime(context);
                       },
-                      child: Icon(
+                      child: const Icon(
                         Icons.keyboard_arrow_down_outlined,
                         color: Color.fromRGBO(116, 118, 136, 1),
                       ))
@@ -248,10 +249,10 @@ class _CreatEventTabState extends State<CreatEventTab> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xff000000).withOpacity(0.10),
+                  color: const Color(0xff000000).withValues(alpha: 0.10),
                   blurRadius: 12, // soften the shadow
                   spreadRadius: 0, //extend the shadow
-                  offset: Offset(
+                  offset: const Offset(
                     0, // Move to right 10  horizontally
                     10, // Move to bottom 10 Vertically
                   ),
@@ -297,7 +298,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
             Container(
               height: 7.h,
               width: 30.w,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xffE7EAEE),
                 borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
               ),
@@ -306,7 +307,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
                   "Cancel",
                   style: TextStyle(
                       fontWeight: FontWeight.w400,
-                      color: Color(0xff64748B),
+                      color: const Color(0xff64748B),
                       fontSize: 13.sp),
                 ),
               ),
@@ -323,7 +324,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
               child: Container(
                 height: 7.h,
                 width: 50.w,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color.fromRGBO(86, 105, 255, 1),
                   boxShadow: [
                     BoxShadow(
@@ -339,7 +340,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.check,
                       color: Colors.white,
                     ),

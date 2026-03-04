@@ -213,7 +213,7 @@ class EventController extends GetxController {
         await getMyEvents();
 
         // Navigate to My Events tab
-        Get.offAll(() => BottomNavBar());
+        Get.offAll(() => const BottomNavBar());
         Future.microtask(() {
           BottomNavController? navController;
           if (Get.isRegistered<BottomNavController>(

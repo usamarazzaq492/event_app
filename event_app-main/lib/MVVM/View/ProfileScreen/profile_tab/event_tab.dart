@@ -10,7 +10,7 @@ import 'package:sizer/sizer.dart';
 import '../../exploreevent/event_update_screen.dart';
 
 class EventTab extends StatelessWidget {
-  EventTab({Key? key}) : super(key: key);
+  EventTab({super.key});
 
   final EventController controller = Get.put(EventController());
 
@@ -47,7 +47,7 @@ class EventTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.signinoptioncolor,
         borderRadius: BorderRadius.circular(2.h),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             blurRadius: 6,
@@ -111,7 +111,7 @@ class EventTab extends StatelessWidget {
                         color: Colors.grey[300],
                       ),
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Text(
                       event.eventPrice != null ? '\$${event.eventPrice}' : '',
                       style: TextStyles.regularwhite.copyWith(
@@ -223,7 +223,7 @@ class EventTab extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    icon: Icon(Icons.delete, color: Colors.white),
+                    icon: const Icon(Icons.delete, color: Colors.white),
                     label: Text(
                       "Delete",
                       style: TextStyles.buttontext,
@@ -235,13 +235,13 @@ class EventTab extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => Get.back(),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.blueColor),
+                      side: const BorderSide(color: AppColors.blueColor),
                       padding: EdgeInsets.symmetric(vertical: 1.5.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    icon: Icon(Icons.close, color: AppColors.blueColor),
+                    icon: const Icon(Icons.close, color: AppColors.blueColor),
                     label: Text(
                       "Cancel",
                       style: TextStyles.buttontext.copyWith(

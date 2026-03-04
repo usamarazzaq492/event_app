@@ -10,12 +10,12 @@ class AppErrorWidget extends StatelessWidget {
   final String? retryText;
 
   const AppErrorWidget({
-    Key? key,
+    super.key,
     required this.message,
     this.onRetry,
     this.icon,
     this.retryText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,13 +84,13 @@ class AppEmptyStateWidget extends StatelessWidget {
   final String? actionText;
 
   const AppEmptyStateWidget({
-    Key? key,
+    super.key,
     required this.title,
     required this.message,
     this.icon,
     this.onAction,
     this.actionText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -155,9 +155,9 @@ class AppLoadingWidget extends StatelessWidget {
   final String? message;
 
   const AppLoadingWidget({
-    Key? key,
+    super.key,
     this.message,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +165,7 @@ class AppLoadingWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.blueColor),
             strokeWidth: 3,
           ),

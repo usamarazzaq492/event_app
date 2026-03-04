@@ -169,7 +169,7 @@ class SkeletonLoading {
   static Widget listSkeleton({int itemCount = 3}) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: itemCount,
       itemBuilder: (context, index) => eventCardSkeleton(),
     );
@@ -191,7 +191,7 @@ class SkeletonLoading {
   }
 
   static Widget _buildTabSkeleton() {
-    return Container(
+    return SizedBox(
       height: 6.h,
       child: Row(
         children: [
@@ -228,7 +228,7 @@ class SkeletonLoading {
   }
 
   static Widget _buildContentSkeleton() {
-    return Container(
+    return SizedBox(
       height: 30.h,
       child: ListView.builder(
         itemCount: 3,

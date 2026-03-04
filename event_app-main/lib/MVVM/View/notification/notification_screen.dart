@@ -1,9 +1,9 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/View/EventDetailScreen/event_detail_screen.dart';
 import 'package:event_app/MVVM/View/ProfileScreen/public_profile_screen.dart';
 import 'package:event_app/MVVM/view_model/notification_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:event_app/utils/navigation_utils.dart';
 import 'package:event_app/utils/refresh_on_navigation_mixin.dart';
@@ -19,7 +19,8 @@ class NotificationScreen extends StatefulWidget {
   State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> with RefreshOnNavigation {
+class _NotificationScreenState extends State<NotificationScreen>
+    with RefreshOnNavigation {
   final NotificationViewModel viewModel = Get.put(NotificationViewModel());
 
   @override
@@ -50,17 +51,6 @@ class _NotificationScreenState extends State<NotificationScreen> with RefreshOnN
     }
   }
 
-  IconData getNotificationIcon(String type) {
-    switch (type) {
-      case 'invite':
-        return Icons.event;
-      case 'follow':
-        return Icons.person_add;
-      default:
-        return Icons.notifications;
-    }
-  }
-
   Color getNotificationColor(String type) {
     switch (type) {
       case 'invite':
@@ -72,193 +62,168 @@ class _NotificationScreenState extends State<NotificationScreen> with RefreshOnN
     }
   }
 
-  String getNotificationText(dynamic notification) {
-    final actorName = notification['actor']?['name'] ?? 'Someone';
-    final type = notification['type'] ?? '';
-
-    switch (type) {
-      case 'invite':
-        final status = notification['status'] ?? 'pending';
-        if (status == 'accepted') {
-          return '$actorName invited you to an event • Accepted';
-        } else if (status == 'declined') {
-          return '$actorName invited you to an event • Declined';
-        }
-        return '$actorName invited you to an event';
-      case 'follow':
-        return '$actorName started following you';
-      default:
-        return 'New notification';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            HapticUtils.navigation();
-            NavigationUtils.pop(context);
-          },
-        ),
-        title: Text(
-          'Notifications',
-          style: TextStyles.heading.copyWith(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
+      body: Stack(
+        children: [
+          // Background Glow effect (Subtle)
+          Positioned(
+            top: -10.h,
+            right: -10.w,
+            child: Container(
+              width: 50.w,
+              height: 50.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.blueColor.withValues(alpha: 0.1),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
           ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
-            onPressed: () {
-              HapticUtils.light();
-              viewModel.fetchNotifications();
-            },
+
+          SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: Obx(() {
+                    if (viewModel.isLoading.value) {
+                      return _buildLoadingState();
+                    }
+
+                    if (viewModel.error.isNotEmpty) {
+                      return _buildErrorState();
+                    }
+
+                    if (viewModel.notifications.isEmpty) {
+                      return _buildEmptyState();
+                    }
+
+                    final grouped = viewModel.groupNotificationsByTime();
+
+                    return RefreshIndicator(
+                      onRefresh: () => viewModel.fetchNotifications(),
+                      color: AppColors.blueColor,
+                      backgroundColor: AppColors.signinoptioncolor,
+                      child: ListView.builder(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 4.w, vertical: 1.h),
+                        itemCount: grouped.length,
+                        itemBuilder: (context, groupIndex) {
+                          final groupKey = grouped.keys.elementAt(groupIndex);
+                          final groupNotifications = grouped[groupKey]!;
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Section Header
+                              Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(1.w, 2.h, 0, 1.5.h),
+                                child: Text(
+                                  groupKey.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 9.sp,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white38,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ),
+                              // Notifications in this group
+                              ...groupNotifications.map((notification) {
+                                return _buildNotificationCard(notification);
+                              }),
+                              SizedBox(height: 1.h),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
           ),
         ],
       ),
-      body: Obx(() {
-        if (viewModel.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.blueColor),
-            ),
-          );
-        }
-
-        if (viewModel.error.isNotEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 50.sp,
-                  color: Colors.red.shade400,
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  'Error Loading Notifications',
-                  style: TextStyles.homeheadingtext.copyWith(
-                    fontSize: 16.sp,
-                  ),
-                ),
-                SizedBox(height: 1.h),
-                Text(
-                  viewModel.error.value,
-                  style: TextStyles.regularwhite.copyWith(
-                    fontSize: 12.sp,
-                    color: Colors.white70,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 3.h),
-                ElevatedButton(
-                  onPressed: () => viewModel.fetchNotifications(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.blueColor,
-                  ),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
-        }
-
-        if (viewModel.notifications.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.notifications_none,
-                  size: 60.sp,
-                  color: Colors.white30,
-                ),
-                SizedBox(height: 3.h),
-                Text(
-                  'No Notifications',
-                  style: TextStyles.homeheadingtext.copyWith(
-                    fontSize: 18.sp,
-                  ),
-                ),
-                SizedBox(height: 1.h),
-                Text(
-                  'When you get notifications, they\'ll show up here',
-                  style: TextStyles.regularwhite.copyWith(
-                    fontSize: 10.sp,
-                    color: Colors.white60,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          );
-        }
-
-        final grouped = viewModel.groupNotificationsByTime();
-
-        return RefreshIndicator(
-          onRefresh: () => viewModel.fetchNotifications(),
-          color: AppColors.blueColor,
-          backgroundColor: AppColors.signinoptioncolor,
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: grouped.length,
-            itemBuilder: (context, groupIndex) {
-              final groupKey = grouped.keys.elementAt(groupIndex);
-              final groupNotifications = grouped[groupKey]!;
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Section Header
-                  Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
-                    child: Text(
-                      groupKey,
-                      style: TextStyles.regularwhite.copyWith(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ),
-                  // Notifications in this group
-                  ...groupNotifications.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final notification = entry.value;
-                    return Column(
-                      children: [
-                        _buildNotificationItem(notification),
-                        // Divider between notifications (Instagram style)
-                        if (index < groupNotifications.length - 1)
-                          Divider(
-                            height: 1,
-                            thickness: 0.5,
-                            color: Colors.white.withValues(alpha: 0.1),
-                            indent: 20.w, // Start after profile picture
-                          ),
-                      ],
-                    );
-                  }).toList(),
-                ],
-              );
-            },
-          ),
-        );
-      }),
     );
   }
 
-  Widget _buildNotificationItem(dynamic notification) {
+  Widget _buildHeader() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(1.5.h),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(1.5.h),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white, size: 16.sp),
+                  onPressed: () {
+                    HapticUtils.navigation();
+                    NavigationUtils.pop(context);
+                  },
+                ),
+              ),
+            ),
+          ),
+          Text(
+            'NOTIFICATIONS',
+            style: TextStyle(
+              fontSize: 8.sp,
+              color: Colors.white38,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2.0,
+            ),
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(1.5.h),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(1.5.h),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    width: 1,
+                  ),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.refresh_rounded,
+                      color: Colors.white, size: 18.sp),
+                  onPressed: () {
+                    HapticUtils.light();
+                    viewModel.fetchNotifications();
+                  },
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationCard(dynamic notification) {
     final type = notification['type'] ?? '';
     final actor = notification['actor'] ?? {};
     final actorName = actor['name'] ?? 'Someone';
@@ -270,10 +235,19 @@ class _NotificationScreenState extends State<NotificationScreen> with RefreshOnN
     final event = notification['event'];
 
     return Container(
-      color: AppColors.backgroundColor,
+      margin: EdgeInsets.only(bottom: 1.2.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(2.h),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.08),
+          width: 1,
+        ),
+      ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          borderRadius: BorderRadius.circular(2.h),
           onTap: () {
             HapticUtils.selection();
             if (isInvite && event != null) {
@@ -291,266 +265,330 @@ class _NotificationScreenState extends State<NotificationScreen> with RefreshOnN
             }
           },
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.2.h),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: EdgeInsets.all(4.w),
+            child: Column(
               children: [
-                // Profile Picture with notification icon overlay (Instagram style)
-                GestureDetector(
-                  onTap: () {
-                    HapticUtils.selection();
-                    NavigationUtils.push(
-                      context,
-                      PublicProfileScreen(id: actor['id']),
-                      routeName: '/public-profile',
-                    );
-                  },
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CircleAvatar(
-                        radius: 28.sp,
-                        backgroundColor: Colors.grey.shade800,
-                        backgroundImage: actorImage != null &&
-                                actorImage.toString().isNotEmpty
-                            ? CachedNetworkImageProvider(
-                                actorImage.toString().startsWith('http')
-                                    ? actorImage.toString()
-                                    : 'https://eventgo-live.com/$actorImage',
-                              )
-                            : null,
-                        child:
-                            actorImage == null || actorImage.toString().isEmpty
-                                ? Icon(
-                                    Icons.person,
-                                    color: Colors.white70,
-                                    size: 24.sp,
-                                  )
-                                : null,
-                      ),
-                      // Notification type icon badge (bottom right, Instagram style)
-                      Positioned(
-                        bottom: -2,
-                        right: -2,
-                        child: Container(
-                          width: 20.sp,
-                          height: 20.sp,
-                          decoration: BoxDecoration(
-                            color: getNotificationColor(type),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.backgroundColor,
-                              width: 2.5,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Profile Picture with overlay
+                    GestureDetector(
+                      onTap: () {
+                        HapticUtils.selection();
+                        NavigationUtils.push(
+                          context,
+                          PublicProfileScreen(id: actor['id']),
+                          routeName: '/public-profile',
+                        );
+                      },
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: getNotificationColor(type)
+                                    .withValues(alpha: 0.3),
+                                width: 2,
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(2),
+                            child: CircleAvatar(
+                              radius: 20.sp,
+                              backgroundColor:
+                                  Colors.white.withValues(alpha: 0.05),
+                              backgroundImage: actorImage != null &&
+                                      actorImage.toString().isNotEmpty
+                                  ? CachedNetworkImageProvider(
+                                      actorImage.toString().startsWith('http')
+                                          ? actorImage.toString()
+                                          : 'https://eventgo-live.com/$actorImage',
+                                    )
+                                  : null,
+                              child: actorImage == null ||
+                                      actorImage.toString().isEmpty
+                                  ? Icon(Icons.person_rounded,
+                                      color: Colors.white24, size: 18.sp)
+                                  : null,
                             ),
                           ),
-                          child: Icon(
-                            getNotificationIcon(type),
-                            color: Colors.white,
-                            size: 11.sp,
-                          ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 3.w),
-                // Notification Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Notification Text (Instagram style - bold name, regular text)
-                      RichText(
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13.sp,
-                            height: 1.4,
+                    ),
+                    SizedBox(width: 4.w),
+                    // Notification Content
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11.sp,
+                                height: 1.3,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: '$actorName ',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white),
+                                ),
+                                TextSpan(
+                                  text: isInvite
+                                      ? 'invited you to an event'
+                                      : 'is now following you',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color:
+                                          Colors.white.withValues(alpha: 0.7)),
+                                ),
+                              ],
+                            ),
                           ),
-                          children: [
-                            TextSpan(
-                              text: actorName,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: isInvite
-                                  ? ' invited you to an event'
-                                  : ' started following you',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.normal),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 0.3.h),
-                      // Event Title (for invites) - subtle
-                      if (isInvite && event != null)
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 0.2.h),
-                          child: Text(
-                            event['title'] ?? 'Event',
+                          SizedBox(height: 0.5.h),
+                          Text(
+                            timeAgo.toUpperCase(),
                             style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w500,
+                              color: Colors.white24,
+                              fontSize: 7.sp,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      // Time ago (Instagram style - small, gray)
-                      Text(
-                        timeAgo,
-                        style: TextStyle(
-                          color: Colors.white54,
-                          fontSize: 11.sp,
+                        ],
+                      ),
+                    ),
+                    if (isInvite && event != null && event['image'] != null)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(1.h),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              'https://eventgo-live.com/${event['image']}',
+                          width: 12.w,
+                          height: 12.w,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) =>
+                              Container(color: Colors.white10),
                         ),
                       ),
-                      // Action Buttons (for pending invites) - Instagram style
-                      if (isPending) ...[
-                        SizedBox(height: 1.2.h),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  HapticUtils.buttonPress();
-                                  viewModel.respondToInvite(
-                                    notification['id'],
-                                    'accepted',
-                                  );
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.green,
-                                  side: const BorderSide(
-                                      color: Colors.green, width: 1.5),
-                                  padding:
-                                      EdgeInsets.symmetric(vertical: 0.8.h),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(1.5.h),
-                                  ),
-                                  minimumSize: Size(0, 4.h),
-                                ),
-                                child: Text(
-                                  'Accept',
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                  ],
+                ),
+                if (isPending) ...[
+                  SizedBox(height: 2.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            HapticUtils.light();
+                            viewModel.respondToInvite(
+                                notification['id'], 'accepted');
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 1.2.h),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  AppColors.blueColor,
+                                  Color(0xFF52D2FF)
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(1.2.h),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Accept',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 10.sp,
                                 ),
                               ),
                             ),
-                            SizedBox(width: 2.w),
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  HapticUtils.buttonPress();
-                                  viewModel.respondToInvite(
-                                    notification['id'],
-                                    'declined',
-                                  );
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.red,
-                                  side: const BorderSide(
-                                      color: Colors.red, width: 1.5),
-                                  padding:
-                                      EdgeInsets.symmetric(vertical: 0.8.h),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(1.5.h),
-                                  ),
-                                  minimumSize: Size(0, 4.h),
-                                ),
-                                child: Text(
-                                  'Decline',
-                                  style: TextStyle(
-                                    fontSize: 11.sp,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ],
+                      ),
+                      SizedBox(width: 3.w),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            HapticUtils.light();
+                            viewModel.respondToInvite(
+                                notification['id'], 'declined');
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 1.2.h),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.05),
+                              borderRadius: BorderRadius.circular(1.2.h),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                width: 1,
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Decline',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 10.sp,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                // Event Image (for invites) or Follow Button (Instagram style)
-                SizedBox(width: 2.w),
-                if (isInvite && event != null && event['image'] != null)
-                  GestureDetector(
-                    onTap: () {
-                      HapticUtils.selection();
-                      NavigationUtils.push(
-                        context,
-                        EventDetailScreen(eventId: '${event['id']}'),
-                        routeName: '/event-detail',
-                      );
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(0.8.h),
-                      child: CachedNetworkImage(
-                        imageUrl: 'https://eventgo-live.com/${event['image']}',
-                        width: 14.w,
-                        height: 14.w,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          width: 14.w,
-                          height: 14.w,
-                          color: Colors.grey.shade800,
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          width: 14.w,
-                          height: 14.w,
-                          color: Colors.grey.shade800,
-                          child: Icon(
-                            Icons.event,
-                            color: Colors.white30,
-                            size: 16.sp,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                else if (type == 'follow')
-                  TextButton(
-                    onPressed: () {
-                      HapticUtils.buttonPress();
-                      NavigationUtils.push(
-                        context,
-                        PublicProfileScreen(id: actor['id']),
-                        routeName: '/public-profile',
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.blueColor,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 3.w, vertical: 0.8.h),
-                      minimumSize: Size(0, 4.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(1.5.h),
-                        side: BorderSide(
-                          color: AppColors.blueColor,
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      'View',
-                      style: TextStyle(
-                        fontSize: 11.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                ],
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+                AppColors.blueColor.withValues(alpha: 0.7)),
+            strokeWidth: 3,
+          ),
+          SizedBox(height: 3.h),
+          Text(
+            'Syncing your alerts...',
+            style: TextStyle(
+              fontSize: 11.sp,
+              color: Colors.white38,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(4.w),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.red.withValues(alpha: 0.1),
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 35.sp,
+                color: Colors.red.withValues(alpha: 0.5),
+              ),
+            ),
+            SizedBox(height: 3.h),
+            Text(
+              'Oops! Something went wrong',
+              style: TextStyle(
+                fontSize: 15.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 1.h),
+            Text(
+              viewModel.error.value,
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: Colors.white38,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 4.h),
+            InkWell(
+              onTap: () => viewModel.fetchNotifications(),
+              borderRadius: BorderRadius.circular(1.5.h),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 1.5.h),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.blueColor,
+                      AppColors.blueColor.withValues(alpha: 0.7)
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(1.5.h),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.blueColor.withValues(alpha: 0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  'Retry',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11.sp,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: EdgeInsets.all(5.w),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.03),
+            ),
+            child: Icon(
+              Icons.notifications_paused_rounded,
+              size: 45.sp,
+              color: Colors.white.withValues(alpha: 0.1),
+            ),
+          ),
+          SizedBox(height: 3.h),
+          Text(
+            'Quiet for now...',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w800,
+              color: Colors.white.withValues(alpha: 0.8),
+              letterSpacing: -0.5,
+            ),
+          ),
+          SizedBox(height: 1.h),
+          Text(
+            'We\'ll notify you when something important happens.',
+            style: TextStyle(
+              fontSize: 10.sp,
+              color: Colors.white24,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

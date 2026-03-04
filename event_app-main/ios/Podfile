@@ -45,6 +45,14 @@ post_install do |installer|
       # Exclude arm64 for simulator so we use x86_64 (runs via Rosetta on M1).
       config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
       config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        '$(inherited)',
+        'PERMISSION_CAMERA=1',
+        'PERMISSION_LOCATION=1',
+        'PERMISSION_NOTIFICATIONS=1',
+        'PERMISSION_PHOTOS=1',
+      ]
     end
   end
 

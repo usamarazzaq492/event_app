@@ -14,7 +14,7 @@ class DeepLinkHandler {
   /// Initialize deep link handling
   static Future<void> init() async {
     _appLinks = AppLinks();
-    
+
     // Handle initial link if app was opened via deep link
     try {
       final initialLink = await _appLinks!.getInitialLink();
@@ -46,7 +46,7 @@ class DeepLinkHandler {
   static Future<void> _handleDeepLink(String link) async {
     try {
       String deepLinkUrl = link;
-      
+
       // Check if the link is JSON (in case QR code contains JSON)
       try {
         final jsonData = json.decode(link);
@@ -60,9 +60,26 @@ class DeepLinkHandler {
         // Not JSON, use link as-is
         deepLinkUrl = link;
       }
-      
+
       final uri = Uri.parse(deepLinkUrl);
-      
+
+      // Handle Square connection redirect
+      if (uri.scheme == 'eventgo' && uri.host == 'square') {
+        if (uri.path.contains('connected') ||
+            uri.queryParameters['status'] == 'success') {
+          // You can use a global event bus or GetX worker here
+          // For now, let's show a success snackbar and the AboutTab will refresh on resume
+          Get.snackbar(
+            'Success',
+            'Square account connected successfully!',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+          return;
+        }
+      }
+
       // Handle payment QR code deep links
       if (uri.scheme == 'eventgo' && uri.host == 'pay') {
         final eventId = int.tryParse(uri.queryParameters['eventId'] ?? '0');
@@ -88,7 +105,7 @@ class DeepLinkHandler {
         );
 
         final responseData = response.body;
-        
+
         // Parse response
         Map<String, dynamic> data;
         try {
@@ -99,7 +116,7 @@ class DeepLinkHandler {
 
         if (response.statusCode == 200 && data['success'] == true) {
           final eventData = data['data'];
-          
+
           // Navigate to booking screen
           Get.to(
             () => BookEventScreen(
@@ -130,4 +147,3 @@ class DeepLinkHandler {
     }
   }
 }
-

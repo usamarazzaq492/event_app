@@ -70,7 +70,7 @@ class Data {
       if (val == null) return [];
       if (val is List) {
         return val
-            .map((x) => (x == null ? '' : x).toString())
+            .map((x) => (x ?? '').toString())
             .where((s) => s.isNotEmpty)
             .toList();
       }

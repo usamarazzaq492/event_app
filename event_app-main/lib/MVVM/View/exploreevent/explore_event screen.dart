@@ -1,10 +1,10 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/View/EventDetailScreen/event_detail_screen.dart';
 import 'package:event_app/MVVM/view_model/event_view_model.dart';
 import 'package:event_app/MVVM/view_model/bottom_nav_controller.dart';
 import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/app/config/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -326,39 +326,42 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
       },
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
-        floatingActionButton: FloatingActionButton(
-          heroTag: "explore_fab",
-          backgroundColor: AppColors.blueColor,
-          child: const Icon(Icons.add, color: Colors.white),
-          onPressed: () {
-            if (authViewModel.isLoggedIn.value) {
-              NavigationUtils.push(
-                context,
-                const CreateEvent(),
-                routeName: '/create-event',
-              );
-            } else {
-              Get.snackbar(
-                'Sign in to create events',
-                'Create an account to host your own events.',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: AppColors.signinoptioncolor,
-                colorText: Colors.white,
-                mainButton: TextButton(
-                  onPressed: () {
-                    Get.toNamed(RouteName.loginScreen);
-                  },
-                  child: Text(
-                    'Sign in',
-                    style: TextStyle(
-                      color: AppColors.blueColor,
-                      fontWeight: FontWeight.w600,
+        floatingActionButton: Padding(
+          padding: EdgeInsets.only(bottom: 11.h),
+          child: FloatingActionButton(
+            heroTag: "explore_fab",
+            backgroundColor: AppColors.blueColor,
+            child: const Icon(Icons.add, color: Colors.white),
+            onPressed: () {
+              if (authViewModel.isLoggedIn.value) {
+                NavigationUtils.push(
+                  context,
+                  const CreateEvent(),
+                  routeName: '/create-event',
+                );
+              } else {
+                Get.snackbar(
+                  'Sign in to create events',
+                  'Create an account to host your own events.',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: AppColors.signinoptioncolor,
+                  colorText: Colors.white,
+                  mainButton: TextButton(
+                    onPressed: () {
+                      Get.toNamed(RouteName.loginScreen);
+                    },
+                    child: const Text(
+                      'Sign in',
+                      style: TextStyle(
+                        color: AppColors.blueColor,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-              );
-            }
-          },
+                );
+              }
+            },
+          ),
         ),
         body: SafeArea(
           child: _buildScrollableContent(),
@@ -368,71 +371,103 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () {
-              HapticUtils.navigation();
-              navController.changeTab(0);
-            },
-            icon: Icon(
-              Icons.arrow_back_ios,
-              color: AppColors.blueColor,
-              size: 20.sp,
-            ),
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor.withValues(alpha: 0.8),
+            border: Border(
+                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
           ),
-          Expanded(
-            child: Text(
-              "Search events",
-              style: TextStyles.heading,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          SizedBox(width: 2.w),
-          IconButton(
-            onPressed: () async {
-              HapticUtils.light();
-              // Tap toggles current location activation on demand
-              final activating = !_useCurrentLocation;
-              setState(() => _useCurrentLocation = activating);
-              if (activating) {
-                await _enableCurrentLocation();
-              } else {
-                setState(() {
-                  _currentLat = null;
-                  _currentLon = null;
-                });
-                _applyFilters();
-              }
-            },
-            icon: Icon(
-              Icons.my_location,
-              color: _useCurrentLocation ? AppColors.blueColor : Colors.white70,
-              size: 20.sp,
-            ),
-            tooltip: 'Use current location',
-          ),
-          SizedBox(width: 1.w),
-          IconButton(
-            onPressed: () {
-              HapticUtils.light();
-              _toggleAdvancedFilters();
-            },
-            icon: AnimatedRotation(
-              turns: _showAdvancedFilters ? 0.5 : 0,
-              duration: const Duration(milliseconds: 300),
-              child: Icon(
-                Icons.tune,
-                color: AppColors.blueColor,
-                size: 20.sp,
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  HapticUtils.navigation();
+                  navController.changeTab(0);
+                },
+                icon: Icon(Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.blueColor, size: 18.sp),
               ),
-            ),
-            tooltip: 'Filters',
+              Expanded(
+                child: Text(
+                  "Discover Events",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5),
+                ),
+              ),
+              _buildHeaderActionIcon(
+                icon: Icons.my_location_rounded,
+                isActive: _useCurrentLocation,
+                onTap: () async {
+                  HapticUtils.light();
+                  final activating = !_useCurrentLocation;
+                  setState(() => _useCurrentLocation = activating);
+                  if (activating) {
+                    await _enableCurrentLocation();
+                  } else {
+                    setState(() {
+                      _currentLat = null;
+                      _currentLon = null;
+                    });
+                    _applyFilters();
+                  }
+                },
+              ),
+              SizedBox(width: 2.w),
+              _buildHeaderActionIcon(
+                icon: Icons.tune_rounded,
+                isActive: _showAdvancedFilters,
+                onTap: () {
+                  HapticUtils.light();
+                  _toggleAdvancedFilters();
+                },
+                isRotating: true,
+              ),
+            ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderActionIcon({
+    required IconData icon,
+    required bool isActive,
+    required VoidCallback onTap,
+    bool isRotating = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(1.2.h),
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppColors.blueColor.withValues(alpha: 0.15)
+              : Colors.white.withValues(alpha: 0.05),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isActive
+                ? AppColors.blueColor.withValues(alpha: 0.5)
+                : Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: isRotating
+            ? AnimatedRotation(
+                turns: isActive ? 0.5 : 0,
+                duration: const Duration(milliseconds: 300),
+                child: Icon(icon,
+                    color: isActive ? AppColors.blueColor : Colors.white,
+                    size: 16.sp),
+              )
+            : Icon(icon,
+                color: isActive ? AppColors.blueColor : Colors.white,
+                size: 16.sp),
       ),
     );
   }
@@ -442,101 +477,103 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
       child: Column(
         children: [
-          // Search Bar with suggestions
           Stack(
+            clipBehavior: Clip.none,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.signinoptioncolor,
-                  borderRadius: BorderRadius.circular(2.h),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  style: TextStyles.regularwhite,
-                  decoration: InputDecoration(
-                    hintText: 'Search events, categories, locations...',
-                    hintStyle:
-                        TextStyles.regularwhite.copyWith(color: Colors.white70),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: AppColors.blueColor,
-                      size: 20.sp,
-                    ),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            onPressed: () {
-                              _searchController.clear();
-                              _applyFilters();
-                            },
-                            icon: Icon(
-                              Icons.clear,
-                              color: Colors.white70,
-                              size: 16.sp,
-                            ),
-                          )
-                        : null,
-                    border: InputBorder.none,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-                  ),
-                ),
-              ),
-              // Search suggestions
-              if (_searchSuggestions.isNotEmpty)
-                Positioned(
-                  top: 6.h,
-                  left: 0,
-                  right: 0,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(2.h),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppColors.signinoptioncolor,
-                      borderRadius: BorderRadius.circular(1.h),
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(2.h),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.1),
                         width: 1,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
-                    child: Column(
-                      children: _searchSuggestions
-                          .map(
-                            (suggestion) => ListTile(
-                              title: Text(
-                                suggestion,
-                                style: TextStyles.regularwhite,
-                              ),
-                              leading: Icon(
-                                Icons.history,
-                                color: AppColors.blueColor,
-                                size: 16.sp,
-                              ),
-                              onTap: () {
-                                _searchController.text = suggestion;
-                                setState(() {
-                                  _searchSuggestions.clear();
-                                });
-                                _applyFilters();
-                              },
-                            ),
-                          )
-                          .toList(),
+                    child: TextField(
+                      controller: _searchController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Search events, categories, locations...',
+                        hintStyle:
+                            TextStyle(color: Colors.white38, fontSize: 11.sp),
+                        prefixIcon: Icon(
+                          Icons.search_rounded,
+                          color: AppColors.blueColor,
+                          size: 20.sp,
+                        ),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                onPressed: () {
+                                  HapticUtils.light();
+                                  _searchController.clear();
+                                  _applyFilters();
+                                },
+                                icon: Icon(
+                                  Icons.clear_rounded,
+                                  color: Colors.white70,
+                                  size: 16.sp,
+                                ),
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 4.w, vertical: 2.h),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              if (_searchSuggestions.isNotEmpty)
+                Positioned(
+                  top: 7.h,
+                  left: 0,
+                  right: 0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(1.5.h),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.signinoptioncolor
+                              .withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(1.5.h),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: _searchSuggestions
+                              .map(
+                                (suggestion) => ListTile(
+                                  title: Text(
+                                    suggestion,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 11.sp),
+                                  ),
+                                  leading: Icon(
+                                    Icons.history_rounded,
+                                    color: AppColors.blueColor,
+                                    size: 16.sp,
+                                  ),
+                                  onTap: () {
+                                    HapticUtils.selection();
+                                    _searchController.text = suggestion;
+                                    setState(() {
+                                      _searchSuggestions.clear();
+                                    });
+                                    _applyFilters();
+                                  },
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -583,13 +620,14 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
       children: [
         Text(
           'Quick Filters',
-          style: TextStyles.subheading,
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 13.sp,
+              fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 1.h),
-
-        // Category chips
+        SizedBox(height: 1.5.h),
         SizedBox(
-          height: 5.h,
+          height: 4.5.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: _categories.length,
@@ -597,9 +635,8 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
               final category = _categories[index];
               final isSelected = _selectedCategory == category;
 
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: EdgeInsets.only(right: 2.w),
+              return Padding(
+                padding: EdgeInsets.only(right: 2.w),
                 child: GestureDetector(
                   onTap: () {
                     HapticUtils.light();
@@ -608,18 +645,19 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                     });
                     _applyFilters();
                   },
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     padding:
-                        EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+                        EdgeInsets.symmetric(horizontal: 4.w, vertical: 0.8.h),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.blueColor
-                          : AppColors.signinoptioncolor,
-                      borderRadius: BorderRadius.circular(1.h),
+                          : Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(1.2.h),
                       border: Border.all(
                         color: isSelected
                             ? AppColors.blueColor
-                            : Colors.white.withValues(alpha: 0.2),
+                            : Colors.white.withValues(alpha: 0.1),
                         width: 1,
                       ),
                       boxShadow: isSelected
@@ -627,8 +665,8 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                               BoxShadow(
                                 color:
                                     AppColors.blueColor.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
                               ),
                             ]
                           : null,
@@ -636,10 +674,11 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                     child: Center(
                       child: Text(
                         category,
-                        style: TextStyles.regularwhite.copyWith(
-                          color: isSelected ? Colors.white : Colors.white70,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.white60,
+                          fontSize: 10.sp,
                           fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                              isSelected ? FontWeight.bold : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -649,161 +688,144 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
             },
           ),
         ),
-
-        SizedBox(height: 2.h),
-
-        // City dropdown removed
       ],
     );
   }
 
   Widget _buildAdvancedFilters() {
-    return Container(
-      padding: EdgeInsets.all(3.w),
-      decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(2.h),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Advanced Filters',
-            style: TextStyles.subheading,
-          ),
-          SizedBox(height: 2.h),
-
-          // Location toggle removed; radius is shown only when active via header icon
-          if (_useCurrentLocation &&
-              _currentLat != null &&
-              _currentLon != null) ...[
-            SizedBox(height: 1.h),
-            Slider(
-              value: _radiusKm,
-              min: 1,
-              max: 100,
-              divisions: 99,
-              activeColor: AppColors.blueColor,
-              label: '${_radiusKm.round()} km',
-              onChanged: (val) {
-                HapticUtils.light();
-                setState(() {
-                  _radiusKm = val;
-                });
-                _applyFilters();
-              },
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2.h),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: EdgeInsets.all(4.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(2.h),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.1),
+              width: 1,
             ),
-          ],
-
-          SizedBox(height: 2.h),
-
-          // Date range
-          Row(
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Start Date',
-                      style: TextStyles.regularwhite,
-                    ),
-                    SizedBox(height: 1.h),
-                    GestureDetector(
-                      onTap: () => _selectStartDate(),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 3.w, vertical: 1.5.h),
-                        decoration: BoxDecoration(
-                          color: AppColors.signinoptioncolor,
-                          borderRadius: BorderRadius.circular(1.h),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              color: AppColors.blueColor,
-                              size: 16.sp,
-                            ),
-                            SizedBox(width: 2.w),
-                            Text(
-                              _startDate != null
-                                  ? DateFormat('MMM d, yyyy')
-                                      .format(_startDate!)
-                                  : 'Select date',
-                              style: TextStyles.regularwhite.copyWith(
-                                color: _startDate != null
-                                    ? Colors.white
-                                    : Colors.white70,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              Text(
+                'Advanced Filters',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.bold),
               ),
-              SizedBox(width: 2.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              if (_useCurrentLocation &&
+                  _currentLat != null &&
+                  _currentLon != null) ...[
+                SizedBox(height: 2.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'End Date',
-                      style: TextStyles.regularwhite,
-                    ),
-                    SizedBox(height: 1.h),
-                    GestureDetector(
-                      onTap: () => _selectEndDate(),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 3.w, vertical: 1.5.h),
-                        decoration: BoxDecoration(
-                          color: AppColors.signinoptioncolor,
-                          borderRadius: BorderRadius.circular(1.h),
-                          border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              color: AppColors.blueColor,
-                              size: 16.sp,
-                            ),
-                            SizedBox(width: 2.w),
-                            Text(
-                              _endDate != null
-                                  ? DateFormat('MMM d, yyyy').format(_endDate!)
-                                  : 'Select date',
-                              style: TextStyles.regularwhite.copyWith(
-                                color: _endDate != null
-                                    ? Colors.white
-                                    : Colors.white70,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    Text('Search Radius',
+                        style:
+                            TextStyle(color: Colors.white70, fontSize: 10.sp)),
+                    Text('${_radiusKm.round()} km',
+                        style: TextStyle(
+                            color: AppColors.blueColor,
+                            fontSize: 10.sp,
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 4,
+                    activeTrackColor: AppColors.blueColor,
+                    inactiveTrackColor: Colors.white.withValues(alpha: 0.1),
+                    thumbColor: Colors.white,
+                    overlayColor: AppColors.blueColor.withValues(alpha: 0.2),
+                  ),
+                  child: Slider(
+                    value: _radiusKm,
+                    min: 1,
+                    max: 100,
+                    onChanged: (val) {
+                      HapticUtils.light();
+                      setState(() => _radiusKm = val);
+                      _applyFilters();
+                    },
+                  ),
+                ),
+              ],
+              SizedBox(height: 2.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDatePicker(
+                      label: 'Start Date',
+                      date: _startDate,
+                      onTap: _selectStartDate,
+                    ),
+                  ),
+                  SizedBox(width: 3.w),
+                  Expanded(
+                    child: _buildDatePicker(
+                      label: 'End Date',
+                      date: _endDate,
+                      onTap: _selectEndDate,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildDatePicker({
+    required String label,
+    required DateTime? date,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: Colors.white60, fontSize: 9.sp)),
+        SizedBox(height: 1.h),
+        GestureDetector(
+          onTap: () {
+            HapticUtils.light();
+            onTap();
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.2.h),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(1.h),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.1),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.calendar_today_rounded,
+                    color: AppColors.blueColor, size: 14.sp),
+                SizedBox(width: 2.w),
+                Expanded(
+                  child: Text(
+                    date != null
+                        ? DateFormat('MMM d, yyyy').format(date)
+                        : 'Anytime',
+                    style: TextStyle(
+                        color: date != null ? Colors.white : Colors.white38,
+                        fontSize: 10.sp),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -817,29 +839,26 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
             _clearAllFilters();
           },
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.5.h),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
             decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(2.h),
+              color: Colors.red.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(1.h),
               border: Border.all(
-                color: Colors.red.withValues(alpha: 0.3),
-                width: 1,
+                color: Colors.red.withValues(alpha: 0.2),
               ),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.clear_all,
-                  color: Colors.red,
-                  size: 16.sp,
-                ),
-                SizedBox(width: 1.w),
+                Icon(Icons.refresh_rounded,
+                    color: Colors.redAccent, size: 12.sp),
+                SizedBox(width: 1.5.w),
                 Text(
-                  'Clear All',
-                  style: TextStyles.regularwhite.copyWith(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w600,
+                  'Reset Filters',
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 9.sp,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -856,19 +875,12 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
     return Container(
       margin: EdgeInsets.only(bottom: 2.h),
       decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor,
-        borderRadius: BorderRadius.circular(2.h),
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(2.2.h),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1),
+          color: Colors.white.withValues(alpha: 0.08),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -881,111 +893,89 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
               routeName: '/event-detail',
             );
           },
-          borderRadius: BorderRadius.circular(2.h),
+          borderRadius: BorderRadius.circular(2.2.h),
           child: Padding(
-            padding: EdgeInsets.all(2.h),
+            padding: EdgeInsets.all(1.5.h),
             child: Row(
               children: [
-                // Event Image with gradient overlay
                 Stack(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(1.h),
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            'https://eventgo-live.com/${event.eventImage}',
-                        width: 20.w,
-                        height: 12.h,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          width: 20.w,
+                    Hero(
+                      tag: 'event_image_${event.eventId}',
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(1.5.h),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              'https://eventgo-live.com/${event.eventImage}',
+                          width: 25.w,
                           height: 12.h,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.grey.shade800,
-                                Colors.grey.shade700,
-                              ],
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            child: const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: AppColors.blueColor),
+                              ),
                             ),
                           ),
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  AppColors.blueColor),
-                            ),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          width: 20.w,
-                          height: 12.h,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.grey.shade800,
-                                Colors.grey.shade700,
-                              ],
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey.shade400,
-                            size: 24.sp,
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            child: Icon(Icons.image_not_supported_rounded,
+                                color: Colors.white24, size: 20.sp),
                           ),
                         ),
                       ),
                     ),
-                    // Category badge
                     Positioned(
-                      top: 0.5.h,
-                      left: 0.5.h,
+                      top: 0.6.h,
+                      left: 0.6.h,
                       child: Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 1.5.w, vertical: 0.5.h),
+                            horizontal: 2.w, vertical: 0.4.h),
                         decoration: BoxDecoration(
                           color: AppColors.blueColor,
-                          borderRadius: BorderRadius.circular(0.5.h),
+                          borderRadius: BorderRadius.circular(0.8.h),
                         ),
                         child: Text(
-                          event.category ?? 'Event',
-                          style: TextStyles.regularwhite.copyWith(
-                            fontSize: 7.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          (event.category ?? 'Event').toUpperCase(),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 6.sp,
+                              fontWeight: FontWeight.w800),
                         ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(width: 3.w),
-
-                // Event Details
+                SizedBox(width: 4.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title
                       Text(
-                        _capitalizeFirstLetter(event.eventTitle ?? ''),
-                        style: TextStyles.homeheadingtext,
+                        _capitalizeFirstLetter(event.eventTitle ?? '').trim(),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.2),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 1.h),
-
-                      // Date & Time
                       Row(
                         children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 12.sp,
-                            color: AppColors.blueColor,
-                          ),
-                          SizedBox(width: 1.w),
+                          Icon(Icons.calendar_today_rounded,
+                              size: 10.sp, color: AppColors.blueColor),
+                          SizedBox(width: 1.5.w),
                           Expanded(
                             child: Text(
-                              '${_formatDate(event.startDate)} | ${_formatTime(event.startTime)}',
-                              style: TextStyles.homedatetext,
+                              '${_formatDate(event.startDate)} • ${_formatTime(event.startTime)}',
+                              style: TextStyle(
+                                  color: Colors.white54, fontSize: 9.sp),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -1005,36 +995,40 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                                   _currentLat!, _currentLon!, evLat, evLon);
                               return Text(
                                 LocationService.formatDistance(dKm),
-                                style: TextStyles.regularwhite.copyWith(
-                                  color: Colors.white70,
-                                ),
+                                style: TextStyle(
+                                    color: AppColors.blueColor
+                                        .withValues(alpha: 0.7),
+                                    fontSize: 9.sp,
+                                    fontWeight: FontWeight.w600),
                               );
                             }
                             return const SizedBox.shrink();
                           },
                         ),
-
-                      // Price
+                      SizedBox(height: 1.h),
                       if (event.eventPrice != null &&
                           event.eventPrice != '0.00')
-                        Text(
-                          '\$${event.eventPrice}',
-                          style: TextStyles.regularwhite.copyWith(
-                            fontSize: 14.sp,
-                            color: Colors.green,
-                            fontWeight: FontWeight.w700,
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 2.w, vertical: 0.4.h),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(0.6.h),
+                          ),
+                          child: Text(
+                            '\$${event.eventPrice}',
+                            style: TextStyle(
+                              color: Colors.greenAccent,
+                              fontSize: 10.sp,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                         ),
                     ],
                   ),
                 ),
-
-                // Arrow
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppColors.blueColor,
-                  size: 14.sp,
-                ),
+                Icon(Icons.arrow_forward_ios_rounded,
+                    color: Colors.white24, size: 12.sp),
               ],
             ),
           ),
@@ -1203,15 +1197,48 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                   onRetry: () => _loadEvents(),
                 );
               } else if (_filteredEvents.isEmpty) {
-                return AppEmptyStateWidget(
-                  title: "No Events Found",
-                  message: "Try adjusting your search filters to find events.",
-                  icon: Icons.event_available,
-                  onAction: () {
-                    HapticUtils.light();
-                    _clearAllFilters();
-                  },
-                  actionText: "Clear Filters",
+                return Padding(
+                  padding: EdgeInsets.only(top: 10.h),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.search_off_rounded,
+                          size: 60.sp, color: Colors.white10),
+                      SizedBox(height: 2.h),
+                      Text(
+                        "No Events Found",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 1.h),
+                      Text(
+                        "Try adjusting your filters to find more events.",
+                        style:
+                            TextStyle(color: Colors.white38, fontSize: 10.sp),
+                      ),
+                      SizedBox(height: 3.h),
+                      OutlinedButton(
+                        onPressed: () {
+                          HapticUtils.light();
+                          _clearAllFilters();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                              color:
+                                  AppColors.blueColor.withValues(alpha: 0.5)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(1.h)),
+                        ),
+                        child: Text("Clear All Filters",
+                            style: TextStyle(
+                                color: AppColors.blueColor,
+                                fontSize: 10.sp,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
                 );
               } else {
                 return ListView.builder(
@@ -1227,8 +1254,8 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
               }
             }),
           ),
-          // Add bottom spacer for safe scrolling past last card
-          SliverToBoxAdapter(child: SizedBox(height: 2.h)),
+          // Add bottom spacer for safe scrolling past last card (accounting for bottom nav bar)
+          SliverToBoxAdapter(child: SizedBox(height: 12.h)),
         ],
       ),
     );

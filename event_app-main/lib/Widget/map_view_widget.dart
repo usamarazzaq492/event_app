@@ -12,13 +12,13 @@ class MapViewWidget extends StatefulWidget {
   final double? initialZoom;
 
   const MapViewWidget({
-    Key? key,
+    super.key,
     required this.events,
     required this.onEventSelected,
     this.initialLatitude,
     this.initialLongitude,
     this.initialZoom,
-  }) : super(key: key);
+  });
 
   @override
   State<MapViewWidget> createState() => _MapViewWidgetState();
@@ -54,13 +54,13 @@ class _MapViewWidgetState extends State<MapViewWidget> {
             ),
             child: Row(
               children: [
-                Icon(Icons.map, color: AppColors.blueColor),
+                const Icon(Icons.map, color: AppColors.blueColor),
                 SizedBox(width: 2.w),
                 Text(
                   'Map View',
                   style: TextStyles.homeheadingtext.copyWith(fontSize: 16.sp),
                 ),
-                Spacer(),
+                const Spacer(),
                 IconButton(
                   onPressed: () {
                     HapticUtils.light();
@@ -126,8 +126,8 @@ class _MapViewWidgetState extends State<MapViewWidget> {
                     HapticUtils.buttonPress();
                     // TODO: Implement actual map functionality
                   },
-                  icon: Icon(Icons.location_on),
-                  label: Text('Enable Location'),
+                  icon: const Icon(Icons.location_on),
+                  label: const Text('Enable Location'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.blueColor,
                     foregroundColor: Colors.white,
@@ -187,7 +187,7 @@ class _MapViewWidgetState extends State<MapViewWidget> {
                 },
                 child: Container(
                   padding: EdgeInsets.all(1.w),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.blueColor,
                     shape: BoxShape.circle,
                     boxShadow: [
@@ -206,7 +206,7 @@ class _MapViewWidgetState extends State<MapViewWidget> {
                 ),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -235,7 +235,7 @@ class _MapViewWidgetState extends State<MapViewWidget> {
                 Container(
                   width: 12.w,
                   height: 12.w,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.blueColor,
                     shape: BoxShape.circle,
                   ),
@@ -293,7 +293,7 @@ class _MapViewWidgetState extends State<MapViewWidget> {
       decoration: BoxDecoration(
         color: AppColors.backgroundColor,
         borderRadius: BorderRadius.circular(2.h),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             blurRadius: 4,

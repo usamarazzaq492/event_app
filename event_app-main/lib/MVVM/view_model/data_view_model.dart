@@ -97,7 +97,7 @@ class DataViewModel extends GetxController {
         backgroundColor: AppColors.blueColor,
         colorText: AppColors.whiteColor,
       );
-      Get.to(() => BottomNavBar());
+      Get.to(() => const BottomNavBar());
     } catch (e) {
       Get.snackbar(
         "Error",

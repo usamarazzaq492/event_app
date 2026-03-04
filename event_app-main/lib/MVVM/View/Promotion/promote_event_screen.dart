@@ -1,8 +1,8 @@
+import 'dart:ui';
 import 'package:event_app/Services/promotion_service.dart';
 import 'package:event_app/Services/payment_web_view.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_text_style.dart';
-import 'package:event_app/Widget/button_widget.dart';
+import 'package:event_app/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -62,7 +62,8 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
               'price': BOOST_PRICE,
               'durationDays': BOOST_DURATION_DAYS,
               'name': 'Event Go-Live Boost',
-              'description': 'Boost your event for 10 days to increase visibility',
+              'description':
+                  'Boost your event for 10 days to increase visibility',
             };
             _isLoadingPackages = false;
           });
@@ -74,7 +75,8 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
             'price': BOOST_PRICE,
             'durationDays': BOOST_DURATION_DAYS,
             'name': 'Event Go-Live Boost',
-            'description': 'Boost your event for 10 days to increase visibility',
+            'description':
+                'Boost your event for 10 days to increase visibility',
           };
           _isLoadingPackages = false;
         });
@@ -140,184 +142,34 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Promote Event',
-          style: TextStyles.heading,
-        ),
-      ),
-      body: _isLoadingPackages
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(4.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Event Title
-                  Container(
-                    padding: EdgeInsets.all(3.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.signinoptioncolor,
-                      borderRadius: BorderRadius.circular(2.h),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.event, color: AppColors.blueColor),
-                        SizedBox(width: 2.w),
-                        Expanded(
-                          child: Text(
-                            widget.eventTitle,
-                            style: TextStyles.homeheadingtext,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 4.h),
-
-                  // Boost Benefits Section
-                  Text(
-                    'Boost Your Event',
-                    style: TextStyles.subheading,
-                  ),
-                  SizedBox(height: 2.h),
-                  _buildBenefitItem(
-                    Icons.trending_up,
-                    'Increased Visibility',
-                    'Your event appears in the Ads section and gets more exposure',
-                  ),
-                  _buildBenefitItem(
-                    Icons.verified,
-                    'Promoted Badge',
-                    'Get a special "Promoted" badge on your event',
-                  ),
-                  _buildBenefitItem(
-                    Icons.home,
-                    'Homepage Featured',
-                    'Featured section on the homepage',
-                  ),
-                  _buildBenefitItem(
-                    Icons.people,
-                    'Reach More People',
-                    'Your event will be seen by more users browsing the app',
-                  ),
-                  SizedBox(height: 4.h),
-
-                  // Single Boost Package Card
-                  if (_boostPackage != null) ...[
-                    Text(
-                      'Boost Package',
-                      style: TextStyles.subheading,
-                    ),
-                    SizedBox(height: 2.h),
-                    _buildBoostCard(_boostPackage!),
-                    SizedBox(height: 4.h),
-                  ],
-
-                  // Purchase Button
-                  ButtonWidget(
-                    text: _isLoading
-                        ? 'Processing...'
-                        : 'Promote Event - \$${_boostPackage?['price']?.toStringAsFixed(0) ?? BOOST_PRICE.toStringAsFixed(0)}',
-                    onPressed: _isLoading ? null : _purchaseBoost,
-                    backgroundColor: AppColors.blueColor,
-                    textColor: Colors.white,
-                    borderRadius: 4.h,
-                  ),
-
-                  SizedBox(height: 2.h),
-
-                  // Info Text
-                  Container(
-                    padding: EdgeInsets.all(3.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.blueColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(2.h),
-                      border: Border.all(
-                        color: AppColors.blueColor.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: AppColors.blueColor,
-                          size: 18.sp,
-                        ),
-                        SizedBox(width: 2.w),
-                        Expanded(
-                          child: Text(
-                            'Your event will be boosted for ${_boostPackage?['durationDays'] ?? BOOST_DURATION_DAYS} days. You can boost again after it expires.',
-                            style: TextStyles.regularwhite.copyWith(
-                              fontSize: 11.sp,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  if (_error != null) ...[
-                    SizedBox(height: 2.h),
-                    Container(
-                      padding: EdgeInsets.all(2.w),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(1.h),
-                      ),
-                      child: Text(
-                        _error!,
-                        style: TextStyles.regularwhite
-                            .copyWith(color: Colors.red),
-                      ),
-                    ),
-                  ],
-                ],
+      body: Stack(
+        children: [
+          // Background Glow
+          Positioned(
+            top: -15.h,
+            left: -15.w,
+            child: Container(
+              width: 60.w,
+              height: 60.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.blueColor.withValues(alpha: 0.1),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                child: Container(color: Colors.transparent),
               ),
             ),
-    );
-  }
-
-  Widget _buildBenefitItem(IconData icon, String title, String description) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 2.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(2.w),
-            decoration: BoxDecoration(
-              color: AppColors.blueColor.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(1.h),
-            ),
-            child: Icon(icon, color: AppColors.blueColor, size: 20.sp),
           ),
-          SizedBox(width: 3.w),
-          Expanded(
+
+          SafeArea(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: TextStyles.homeheadingtext.copyWith(fontSize: 13.sp),
-                ),
-                SizedBox(height: 0.5.h),
-                Text(
-                  description,
-                  style: TextStyles.regularwhite.copyWith(
-                    color: Colors.white70,
-                    fontSize: 11.sp,
-                  ),
+                _buildHeader(),
+                Expanded(
+                  child: _isLoadingPackages
+                      ? const Center(child: CircularProgressIndicator())
+                      : _buildMainContent(),
                 ),
               ],
             ),
@@ -327,19 +179,358 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
     );
   }
 
+  Widget _buildHeader() {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor.withValues(alpha: 0.8),
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 0.5,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  HapticUtils.navigation();
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  padding: EdgeInsets.all(1.2.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 16.sp,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'Promote Event',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 44), // Placeholder for symmetry
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContent() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(5.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Event Title Card
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2.h),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(2.h),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(1.5.w),
+                      decoration: BoxDecoration(
+                        color: AppColors.blueColor.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(1.h),
+                      ),
+                      child: Icon(Icons.event_available_rounded,
+                          color: AppColors.blueColor, size: 18.sp),
+                    ),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Text(
+                        widget.eventTitle,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 4.h),
+
+          // Boost Benefits Section
+          Text(
+            'Boost Benefits',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15.sp,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ),
+          ),
+          SizedBox(height: 2.5.h),
+          _buildBenefitItem(
+            Icons.trending_up_rounded,
+            'Increased Visibility',
+            'Your event appears in the Ads section and gets more exposure',
+          ),
+          _buildBenefitItem(
+            Icons.verified_rounded,
+            'Promoted Badge',
+            'Get a special "Promoted" badge on your event',
+          ),
+          _buildBenefitItem(
+            Icons.home_max_rounded,
+            'Homepage Featured',
+            'Featured section on the main discovery feed',
+          ),
+          _buildBenefitItem(
+            Icons.people_alt_rounded,
+            'Reach More People',
+            'Maximize your attendance by reaching active users',
+          ),
+          SizedBox(height: 4.h),
+
+          // Single Boost Package Card
+          if (_boostPackage != null) ...[
+            Text(
+              'Available Package',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15.sp,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
+            ),
+            SizedBox(height: 2.h),
+            _buildBoostCard(_boostPackage!),
+            SizedBox(height: 4.h),
+          ],
+
+          // Purchase Button
+          Hero(
+            tag: 'promote_button',
+            child: SizedBox(
+              width: double.infinity,
+              height: 6.5.h,
+              child: GestureDetector(
+                onTap: () {
+                  HapticUtils.buttonPress();
+                  if (!_isLoading) _purchaseBoost();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.blueColor,
+                        AppColors.blueColor.withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(4.h),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.blueColor.withValues(alpha: 0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'Promote Now - \$${_boostPackage?['price']?.toStringAsFixed(0) ?? BOOST_PRICE.toStringAsFixed(0)}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 3.h),
+
+          // Info Text
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2.h),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                padding: EdgeInsets.all(4.w),
+                decoration: BoxDecoration(
+                  color: AppColors.blueColor.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(2.h),
+                  border: Border.all(
+                    color: AppColors.blueColor.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      color: AppColors.blueColor,
+                      size: 18.sp,
+                    ),
+                    SizedBox(width: 3.w),
+                    Expanded(
+                      child: Text(
+                        'Your event will be boosted for ${_boostPackage?['durationDays'] ?? BOOST_DURATION_DAYS} days. You can boost again after it expires.',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: Colors.white60,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          if (_error != null) ...[
+            SizedBox(height: 2.h),
+            Container(
+              padding: EdgeInsets.all(3.w),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(1.5.h),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+              ),
+              child: Text(
+                _error!,
+                style: TextStyle(color: Colors.red, fontSize: 10.sp),
+              ),
+            ),
+          ],
+          SizedBox(height: 4.h),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBenefitItem(IconData icon, String title, String description) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 2.h),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(1.8.h),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Container(
+            padding: EdgeInsets.all(2.h),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(1.8.h),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(2.w),
+                  decoration: BoxDecoration(
+                    color: AppColors.blueColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(1.2.h),
+                  ),
+                  child: Icon(icon, color: AppColors.blueColor, size: 18.sp),
+                ),
+                SizedBox(width: 4.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 0.6.h),
+                      Text(
+                        description,
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 10.sp,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildBoostCard(Map<String, dynamic> boostData) {
-    final price = boostData['price']?.toStringAsFixed(2) ?? BOOST_PRICE.toStringAsFixed(2);
-    final durationDays = boostData['durationDays']?.toString() ?? BOOST_DURATION_DAYS.toString();
-    final name = boostData['name']?.toString() ?? 'Event Go-Live Boost';
-    final description = boostData['description']?.toString() ?? 'Boost your event for 10 days to increase visibility';
+    final price = boostData['price']?.toStringAsFixed(2) ??
+        BOOST_PRICE.toStringAsFixed(2);
+    final durationDays =
+        boostData['durationDays']?.toString() ?? BOOST_DURATION_DAYS.toString();
+    final name = boostData['name']?.toString() ?? 'Event Boost';
+    final description = boostData['description']?.toString() ??
+        'Boost your event visibility for 10 days';
 
     return Container(
-      padding: EdgeInsets.all(4.w),
+      width: double.infinity,
+      padding: EdgeInsets.all(5.w),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
             AppColors.blueColor,
-            AppColors.blueColor.withOpacity(0.8),
+            AppColors.blueColor.withValues(alpha: 0.6),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -347,9 +538,9 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
         borderRadius: BorderRadius.circular(2.5.h),
         boxShadow: [
           BoxShadow(
-            color: AppColors.blueColor.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: AppColors.blueColor.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -359,36 +550,36 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(2.w),
+                padding: EdgeInsets.all(2.5.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(1.h),
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.rocket_launch,
+                  Icons.rocket_launch_rounded,
                   color: Colors.white,
-                  size: 24.sp,
+                  size: 20.sp,
                 ),
               ),
-              SizedBox(width: 3.w),
+              SizedBox(width: 4.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       name,
-                      style: TextStyles.homeheadingtext.copyWith(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w900,
                         color: Colors.white,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    SizedBox(height: 0.5.h),
                     Text(
                       description,
-                      style: TextStyles.regularwhite.copyWith(
-                        fontSize: 11.sp,
-                        color: Colors.white.withOpacity(0.9),
+                      style: TextStyle(
+                        fontSize: 9.sp,
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -396,25 +587,26 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
               ),
             ],
           ),
-          SizedBox(height: 3.h),
+          SizedBox(height: 4.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Duration',
-                    style: TextStyles.regularwhite.copyWith(
-                      fontSize: 10.sp,
-                      color: Colors.white70,
+                    'DURATION',
+                    style: TextStyle(
+                      fontSize: 8.sp,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
-                  SizedBox(height: 0.5.h),
                   Text(
                     '$durationDays Days',
-                    style: TextStyles.homeheadingtext.copyWith(
-                      fontSize: 16.sp,
+                    style: TextStyle(
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -425,18 +617,18 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'Price',
-                    style: TextStyles.regularwhite.copyWith(
-                      fontSize: 10.sp,
-                      color: Colors.white70,
+                    'TOTAL',
+                    style: TextStyle(
+                      fontSize: 8.sp,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
-                  SizedBox(height: 0.5.h),
                   Text(
                     '\$$price',
-                    style: TextStyles.heading.copyWith(
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.w900,
                       color: Colors.white,
                     ),
                   ),

@@ -62,7 +62,7 @@ class AdViewModel extends GetxController {
         Get.snackbar("Success", "Ad uploaded successfully");
 
         // Navigate to bottom nav bar (adjust initial index as needed)
-        Get.offAll(() => BottomNavBar(initialIndex: 2));
+        Get.offAll(() => const BottomNavBar(initialIndex: 2));
 
         // Refresh ads list after uploading
         await fetchAds();

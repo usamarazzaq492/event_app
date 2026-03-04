@@ -45,9 +45,9 @@ class Routes {
       case RouteName.welcomScreen:
         return MaterialPageRoute(builder: (_) => const WelcomeScreen());
       case RouteName.onboardScreen:
-        return MaterialPageRoute(builder: (_) => OnboardingScreen());
+        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
       case RouteName.signupScreen:
-        return MaterialPageRoute(builder: (_) => SignupScreen());
+        return MaterialPageRoute(builder: (_) => const SignupScreen());
       case RouteName.termsScreen:
         return MaterialPageRoute(builder: (_) => const TermsScreen());
       case RouteName.privacyScreen:
@@ -56,12 +56,12 @@ class Routes {
         return MaterialPageRoute(builder: (_) => const ContactScreen());
 
       case RouteName.loginScreen:
-        return MaterialPageRoute(builder: (_) => SigninScreen());
+        return MaterialPageRoute(builder: (_) => const SigninScreen());
 
       case RouteName.home:
-        return MaterialPageRoute(builder: (_) => HomeScreen());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       case RouteName.bottomNav:
-        return MaterialPageRoute(builder: (_) => BottomNavBar(initialIndex: 0));
+        return MaterialPageRoute(builder: (_) => const BottomNavBar(initialIndex: 0));
       case RouteName.otpScreen:
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
@@ -71,11 +71,11 @@ class Routes {
           ),
         );
       case RouteName.password:
-        return MaterialPageRoute(builder: (_) => PasswordSetting());
+        return MaterialPageRoute(builder: (_) => const PasswordSetting());
       case RouteName.forgotpassword:
-        return MaterialPageRoute(builder: (_) => ForgotPassword());
+        return MaterialPageRoute(builder: (_) => const ForgotPassword());
       case RouteName.profileScreen:
-        return MaterialPageRoute(builder: (_) => ProfileScreen());
+        return MaterialPageRoute(builder: (_) => const ProfileScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

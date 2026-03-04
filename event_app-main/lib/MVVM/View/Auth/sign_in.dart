@@ -50,6 +50,8 @@ class _SigninScreenState extends State<SigninScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
+        FocusScope.of(context).unfocus();
+        HapticUtils.medium();
         await authViewModel.login(
           emailController.text.trim(),
           passwordController.text.trim(),
@@ -78,7 +80,7 @@ class _SigninScreenState extends State<SigninScreen> {
               right: 4.w,
               bottom: 6.h,
             ),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -363,7 +365,7 @@ class _SigninScreenState extends State<SigninScreen> {
                             height: 50,
                             child: SignInWithAppleButton(
                               onPressed: () async {
-                                HapticUtils.light();
+                                HapticUtils.medium();
                                 try {
                                   final credential = await SignInWithApple
                                       .getAppleIDCredential(

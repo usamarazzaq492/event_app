@@ -52,7 +52,7 @@ class SplashUtils {
       Get.offAll(() => BottomNavBar(initialIndex: preferredIndex));
     } else {
       // Returning user but not logged in - go to login
-      Get.offAll(() => BottomNavBar(initialIndex: 0));
+      Get.offAll(() => const BottomNavBar(initialIndex: 0));
     }
   }
 

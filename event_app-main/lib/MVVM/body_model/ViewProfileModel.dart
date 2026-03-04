@@ -35,7 +35,7 @@ class ViewPublicProfileModel {
             .toList();
       } else if (json['interests'] is List) {
         interests = (json['interests'] as List)
-            .map((e) => (e == null ? '' : e).toString())
+            .map((e) => (e ?? '').toString())
             .where((s) => s.isNotEmpty)
             .toList();
       }

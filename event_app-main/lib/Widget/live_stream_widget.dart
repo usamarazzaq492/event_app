@@ -6,10 +6,10 @@ class LiveStreamWidget extends StatefulWidget {
   final String platform;
 
   const LiveStreamWidget({
-    Key? key,
+    super.key,
     required this.embedUrl,
     required this.platform,
-  }) : super(key: key);
+  });
 
   @override
   _LiveStreamWidgetState createState() => _LiveStreamWidgetState();
@@ -57,10 +57,10 @@ class _LiveStreamWidgetState extends State<LiveStreamWidget> {
   Widget build(BuildContext context) {
     return Container(
       height: 250,
-      margin: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black26,
             blurRadius: 8,
@@ -76,7 +76,7 @@ class _LiveStreamWidgetState extends State<LiveStreamWidget> {
             if (_isLoading)
               Container(
                 color: Colors.black87,
-                child: Center(
+                child: const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -97,16 +97,16 @@ class _LiveStreamWidgetState extends State<LiveStreamWidget> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error, color: Colors.red, size: 48),
-                      SizedBox(height: 16),
-                      Text(
+                      const Icon(Icons.error, color: Colors.red, size: 48),
+                      const SizedBox(height: 16),
+                      const Text(
                         'Failed to load live stream',
                         style: TextStyle(color: Colors.white),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       ElevatedButton(
                         onPressed: _initializeWebView,
-                        child: Text('Retry'),
+                        child: const Text('Retry'),
                       ),
                     ],
                   ),
@@ -116,12 +116,12 @@ class _LiveStreamWidgetState extends State<LiveStreamWidget> {
               top: 8,
               right: 8,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.circle, color: Colors.white, size: 8),

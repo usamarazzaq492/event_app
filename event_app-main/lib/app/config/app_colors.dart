@@ -12,4 +12,9 @@ class AppColors {
   static const Color searchtextcolor = Color(0xff5B5E63);
   static const Color bottombarcolor = Color(0xff191A1F);
   static const Color tabtextcolor = Color(0xff464848);
+  static const Gradient primaryGradient = LinearGradient(
+    colors: [blueColor, lightColor],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

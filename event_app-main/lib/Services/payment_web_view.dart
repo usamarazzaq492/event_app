@@ -121,7 +121,7 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
               Container(
                 height: 80,
                 width: 80,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.blueColor,
                   shape: BoxShape.circle,
                 ),
@@ -142,7 +142,7 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
                     ? "Your event promotion has been activated successfully!"
                     : "You have successfully placed an order for the event. Enjoy!",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
@@ -162,7 +162,7 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => TicketScreen(),
+                        builder: (_) => const TicketScreen(),
                       ),
                     );
                   },

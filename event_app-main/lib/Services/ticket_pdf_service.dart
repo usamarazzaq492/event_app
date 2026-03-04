@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:media_store_plus/media_store_plus.dart';
+import 'package:flutter/foundation.dart';
 
 Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
   final pdf = pw.Document();
@@ -40,7 +41,7 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
         eventImageData = response.bodyBytes;
       }
     } catch (e) {
-      print("Failed to load event image: $e");
+      debugPrint("Failed to load event image: $e");
     }
   }
 
@@ -54,7 +55,8 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
   final ticketNumber = ticketData['ticketNumber'] ?? 'EVT123456';
   final address = ticketData['address'] ?? '';
   final city = ticketData['city'] ?? '';
-  final qrCodeData = ticketData['qrCodeData'] ?? ''; // Get QR code data from API
+  final qrCodeData =
+      ticketData['qrCodeData'] ?? ''; // Get QR code data from API
 
   final venue = (address.isNotEmpty && city.isNotEmpty)
       ? '$address, $city'
@@ -65,14 +67,16 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
   if (qrCodeData.isNotEmpty) {
     try {
       // Use online QR code API to generate QR code image
-      final qrDataString = qrCodeData is String ? qrCodeData : jsonEncode(qrCodeData);
-      final qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(qrDataString)}';
+      final qrDataString =
+          qrCodeData is String ? qrCodeData : jsonEncode(qrCodeData);
+      final qrCodeUrl =
+          'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${Uri.encodeComponent(qrDataString)}';
       final qrResponse = await http.get(Uri.parse(qrCodeUrl));
       if (qrResponse.statusCode == 200) {
         qrCodeImageBytes = qrResponse.bodyBytes;
       }
     } catch (e) {
-      print("Failed to generate QR code image: $e");
+      debugPrint("Failed to generate QR code image: $e");
     }
   }
 
@@ -166,7 +170,7 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
                     pw.Container(
                       padding: const pw.EdgeInsets.all(10),
                       decoration: pw.BoxDecoration(
-                        color: PdfColor(0, 0, 0, 0.7),
+                        color: const PdfColor(0, 0, 0, 0.7),
                         borderRadius: pw.BorderRadius.circular(8),
                       ),
                       child: pw.Row(
@@ -334,11 +338,11 @@ Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
     );
 
     if (saveInfo != null) {
-      print("✅ Ticket PDF saved. Path: $saveInfo");
+      debugPrint("✅ Ticket PDF saved. Path: $saveInfo");
     } else {
-      print("❌ Failed to save PDF: saveInfo is null");
+      debugPrint("❌ Failed to save PDF: saveInfo is null");
     }
   } catch (e) {
-    print("❌ Exception while saving PDF: $e");
+    debugPrint("❌ Exception while saving PDF: $e");
   }
 }

@@ -31,7 +31,8 @@ class _ContactScreenState extends State<ContactScreen> {
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: Colors.white, size: 20),
           onPressed: () {
             HapticUtils.navigation();
             Navigator.pop(context);

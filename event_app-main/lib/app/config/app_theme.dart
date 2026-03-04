@@ -165,7 +165,7 @@ class AppTheme {
 
       // Divider theme
       dividerTheme: DividerThemeData(
-        color: Colors.grey.withOpacity(0.3),
+        color: Colors.grey.withValues(alpha: 0.3),
         thickness: 0.5,
         space: 1,
       ),
@@ -179,7 +179,7 @@ class AppTheme {
       // Global text color override to ensure visibility
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: AppColors.blueColor,
-        selectionColor: AppColors.blueColor.withOpacity(0.3),
+        selectionColor: AppColors.blueColor.withValues(alpha: 0.3),
         selectionHandleColor: AppColors.blueColor,
       ),
 
@@ -282,20 +282,18 @@ class AppTheme {
         primary: AppColors.blueColor,
         secondary: AppColors.lightColor,
         surface: AppColors.signinoptioncolor,
-        background: AppColors.backgroundColor,
         error: Colors.redAccent,
         onPrimary: AppColors.whiteColor,
         onSecondary: AppColors.whiteColor,
         onSurface: AppColors.whiteColor,
-        onBackground: AppColors.whiteColor,
         onError: AppColors.whiteColor,
       ),
 
       // Progress indicator theme
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.blueColor,
-        linearTrackColor: Colors.grey.withOpacity(0.3),
-        circularTrackColor: Colors.grey.withOpacity(0.3),
+        linearTrackColor: Colors.grey.withValues(alpha: 0.3),
+        circularTrackColor: Colors.grey.withValues(alpha: 0.3),
       ),
 
       // Floating action button theme

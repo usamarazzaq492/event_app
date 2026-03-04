@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
+import 'package:event_app/utils/haptic_utils.dart';
 
 /// Eventbrite-style permissions screen shown on first app install.
 /// Explains benefits before requesting Location and Notification permissions.
@@ -32,6 +33,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
       if (mounted) {
         setState(() {
           _locationGranted = locationStatus.isGranted;
+          if (_locationGranted) HapticUtils.success();
         });
       }
 
@@ -40,6 +42,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
       if (mounted) {
         setState(() {
           _notificationGranted = notificationStatus.isGranted;
+          if (_notificationGranted) HapticUtils.success();
         });
       }
     } catch (e) {
@@ -57,6 +60,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
   }
 
   void _onContinue() async {
+    HapticUtils.light();
     await _requestPermissions();
     await _markOnboardingComplete();
     if (mounted) {
@@ -127,6 +131,15 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                 onPressed: _isRequesting ? null : _onContinue,
                 backgroundColor: AppColors.blueColor,
                 borderRadius: 4.h,
+              ),
+              SizedBox(height: 2.h),
+              Text(
+                'You can change these settings anytime in your device settings.',
+                textAlign: TextAlign.center,
+                style: TextStyles.regularwhite.copyWith(
+                  fontSize: 8.sp,
+                  color: Colors.white38,
+                ),
               ),
             ],
           ),

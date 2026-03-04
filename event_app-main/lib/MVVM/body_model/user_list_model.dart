@@ -11,7 +11,7 @@ class UserListModel {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
     message = json['message'];
@@ -19,13 +19,13 @@ class UserListModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['success'] = success;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    data['message'] = this.message;
-    data['count'] = this.count;
+    data['message'] = message;
+    data['count'] = count;
     return data;
   }
 }
@@ -70,17 +70,17 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['userId'] = this.userId;
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['phoneNumber'] = this.phoneNumber;
-    data['profileImageUrl'] = this.profileImageUrl;
-    data['shortBio'] = this.shortBio;
-    data['interests'] = this.interests;
-    data['isActive'] = this.isActive;
-    data['emailVerified'] = this.emailVerified;
-    data['created_at'] = this.createdAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['userId'] = userId;
+    data['name'] = name;
+    data['email'] = email;
+    data['phoneNumber'] = phoneNumber;
+    data['profileImageUrl'] = profileImageUrl;
+    data['shortBio'] = shortBio;
+    data['interests'] = interests;
+    data['isActive'] = isActive;
+    data['emailVerified'] = emailVerified;
+    data['created_at'] = createdAt;
     return data;
   }
 }

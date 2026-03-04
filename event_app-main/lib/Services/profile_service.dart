@@ -5,6 +5,7 @@ import 'package:event_app/MVVM/body_model/profile_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart';
+import 'package:flutter/foundation.dart';
 
 class UserService {
   static const String baseUrl = 'https://eventgo-live.com/api/v1';
@@ -12,7 +13,7 @@ class UserService {
   /// 🔷 Fetch Public Profile by userId (works without auth for guests)
   Future<ViewPublicProfileModel?> fetchPublicProfile(int? id) async {
     if (id == null) {
-      print('❌ fetchPublicProfile called with null id');
+      debugPrint('❌ fetchPublicProfile called with null id');
       return null;
     }
 
@@ -20,7 +21,7 @@ class UserService {
     String? token = prefs.getString('token');
 
     final uri = Uri.parse('$baseUrl/user/$id');
-    print('🔷 Fetching public profile: $uri');
+    debugPrint('🔷 Fetching public profile: $uri');
 
     final headers = <String, String>{
       'Accept': 'application/json',
@@ -31,18 +32,18 @@ class UserService {
 
     final response = await http.get(uri, headers: headers);
 
-    print('🔷 Profile API Response Status: ${response.statusCode}');
-    print('🔷 Profile API Response Body: ${response.body}');
+    debugPrint('🔷 Profile API Response Status: ${response.statusCode}');
+    debugPrint('🔷 Profile API Response Body: ${response.body}');
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      print('🔷 Parsed JSON: $jsonData');
+      debugPrint('🔷 Parsed JSON: $jsonData');
       final profile = ViewPublicProfileModel.fromJson(jsonData);
-      print(
+      debugPrint(
           '🔷 Parsed Profile - isFollowing: ${profile.isFollowing}, followersCount: ${profile.followersCount}');
       return profile;
     } else {
-      print(
+      debugPrint(
           '❌ Failed to fetch profile: ${response.statusCode} - ${response.body}');
       return null;
     }
@@ -74,7 +75,7 @@ class UserService {
       );
 
       final jsonResponse = json.decode(response.body);
-      print(
+      debugPrint(
           '[fetchProfile] Status: ${response.statusCode}, Response: $jsonResponse');
 
       if (response.statusCode == 200) {
@@ -158,7 +159,7 @@ class UserService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print(
+      debugPrint(
           '[updateUserProfile] Status: ${response.statusCode}, Body: ${response.body}');
 
       if (response.statusCode == 200) {
@@ -168,7 +169,7 @@ class UserService {
             'Failed to update profile: ${response.statusCode}, ${response.body}');
       }
     } catch (e) {
-      print('❌ Error in updateUserProfile: $e');
+      debugPrint('❌ Error in updateUserProfile: $e');
       rethrow;
     }
   }

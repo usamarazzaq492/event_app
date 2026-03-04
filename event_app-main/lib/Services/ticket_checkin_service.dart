@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class TicketCheckInService {
   static const String baseUrl = 'https://eventgo-live.com';
@@ -30,8 +31,8 @@ class TicketCheckInService {
         }),
       );
 
-      print('Ticket Check-in Response: ${response.statusCode}');
-      print('Ticket Check-in Body: ${response.body}');
+      debugPrint('Ticket Check-in Response: ${response.statusCode}');
+      debugPrint('Ticket Check-in Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -50,7 +51,7 @@ class TicketCheckInService {
         };
       }
     } catch (e) {
-      print('Ticket Check-in Error: $e');
+      debugPrint('Ticket Check-in Error: $e');
       return {
         'success': false,
         'error': e.toString(),
@@ -98,7 +99,7 @@ class TicketCheckInService {
         };
       }
     } catch (e) {
-      print('Ticket Verify Error: $e');
+      debugPrint('Ticket Verify Error: $e');
       return {
         'success': false,
         'error': e.toString(),
@@ -106,4 +107,3 @@ class TicketCheckInService {
     }
   }
 }
-

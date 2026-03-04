@@ -8,11 +8,11 @@ class CustomRefreshIndicator extends StatelessWidget {
   final String? message;
 
   const CustomRefreshIndicator({
-    Key? key,
+    super.key,
     required this.onRefresh,
     required this.child,
     this.message,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +33,11 @@ class CustomLoadingIndicator extends StatelessWidget {
   final Color? color;
 
   const CustomLoadingIndicator({
-    Key? key,
+    super.key,
     this.message,
     this.size,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,10 +78,10 @@ class CustomShimmerEffect extends StatefulWidget {
   final bool enabled;
 
   const CustomShimmerEffect({
-    Key? key,
+    super.key,
     required this.child,
     this.enabled = true,
-  }) : super(key: key);
+  });
 
   @override
   State<CustomShimmerEffect> createState() => _CustomShimmerEffectState();

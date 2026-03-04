@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 class ReviewTab extends StatelessWidget {
+  const ReviewTab({super.key});
+
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           height: 40.h,
           width: double.infinity,
           child: ListView.builder(

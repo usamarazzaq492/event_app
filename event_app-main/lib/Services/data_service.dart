@@ -68,7 +68,7 @@ class DataService {
     var uri = Uri.parse('$baseUrl/user/update');
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
-    print('token ${token}');
+    print('token $token');
     var request = http.MultipartRequest('POST', uri)
       ..headers.addAll({
         'Accept': 'application/json',

@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/View/EventDetailScreen/event_detail_screen.dart';
 import 'package:event_app/MVVM/View/Promotion/select_event_to_promote_screen.dart';
@@ -9,11 +10,14 @@ import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/refresh_on_navigation_mixin.dart';
+import 'package:event_app/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 class AllAdsScreen extends StatefulWidget {
+  const AllAdsScreen({super.key});
+
   @override
   State<AllAdsScreen> createState() => _AllAdsScreenState();
 }
@@ -31,94 +35,136 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header Section
-            _buildHeader(),
+      body: Stack(
+        children: [
+          // Background Glow Effect
+          Positioned(
+            top: -10.h,
+            right: -10.w,
+            child: Container(
+              width: 50.w,
+              height: 50.w,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.blueColor.withValues(alpha: 0.15),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
+          ),
 
-            // Promoted Events List
-            Expanded(child: _buildPromotedEventsList()),
+          SafeArea(
+            child: Column(
+              children: [
+                // Header Section
+                _buildHeader(),
 
-            // Promote Event Button (Fixed at bottom)
-            _buildPromoteButton(),
-          ],
-        ),
+                // Promoted Events List
+                Expanded(child: _buildPromotedEventsList()),
+
+                // Promote Event Button (Fixed at bottom)
+                _buildPromoteButton(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildPromoteButton() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {
-              if (!authViewModel.isLoggedIn.value) {
-                Get.snackbar(
-                  'Sign in to promote',
-                  'Create an account to promote your events.',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: AppColors.signinoptioncolor,
-                  colorText: Colors.white,
-                  mainButton: TextButton(
-                    onPressed: () => Get.toNamed(RouteName.loginScreen),
-                    child: Text(
-                      'Sign in',
-                      style: TextStyle(
-                        color: AppColors.blueColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                );
-                return;
-              }
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const SelectEventToPromoteScreen(),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.blueColor,
-              padding: EdgeInsets.symmetric(vertical: 2.h),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(2.h),
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor.withValues(alpha: 0.7),
+            border: Border(
+              top: BorderSide(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 0.5,
               ),
-              elevation: 0,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.rocket_launch,
-                  color: Colors.white,
-                  size: 20.sp,
-                ),
-                SizedBox(width: 2.w),
-                Text(
-                  "Promote Your Event",
-                  style: TextStyles.regularwhite.copyWith(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.bold,
+          ),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              width: double.infinity,
+              height: 6.5.h,
+              child: GestureDetector(
+                onTap: () {
+                  HapticUtils.buttonPress();
+                  if (!authViewModel.isLoggedIn.value) {
+                    Get.snackbar(
+                      'Sign in to promote',
+                      'Create an account to promote your events.',
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: AppColors.signinoptioncolor,
+                      colorText: Colors.white,
+                      mainButton: TextButton(
+                        onPressed: () => Get.toNamed(RouteName.loginScreen),
+                        child: const Text(
+                          'Sign in',
+                          style: TextStyle(
+                            color: AppColors.blueColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SelectEventToPromoteScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.blueColor,
+                        AppColors.blueColor.withValues(alpha: 0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(2.h),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.blueColor.withValues(alpha: 0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.rocket_launch_rounded,
+                        color: Colors.white,
+                        size: 16.sp,
+                      ),
+                      SizedBox(width: 3.w),
+                      Text(
+                        "Promote Your Event",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -127,82 +173,99 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
   }
 
   Widget _buildHeader() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundColor,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.white.withValues(alpha: 0.08),
-            width: 1,
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+          decoration: BoxDecoration(
+            color: AppColors.backgroundColor.withValues(alpha: 0.8),
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 0.5,
+              ),
+            ),
           ),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Icon and Title
-          Expanded(
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(1.5.w),
-                  decoration: BoxDecoration(
-                    color: AppColors.blueColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(1.5.h),
-                  ),
-                  child: Icon(
-                    Icons.trending_up,
-                    color: AppColors.blueColor,
-                    size: 20.sp,
-                  ),
-                ),
-                SizedBox(width: 3.w),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Promoted Events",
-                        style: TextStyles.heading.copyWith(
-                          fontSize: 18.sp,
+          child: Row(
+            children: [
+              // Icon and Title
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(1.2.h),
+                      decoration: BoxDecoration(
+                        color: AppColors.blueColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(1.2.h),
+                        border: Border.all(
+                          color: AppColors.blueColor.withValues(alpha: 0.2),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 0.3.h),
-                      Obx(() => Text(
-                            "${adVM.ads.length} active promotion${adVM.ads.length != 1 ? 's' : ''}",
-                            style: TextStyles.regularwhite.copyWith(
-                              fontSize: 11.sp,
-                              color: Colors.white60,
+                      child: Icon(
+                        Icons.trending_up_rounded,
+                        color: AppColors.blueColor,
+                        size: 18.sp,
+                      ),
+                    ),
+                    SizedBox(width: 4.w),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Promoted",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                          )),
-                    ],
+                          ),
+                          Obx(() => Text(
+                                "${adVM.ads.length} active promotion${adVM.ads.length != 1 ? 's' : ''}",
+                                style: TextStyle(
+                                  fontSize: 9.sp,
+                                  color: Colors.white38,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Refresh Button
+              GestureDetector(
+                onTap: () {
+                  HapticUtils.light();
+                  adVM.fetchAds();
+                },
+                child: Container(
+                  padding: EdgeInsets.all(1.2.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    color: Colors.white70,
+                    size: 16.sp,
                   ),
                 ),
-              ],
-            ),
-          ),
-          // Refresh Button
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.signinoptioncolor,
-              borderRadius: BorderRadius.circular(1.5.h),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
               ),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.white),
-              onPressed: () => adVM.fetchAds(),
-              tooltip: 'Refresh',
-              iconSize: 20.sp,
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -219,9 +282,10 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
           );
         } else if (adVM.error.isNotEmpty) {
           // Show friendly message for auth/network errors instead of raw exception
-          final isAuthError = adVM.error.value.toLowerCase().contains('unauthenticated') ||
-              adVM.error.value.contains('401') ||
-              adVM.error.value.toLowerCase().contains('unauthorized');
+          final isAuthError =
+              adVM.error.value.toLowerCase().contains('unauthenticated') ||
+                  adVM.error.value.contains('401') ||
+                  adVM.error.value.toLowerCase().contains('unauthorized');
           return ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
@@ -251,7 +315,8 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                       SizedBox(height: 1.h),
                       TextButton.icon(
                         onPressed: () => adVM.fetchAds(),
-                        icon: const Icon(Icons.refresh, color: Colors.white70, size: 20),
+                        icon: const Icon(Icons.refresh,
+                            color: Colors.white70, size: 20),
                         label: Text(
                           'Retry',
                           style: TextStyles.regularwhite.copyWith(
@@ -317,144 +382,174 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
         ? imagePath
         : 'https://eventgo-live.com/$imagePath';
 
-    return InkWell(
-      onTap: () {
-        // Navigate to event detail (use eventId if available, otherwise donationId)
-        final eventId = ad.eventId ?? ad.donationId;
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => EventDetailScreen(
-              eventId: eventId?.toString() ?? '',
-            ),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(2.h),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.signinoptioncolor,
-          borderRadius: BorderRadius.circular(2.h),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.08),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Image
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(2.h),
-                bottomLeft: Radius.circular(2.h),
-              ),
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                width: 28.w,
-                height: 14.h,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: Colors.grey.shade800,
-                  child: const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 4.w),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(2.2.h),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: GestureDetector(
+            onTap: () {
+              HapticUtils.selection();
+              final eventId = ad.eventId ?? ad.donationId;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => EventDetailScreen(
+                    eventId: eventId?.toString() ?? '',
                   ),
                 ),
-                errorWidget: (context, url, error) => Container(
-                  color: Colors.grey.shade800,
-                  child: const Icon(Icons.broken_image, color: Colors.white70),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(2.2.h),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  width: 1,
                 ),
               ),
-            ),
-
-            // Content
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.5.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title.isNotEmpty
-                                ? '${title[0].toUpperCase()}${title.substring(1)}'
-                                : 'Untitled',
-                            style: TextStyles.homeheadingtext,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                    // Image
+                    Hero(
+                      tag: 'ad_image_${ad.donationId ?? ad.eventId}',
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(2.2.h),
+                          bottomLeft: Radius.circular(2.2.h),
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 2.w,
-                            vertical: 0.5.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.blueColor.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color:
-                                  AppColors.blueColor.withValues(alpha: 0.35),
+                        child: CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          width: 32.w,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.rocket_launch,
-                                size: 12.sp,
-                                color: Colors.white,
-                              ),
-                              SizedBox(width: 1.w),
-                              Text(
-                                'Promoted',
-                                style: TextStyles.regularwhite.copyWith(
-                                  fontSize: 9.sp,
-                                ),
-                              ),
-                            ],
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.white.withValues(alpha: 0.05),
+                            child: const Icon(Icons.broken_image_rounded,
+                                color: Colors.white24),
                           ),
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 0.8.h),
-                    Text(
-                      description.isNotEmpty
-                          ? (description.length > 100
-                              ? '${description.substring(0, 100)}…'
-                              : description)
-                          : 'No description provided',
-                      style: TextStyles.regularwhite.copyWith(
-                        color: Colors.white70,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 0.8.h),
-                    if (ad.amount != null &&
-                        ad.amount!.isNotEmpty &&
-                        ad.amount != '0')
-                      Text(
-                        '\$${ad.amount}',
-                        style: TextStyles.regularwhite.copyWith(
-                          fontSize: 14.sp,
-                          color: Colors.green,
-                          fontWeight: FontWeight.w700,
+
+                    // Content
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(1.5.h),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    title.isNotEmpty
+                                        ? '${title[0].toUpperCase()}${title.substring(1)}'
+                                        : 'Untitled',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.2,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 2.w,
+                                    vertical: 0.4.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.blueColor
+                                        .withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(1.h),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.verified_rounded,
+                                        size: 10.sp,
+                                        color: AppColors.blueColor,
+                                      ),
+                                      SizedBox(width: 1.w),
+                                      Text(
+                                        'PRO',
+                                        style: TextStyle(
+                                          fontSize: 7.sp,
+                                          fontWeight: FontWeight.w900,
+                                          color: AppColors.blueColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 0.8.h),
+                            Expanded(
+                              child: Text(
+                                description.isNotEmpty
+                                    ? description
+                                    : 'No description provided',
+                                style: TextStyle(
+                                  color: Colors.white60,
+                                  fontSize: 10.sp,
+                                  height: 1.3,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            SizedBox(height: 1.h),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                if (ad.amount != null &&
+                                    ad.amount!.isNotEmpty &&
+                                    ad.amount != '0')
+                                  Text(
+                                    '\$${ad.amount}',
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                Container(
+                                  padding: EdgeInsets.all(0.6.h),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    size: 10.sp,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

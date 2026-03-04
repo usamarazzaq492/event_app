@@ -43,6 +43,8 @@ dependencies:
   app_links: ^6.3.1
   sign_in_with_apple: ^7.0.1
 
+  path: any
+  http_parser: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -54,20 +54,20 @@ class AdsModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['donationId'] = this.donationId;
-    data['eventId'] = this.eventId;
-    data['userId'] = this.userId;
-    data['title'] = this.title;
-    data['imageUrl'] = this.imageUrl;
-    data['description'] = this.description;
-    data['amount'] = this.amount;
-    data['city'] = this.city;
-    data['state'] = this.state;
-    data['zipcode'] = this.zipcode;
-    data['isActive'] = this.isActive;
-    data['addDate'] = this.addDate;
-    data['updated_at'] = this.updatedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['donationId'] = donationId;
+    data['eventId'] = eventId;
+    data['userId'] = userId;
+    data['title'] = title;
+    data['imageUrl'] = imageUrl;
+    data['description'] = description;
+    data['amount'] = amount;
+    data['city'] = city;
+    data['state'] = state;
+    data['zipcode'] = zipcode;
+    data['isActive'] = isActive;
+    data['addDate'] = addDate;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }

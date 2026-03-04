@@ -32,7 +32,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
     try {
       // Check camera permission first
       final status = await Permission.camera.status;
-      
+
       if (status.isGranted) {
         // Permission already granted, initialize scanner
         _controller = MobileScannerController();
@@ -131,10 +131,10 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
     try {
       // Clean and prepare the QR code data
       String cleanedValue = rawValue.trim();
-      
+
       print('🔍 Scanned QR Code - Raw value: $rawValue');
       print('🔍 Scanned QR Code - Length: ${rawValue.length}');
-      
+
       // Try URL decoding in case the QR code was URL-encoded
       try {
         final decoded = Uri.decodeComponent(cleanedValue);
@@ -150,7 +150,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
       // Try to parse as JSON (ticket QR codes are JSON strings)
       Map<String, dynamic>? qrData;
       String qrDataString = cleanedValue;
-      
+
       try {
         // First, try parsing directly
         qrData = jsonDecode(cleanedValue);
@@ -164,7 +164,8 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           if (cleanedValue.startsWith('"') && cleanedValue.endsWith('"')) {
             cleanedValue = cleanedValue.substring(1, cleanedValue.length - 1);
             // Unescape JSON string
-            cleanedValue = cleanedValue.replaceAll('\\"', '"').replaceAll('\\\\', '\\');
+            cleanedValue =
+                cleanedValue.replaceAll('\\"', '"').replaceAll('\\\\', '\\');
             print('🔍 Removed surrounding quotes');
           }
           qrData = jsonDecode(cleanedValue);
@@ -174,8 +175,10 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           print('❌ QR Code parsing error: $e2');
           print('📋 Raw QR value: $rawValue');
           print('📋 Cleaned value: $cleanedValue');
-          print('📋 First 100 chars: ${cleanedValue.length > 100 ? cleanedValue.substring(0, 100) : cleanedValue}');
-          throw Exception('Invalid QR code format. Please scan a valid ticket QR code.\n\nScanned: ${cleanedValue.length > 50 ? cleanedValue.substring(0, 50) + "..." : cleanedValue}\n\nError: ${e2.toString()}');
+          debugPrint(
+              '📋 First 100 chars: ${cleanedValue.length > 100 ? cleanedValue.substring(0, 100) : cleanedValue}');
+          throw Exception(
+              'Invalid QR code format. Please scan a valid ticket QR code.\n\nScanned: ${cleanedValue.length > 50 ? "${cleanedValue.substring(0, 50)}..." : cleanedValue}\n\nError: ${e2.toString()}');
         }
       }
 
@@ -186,8 +189,9 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
       }
 
       // Check if this is old format (missing ticket_num and hash)
-      final bool isOldFormat = !qrData.containsKey('ticket_num') || !qrData.containsKey('hash');
-      
+      final bool isOldFormat =
+          !qrData.containsKey('ticket_num') || !qrData.containsKey('hash');
+
       if (isOldFormat) {
         print('⚠️ Old format QR code detected (missing ticket_num or hash)');
         print('📋 QR Data: $qrData');
@@ -205,7 +209,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
         // Success - ticket checked in
         final data = result['data'];
         HapticUtils.success();
-        
+
         Get.snackbar(
           '✅ Ticket Checked In',
           'Ticket #${data['ticket_number']} checked in successfully',
@@ -291,7 +295,8 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
     );
   }
 
-  void _showDuplicateWarning(String message, String? checkedInAt, String? warning) {
+  void _showDuplicateWarning(
+      String message, String? checkedInAt, String? warning) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -325,13 +330,14 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.2),
+                  color: Colors.orange.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.orange),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: Colors.orange, size: 20),
+                    const Icon(Icons.info_outline,
+                        color: Colors.orange, size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -484,7 +490,8 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
               color: Colors.black54,
               child: const Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.blueColor),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.blueColor),
                 ),
               ),
             ),
@@ -499,7 +506,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
                 padding: EdgeInsets.all(4.w),
                 margin: EdgeInsets.symmetric(horizontal: 5.w),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(2.h),
                 ),
                 child: Column(
@@ -531,4 +538,3 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
     );
   }
 }
-
