@@ -335,8 +335,8 @@ class NavigationUtils {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => WillPopScope(
-        onWillPop: () async => false,
+      builder: (context) => PopScope(
+        canPop: false,
         child: AlertDialog(
           backgroundColor: Colors.grey[900],
           content: Column(

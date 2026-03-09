@@ -1,10 +1,10 @@
+import 'package:event_app/app/config/app_url.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
-  static const String baseUrl = "https://eventgo-live.com/api/v1";
-
   /// Fetch all notifications (invites + follows)
   Future<List<dynamic>> getAllNotifications() async {
     final prefs = await SharedPreferences.getInstance();
@@ -14,8 +14,8 @@ class NotificationService {
       throw Exception('Missing token');
     }
 
-    final uri = Uri.parse('$baseUrl/notifications');
-    print('🔗 Fetching notifications from: $uri');
+    final uri = Uri.parse('${AppUrl.baseUrl}/notifications');
+    debugPrint('🔗 Fetching notifications from: $uri');
 
     final response = await http.get(
       uri,
@@ -25,8 +25,8 @@ class NotificationService {
       },
     );
 
-    print('✅ Notifications Status: ${response.statusCode}');
-    print('📄 Notifications Body: ${response.body}');
+    debugPrint('✅ Notifications Status: ${response.statusCode}');
+    debugPrint('📄 Notifications Body: ${response.body}');
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

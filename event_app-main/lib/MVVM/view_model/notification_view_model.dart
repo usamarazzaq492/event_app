@@ -18,10 +18,10 @@ class NotificationViewModel extends GetxController {
       error.value = '';
       final notifs = await _notificationService.getAllNotifications();
       notifications.assignAll(notifs);
-      print("✅ Fetched ${notifs.length} notifications");
+      debugPrint("✅ Fetched ${notifs.length} notifications");
     } catch (e) {
       error.value = e.toString();
-      print("❌ Error fetching notifications: $e");
+      debugPrint("❌ Error fetching notifications: $e");
       notifications.clear();
     } finally {
       isLoading.value = false;
@@ -35,10 +35,10 @@ class NotificationViewModel extends GetxController {
         inviteId: inviteId,
         response: response,
       );
-      
+
       // Refresh notifications
       await fetchNotifications();
-      
+
       Get.snackbar(
         "Success",
         "Invite ${response == 'accepted' ? 'accepted' : 'declined'} successfully",
@@ -47,10 +47,10 @@ class NotificationViewModel extends GetxController {
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
-      print("❌ Error responding to invite: $e");
+      debugPrint("❌ Error responding to invite: $e");
       Get.snackbar(
         "Error",
-        "Failed to respond to invite: ${e.toString()}",
+        "Failed to respond to invite",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -73,8 +73,9 @@ class NotificationViewModel extends GetxController {
       final createdAt = DateTime.tryParse(notification['createdAt'] ?? '');
       if (createdAt == null) continue;
 
-      final notificationDate = DateTime(createdAt.year, createdAt.month, createdAt.day);
-      
+      final notificationDate =
+          DateTime(createdAt.year, createdAt.month, createdAt.day);
+
       if (notificationDate == today) {
         grouped['Today']!.add(notification);
       } else if (notificationDate.isAfter(weekAgo)) {

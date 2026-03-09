@@ -67,6 +67,7 @@ class AuthViewModel extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP);
+    debugPrint("API Error: $e"); // Added debugPrint for API errors
   }
 
   void _showSuccess(String message) {
@@ -165,7 +166,7 @@ class AuthViewModel extends GetxController {
     if (userData != null) {
       currentUser.value = jsonDecode(userData);
     } else {
-      print("No user data found in prefs");
+      debugPrint("No user data found in prefs");
     }
   }
 
@@ -401,7 +402,7 @@ class AuthViewModel extends GetxController {
 
       Get.offAllNamed(RouteName.bottomNav);
     } catch (e) {
-      print('Error in checkLoginStatus: $e');
+      debugPrint('Error in checkLoginStatus: $e');
       // Invalid/expired token or network error: clear auth and open app as guest
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('token');
@@ -521,5 +522,4 @@ class AuthViewModel extends GetxController {
       isLoading.value = false;
     }
   }
-
 }

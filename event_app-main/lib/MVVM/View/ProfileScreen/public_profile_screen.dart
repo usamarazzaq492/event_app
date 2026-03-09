@@ -56,20 +56,20 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
   }
 
   Future<void> loadProfile() async {
-    print('🔷 Loading profile for user ID: ${widget.id}');
+    debugPrint('🔷 Loading profile for user ID: ${widget.id}');
     await controller.loadPublicProfile(widget.id);
     final profile = controller.profile.value;
     if (profile != null) {
-      print(
+      debugPrint(
           '🔷 Profile loaded - isFollowing: ${profile.isFollowing}, followersCount: ${profile.followersCount}');
       dataViewModel.initializeFollowState(
         profile.isFollowing ?? false,
         profile.followersCount ?? 0,
       );
-      print(
+      debugPrint(
           '🔷 Follow state initialized - isFollowing: ${dataViewModel.isFollowing.value}, followersCount: ${dataViewModel.followersCount.value}');
     } else {
-      print('❌ Profile is null after loading');
+      debugPrint('❌ Profile is null after loading');
     }
   }
 
@@ -118,14 +118,15 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
             // Main Content
             RefreshIndicator(
               onRefresh: () async {
-                print('🔷 Refreshing profile...');
+                debugPrint('🔷 Refreshing profile...');
                 await loadProfile();
               },
               color: AppColors.blueColor,
               backgroundColor: AppColors.signinoptioncolor,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.fromLTRB(4.w, MediaQuery.of(context).padding.top + 2.h, 4.w, 4.h),
+                padding: EdgeInsets.fromLTRB(
+                    4.w, MediaQuery.of(context).padding.top + 2.h, 4.w, 4.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -164,7 +165,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.blueColor),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.blueColor),
                   strokeWidth: 3,
                 ),
                 SizedBox(height: 3.h),
@@ -193,42 +195,43 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-              Icon(
-                Icons.error_outline,
-                size: 48.sp,
-                color: Colors.red.shade400,
-              ),
-              SizedBox(height: 3.h),
-              Text(
-                'Error Loading Profile',
-                style: TextStyles.homeheadingtext.copyWith(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
+                Icon(
+                  Icons.error_outline,
+                  size: 48.sp,
+                  color: Colors.red.shade400,
                 ),
-              ),
-              SizedBox(height: 1.h),
-              Text(
-                controller.error.value,
-                style: TextStyles.regularwhite.copyWith(
-                  fontSize: 11.sp,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 4.h),
-              ElevatedButton.icon(
-                onPressed: () => loadProfile(),
-                icon: Icon(Icons.refresh, size: 14.sp),
-                label: Text('Retry', style: TextStyle(fontSize: 12.sp)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.blueColor,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2.h),
+                SizedBox(height: 3.h),
+                Text(
+                  'Error Loading Profile',
+                  style: TextStyles.homeheadingtext.copyWith(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
+                SizedBox(height: 1.h),
+                Text(
+                  controller.error.value,
+                  style: TextStyles.regularwhite.copyWith(
+                    fontSize: 11.sp,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 4.h),
+                ElevatedButton.icon(
+                  onPressed: () => loadProfile(),
+                  icon: Icon(Icons.refresh, size: 14.sp),
+                  label: Text('Retry', style: TextStyle(fontSize: 12.sp)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.blueColor,
+                    foregroundColor: Colors.white,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2.h),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -249,43 +252,44 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
               children: [
                 Icon(
                   Icons.person_off,
-                size: 48.sp,
-                color: Colors.grey.shade400,
-              ),
-              SizedBox(height: 3.h),
-              Text(
-                'Profile Not Found',
-                style: TextStyles.homeheadingtext.copyWith(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
+                  size: 48.sp,
+                  color: Colors.grey.shade400,
                 ),
-              ),
-              SizedBox(height: 1.h),
-              Text(
-                'This profile doesn\'t exist or has been removed.',
-                style: TextStyles.regularwhite.copyWith(
-                  fontSize: 11.sp,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 4.h),
-              ElevatedButton.icon(
-                onPressed: () => NavigationUtils.pop(context),
-                icon: Icon(Icons.arrow_back, size: 14.sp),
-                label: Text('Go Back', style: TextStyle(fontSize: 12.sp)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.blueColor,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(2.h),
+                SizedBox(height: 3.h),
+                Text(
+                  'Profile Not Found',
+                  style: TextStyles.homeheadingtext.copyWith(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-            ],
+                SizedBox(height: 1.h),
+                Text(
+                  'This profile doesn\'t exist or has been removed.',
+                  style: TextStyles.regularwhite.copyWith(
+                    fontSize: 11.sp,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 4.h),
+                ElevatedButton.icon(
+                  onPressed: () => NavigationUtils.pop(context),
+                  icon: Icon(Icons.arrow_back, size: 14.sp),
+                  label: Text('Go Back', style: TextStyle(fontSize: 12.sp)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.blueColor,
+                    foregroundColor: Colors.white,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2.h),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
         ),
       ],
     );
@@ -474,7 +478,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
           child: CircleAvatar(
             radius: 65,
             backgroundColor: Colors.white.withValues(alpha: 0.05),
-            backgroundImage: (profile.profileImageUrl != null && profile.profileImageUrl!.isNotEmpty)
+            backgroundImage: (profile.profileImageUrl != null &&
+                    profile.profileImageUrl!.isNotEmpty)
                 ? CachedNetworkImageProvider(
                     'https://eventgo-live.com/${profile.profileImageUrl}',
                   )
@@ -562,7 +567,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                 ),
               ),
               Expanded(
-                child: buildCountColumn('${profile.followingCount}', 'Following'),
+                child:
+                    buildCountColumn('${profile.followingCount}', 'Following'),
               ),
             ],
           ),
@@ -583,14 +589,21 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isFollowing
-                    ? [Colors.white.withValues(alpha: 0.1), Colors.white.withValues(alpha: 0.05)]
-                    : [AppColors.blueColor, AppColors.blueColor.withValues(alpha: 0.7)],
+                    ? [
+                        Colors.white.withValues(alpha: 0.1),
+                        Colors.white.withValues(alpha: 0.05)
+                      ]
+                    : [
+                        AppColors.blueColor,
+                        AppColors.blueColor.withValues(alpha: 0.7)
+                      ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(2.h),
               border: isFollowing
-                  ? Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1)
+                  ? Border.all(
+                      color: Colors.white.withValues(alpha: 0.1), width: 1)
                   : null,
               boxShadow: isFollowing
                   ? null
@@ -642,7 +655,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        isFollowing ? Icons.person_remove_rounded : Icons.person_add_rounded,
+                        isFollowing
+                            ? Icons.person_remove_rounded
+                            : Icons.person_add_rounded,
                         color: isFollowing ? Colors.white70 : Colors.white,
                         size: 16.sp,
                       ),
@@ -857,14 +872,24 @@ Download EventGo app to connect with them and discover amazing events!
     );
     if (reason == null) return;
     try {
-      final res = await ModerationService.reportUser(userId, reason: reason.isEmpty ? null : reason);
+      final res = await ModerationService.reportUser(userId,
+          reason: reason.isEmpty ? null : reason);
       if (res['statusCode'] == 201 || res['statusCode'] == 200) {
-        Get.snackbar('Reported', res['message'] ?? 'Report submitted.', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.signinoptioncolor, colorText: Colors.white);
+        Get.snackbar('Reported', res['message'] ?? 'Report submitted.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: AppColors.signinoptioncolor,
+            colorText: Colors.white);
       } else {
-        Get.snackbar('Error', res['message'] ?? 'Could not submit report.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+        Get.snackbar('Error', res['message'] ?? 'Could not submit report.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
     }
   }
 
@@ -873,10 +898,17 @@ Download EventGo app to connect with them and discover amazing events!
       AlertDialog(
         backgroundColor: AppColors.signinoptioncolor,
         title: const Text('Block User?', style: TextStyle(color: Colors.white)),
-        content: const Text('This user will be removed from your feed. You can unblock them later from settings.', style: TextStyle(color: Colors.white70)),
+        content: const Text(
+            'This user will be removed from your feed. You can unblock them later from settings.',
+            style: TextStyle(color: Colors.white70)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel', style: TextStyle(color: Colors.white70))),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Block', style: TextStyle(color: Colors.red))),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel',
+                  style: TextStyle(color: Colors.white70))),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Block', style: TextStyle(color: Colors.red))),
         ],
       ),
     );
@@ -884,13 +916,22 @@ Download EventGo app to connect with them and discover amazing events!
     try {
       final res = await ModerationService.blockUser(userId);
       if (res['statusCode'] == 200) {
-        Get.snackbar('Blocked', res['message'] ?? 'User blocked.', snackPosition: SnackPosition.BOTTOM, backgroundColor: AppColors.signinoptioncolor, colorText: Colors.white);
+        Get.snackbar('Blocked', res['message'] ?? 'User blocked.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: AppColors.signinoptioncolor,
+            colorText: Colors.white);
         if (mounted) Navigator.of(context).pop();
       } else {
-        Get.snackbar('Error', res['message'] ?? 'Could not block.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+        Get.snackbar('Error', res['message'] ?? 'Could not block.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white);
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''), snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white);
     }
   }
 }
@@ -918,7 +959,8 @@ class _ReportReasonDialogState extends State<_ReportReasonDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Optionally describe the issue:', style: TextStyle(color: Colors.white70, fontSize: 12)),
+          const Text('Optionally describe the issue:',
+              style: TextStyle(color: Colors.white70, fontSize: 12)),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
@@ -926,7 +968,8 @@ class _ReportReasonDialogState extends State<_ReportReasonDialog> {
             decoration: InputDecoration(
               hintText: 'Reason (optional)',
               hintStyle: const TextStyle(color: Colors.white38),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
               fillColor: Colors.white.withValues(alpha: 0.1),
             ),
@@ -935,8 +978,14 @@ class _ReportReasonDialogState extends State<_ReportReasonDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white70))),
-        TextButton(onPressed: () => Navigator.pop(context, _controller.text.trim()), child: const Text('Submit', style: TextStyle(color: AppColors.blueColor))),
+        TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+                const Text('Cancel', style: TextStyle(color: Colors.white70))),
+        TextButton(
+            onPressed: () => Navigator.pop(context, _controller.text.trim()),
+            child: const Text('Submit',
+                style: TextStyle(color: AppColors.blueColor))),
       ],
     );
   }

@@ -1,6 +1,7 @@
 import 'package:event_app/MVVM/body_model/event_model.dart';
 import 'package:event_app/Services/event_service.dart';
 import 'package:event_app/Services/location_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -51,7 +52,7 @@ class SearchViewModel extends GetxController {
       }
     } catch (e) {
       isLocationEnabled.value = false;
-      print('Location error: $e');
+      debugPrint('Location error: $e');
     }
   }
 

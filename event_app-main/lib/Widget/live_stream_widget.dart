@@ -12,7 +12,7 @@ class LiveStreamWidget extends StatefulWidget {
   });
 
   @override
-  _LiveStreamWidgetState createState() => _LiveStreamWidgetState();
+  State<LiveStreamWidget> createState() => _LiveStreamWidgetState();
 }
 
 class _LiveStreamWidgetState extends State<LiveStreamWidget> {
@@ -144,4 +144,3 @@ class _LiveStreamWidgetState extends State<LiveStreamWidget> {
     );
   }
 }
-

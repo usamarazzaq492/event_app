@@ -1,3 +1,5 @@
+import 'package:event_app/app/config/app_url.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:event_app/MVVM/body_model/event_detail_model.dart';
@@ -9,8 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'location_service.dart';
 
 class EventService {
-  static const String baseUrl = "https://eventgo-live.com/api/v1/events";
-
   /// 🔷 Create Event
   Future<http.Response> createEvent({
     required String eventTitle,
@@ -29,7 +29,7 @@ class EventService {
     required String eventimage, // File path
     String? liveStreamUrl,
   }) async {
-    final uri = Uri.parse('$baseUrl/add');
+    final uri = Uri.parse(AppUrl.addEvent);
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -85,7 +85,7 @@ class EventService {
 
     // Use GET for list (public route) — no body, works for guests
     final response = await http.get(
-      Uri.parse(baseUrl),
+      Uri.parse(AppUrl.events),
       headers: headers,
     );
 
@@ -278,7 +278,7 @@ class EventService {
 
   /// 🔷 Fetch Event Detail by ID (works without auth for guests)
   Future<EventDetailModel> fetchEventDetail(String id) async {
-    final uri = Uri.parse('$baseUrl/$id');
+    final uri = Uri.parse('${AppUrl.events}/$id');
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -309,14 +309,14 @@ class EventService {
     String? token = prefs.getString('token');
 
     final response = await http.get(
-      Uri.parse('$baseUrl/my'),
+      Uri.parse(AppUrl.myEvents),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
       },
     );
 
-    print('fetchMyEvents response: ${response.body}');
+    debugPrint('fetchMyEvents response: ${response.body}');
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
@@ -339,7 +339,7 @@ class EventService {
     String? token = prefs.getString('token');
 
     final response = await http.get(
-      Uri.parse('$baseUrl/timeline'),
+      Uri.parse(AppUrl.timelineEvents),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
@@ -371,7 +371,7 @@ class EventService {
     String? token = prefs.getString('token');
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/$id'),
+      Uri.parse('${AppUrl.events}/$id'),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
@@ -399,7 +399,7 @@ class EventService {
     File? eventImage,
     String? liveStreamUrl,
   }) async {
-    final uri = Uri.parse("$baseUrl/$eventId");
+    final uri = Uri.parse("${AppUrl.events}/$eventId");
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -434,7 +434,7 @@ class EventService {
           filename: basename(eventImage.path),
         ));
       } catch (e) {
-        print("Error adding image file: $e");
+        debugPrint("Error adding image file: $e");
         throw Exception("Failed to process image file: $e");
       }
     }
@@ -442,10 +442,11 @@ class EventService {
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-      print("Update Event Response: ${response.statusCode} - ${response.body}");
+      debugPrint(
+          "Update Event Response: ${response.statusCode} - ${response.body}");
       return response;
     } catch (e) {
-      print("Error sending update request: $e");
+      debugPrint("Error sending update request: $e");
       rethrow;
     }
   }

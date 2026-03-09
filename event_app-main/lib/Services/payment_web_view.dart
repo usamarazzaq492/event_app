@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:event_app/app/config/app_url.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,10 +43,9 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
           await sendToBackend(nonce);
         },
       )
-      ..loadRequest(Uri.parse(
-          widget.isPromotion
-              ? 'https://eventgo-live.com/square-payment/${widget.id}?is_promotion=true&package=${widget.category}'
-              : 'https://eventgo-live.com/square-payment/${widget.id}?quantity=${widget.seats}&ticket_type=${widget.category}'));
+      ..loadRequest(Uri.parse(widget.isPromotion
+          ? '${AppUrl.baseUrl}/square-payment/${widget.id}?is_promotion=true&package=${widget.category}'
+          : '${AppUrl.baseUrl}/square-payment/${widget.id}?quantity=${widget.seats}&ticket_type=${widget.category}'));
   }
 
   Future<void> sendToBackend(String nonce) async {
@@ -56,9 +56,9 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
 
     try {
       final String apiUrl = widget.isPromotion
-          ? 'https://eventgo-live.com/api/v1/events/${widget.id}/promote'
-          : 'https://eventgo-live.com/api/v1/events/${widget.id}/book';
-      
+          ? '${AppUrl.baseUrl}/api/v1/events/${widget.id}/promote'
+          : '${AppUrl.baseUrl}/api/v1/events/${widget.id}/book';
+
       final Map<String, dynamic> requestBody = widget.isPromotion
           ? {
               'package': widget.category,
@@ -83,6 +83,7 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
 
       if (response.statusCode == 200) {
         debugPrint('✅ Payment success: ${response.body}');
+        if (!mounted) return;
         if (widget.isPromotion) {
           Navigator.pop(context, true); // Return success to promotion screen
         } else {
@@ -152,8 +153,8 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.blueColor,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

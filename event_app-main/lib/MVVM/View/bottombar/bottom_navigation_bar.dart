@@ -11,7 +11,7 @@ import '../../../utils/haptic_utils.dart';
 
 import '../HomeScreen/home_screen.dart';
 import '../CreateAd/all_ads_screen.dart';
-import '../exploreevent/explore_event screen.dart';
+import '../exploreevent/explore_event_screen.dart';
 import '../ticketScreen/ticket_screen.dart';
 
 class BottomNavBar extends StatefulWidget {

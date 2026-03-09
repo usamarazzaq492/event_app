@@ -387,7 +387,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
         // 2024-05-13 is just a placeholder, you can change it to the current date or any other date
         // Hm format shows time in "hour:minute" format (e.g., "14:30")
         // Adjust the format according to your needs
-        print("Selected Time: $_endTime");
+        debugPrint("Selected Time: $_endTime");
       });
     }
   }
@@ -404,7 +404,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
         // 2024-05-13 is just a placeholder, you can change it to the current date or any other date
         // Hm format shows time in "hour:minute" format (e.g., "14:30")
         // Adjust the format according to your needs
-        print("Selected Time: $_startTime");
+        debugPrint("Selected Time: $_startTime");
       });
     }
   }

@@ -1,11 +1,11 @@
+import 'package:event_app/app/config/app_url.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:event_app/MVVM/body_model/user_list_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static const String baseUrl = "https://eventgo-live.com/api/v1";
-
   /// 🔐 Helper to get stored token for authenticated requests
   static Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -17,8 +17,8 @@ class AuthService {
     try {
       return jsonDecode(source);
     } catch (e) {
-      print('❌ JSON Decode Error: $e');
-      print('🔴 Raw Response: $source');
+      debugPrint('❌ JSON Decode Error: $e');
+      debugPrint('🔴 Raw Response: $source');
       return {'message': 'Invalid response format', 'raw': source};
     }
   }
@@ -26,7 +26,7 @@ class AuthService {
   /// 🔑 Login User
   static Future<Map<String, dynamic>> loginUser(
       String email, String password, bool rememberMe) async {
-    var url = Uri.parse('$baseUrl/login');
+    var url = Uri.parse(AppUrl.login);
 
     var response = await http.post(
       url,
@@ -38,8 +38,8 @@ class AuthService {
       },
     );
 
-    print('🔵 Login Status: ${response.statusCode}');
-    print('🔵 Login Response: ${response.body}');
+    debugPrint('🔵 Login Status: ${response.statusCode}');
+    debugPrint('🔵 Login Response: ${response.body}');
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
@@ -49,7 +49,7 @@ class AuthService {
   /// 📝 Register User
   static Future<Map<String, dynamic>> registerUser(String name, String email,
       String password, String confirmPassword) async {
-    var url = Uri.parse('$baseUrl/register');
+    var url = Uri.parse(AppUrl.register);
 
     var response = await http.post(
       url,
@@ -62,8 +62,8 @@ class AuthService {
       },
     );
 
-    print('🔵 Register Status: ${response.statusCode}');
-    print('🔵 Register Response: ${response.body}');
+    debugPrint('🔵 Register Status: ${response.statusCode}');
+    debugPrint('🔵 Register Response: ${response.body}');
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
@@ -75,7 +75,7 @@ class AuthService {
     required String email,
     required String verificationCode,
   }) async {
-    var url = Uri.parse("$baseUrl/verify-email");
+    var url = Uri.parse(AppUrl.verifyEmail);
 
     var response = await http.post(
       url,
@@ -86,8 +86,8 @@ class AuthService {
       },
     );
 
-    print("🔵 Verify Email Status: ${response.statusCode}");
-    print("🔵 Verify Email Response: ${response.body}");
+    debugPrint("🔵 Verify Email Status: ${response.statusCode}");
+    debugPrint("🔵 Verify Email Response: ${response.body}");
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
@@ -98,7 +98,7 @@ class AuthService {
   static Future<Map<String, dynamic>> forgotPassword({
     required String email,
   }) async {
-    var url = Uri.parse("$baseUrl/forgot-password");
+    var url = Uri.parse(AppUrl.forgotPassword);
 
     var response = await http.post(
       url,
@@ -106,8 +106,8 @@ class AuthService {
       body: {'email': email},
     );
 
-    print("🔵 Forgot Password Status: ${response.statusCode}");
-    print("🔵 Forgot Password Response: ${response.body}");
+    debugPrint("🔵 Forgot Password Status: ${response.statusCode}");
+    debugPrint("🔵 Forgot Password Response: ${response.body}");
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
@@ -119,7 +119,7 @@ class AuthService {
     required String email,
     required String otp,
   }) async {
-    var url = Uri.parse("$baseUrl/verify-password-otp");
+    var url = Uri.parse(AppUrl.verifyPasswordOtp);
 
     var response = await http.post(
       url,
@@ -130,8 +130,8 @@ class AuthService {
       },
     );
 
-    print("🔵 Verify OTP Status: ${response.statusCode}");
-    print("🔵 Verify OTP Response: ${response.body}");
+    debugPrint("🔵 Verify OTP Status: ${response.statusCode}");
+    debugPrint("🔵 Verify OTP Response: ${response.body}");
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
@@ -144,7 +144,7 @@ class AuthService {
     required String password,
     required String passwordConfirmation,
   }) async {
-    var url = Uri.parse("$baseUrl/reset-password");
+    var url = Uri.parse(AppUrl.resetPassword);
 
     var response = await http.post(
       url,
@@ -156,8 +156,8 @@ class AuthService {
       },
     );
 
-    print("🔵 Reset Password Status: ${response.statusCode}");
-    print("🔵 Reset Password Response: ${response.body}");
+    debugPrint("🔵 Reset Password Status: ${response.statusCode}");
+    debugPrint("🔵 Reset Password Response: ${response.body}");
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
@@ -171,8 +171,8 @@ class AuthService {
       return UserListModel(
           success: true, data: [], message: 'Query too short', count: 0);
     }
-    final uri = Uri.parse('$baseUrl/users/search')
-        .replace(queryParameters: {'q': trimmed});
+    final uri =
+        Uri.parse(AppUrl.searchUsers).replace(queryParameters: {'q': trimmed});
     var response = await http.get(uri, headers: {'Accept': 'application/json'});
     if (response.statusCode == 200) {
       return UserListModel.fromJson(json.decode(response.body));
@@ -184,7 +184,7 @@ class AuthService {
   /// 👥 Fetch Users (Authenticated)
   static Future<UserListModel> fetchUsers() async {
     final token = await _getToken();
-    final uri = Uri.parse('$baseUrl/fetchusers');
+    final uri = Uri.parse(AppUrl.fetchUsers);
 
     var response = await http.get(
       uri,
@@ -194,8 +194,8 @@ class AuthService {
       },
     );
 
-    print('🔵 Fetch Users Status: ${response.statusCode}');
-    print('🔵 Fetch Users Response: ${response.body}');
+    debugPrint('🔵 Fetch Users Status: ${response.statusCode}');
+    debugPrint('🔵 Fetch Users Response: ${response.body}');
 
     if (response.statusCode == 200) {
       return UserListModel.fromJson(json.decode(response.body));
@@ -208,7 +208,7 @@ class AuthService {
   static Future<Map<String, dynamic>> resendVerificationEmail({
     required String email,
   }) async {
-    var url = Uri.parse('$baseUrl/resend-verification');
+    var url = Uri.parse(AppUrl.resendVerification);
 
     var response = await http.post(
       url,
@@ -216,8 +216,8 @@ class AuthService {
       body: {'email': email},
     );
 
-    print('🔵 Resend Verification Status: ${response.statusCode}');
-    print('🔵 Resend Verification Response: ${response.body}');
+    debugPrint('🔵 Resend Verification Status: ${response.statusCode}');
+    debugPrint('🔵 Resend Verification Response: ${response.body}');
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
@@ -233,7 +233,7 @@ class AuthService {
     String? givenName,
     String? familyName,
   }) async {
-    var url = Uri.parse('$baseUrl/auth/apple');
+    var url = Uri.parse(AppUrl.appleAuth);
     var response = await http.post(
       url,
       headers: {
@@ -257,7 +257,7 @@ class AuthService {
   /// 🚪 Logout User
   static Future<Map<String, dynamic>> logoutUser() async {
     final token = await _getToken();
-    var url = Uri.parse('$baseUrl/logout');
+    var url = Uri.parse(AppUrl.logout);
 
     var response = await http.post(
       url,
@@ -267,8 +267,8 @@ class AuthService {
       },
     );
 
-    print('🔵 Logout Status: ${response.statusCode}');
-    print('🔵 Logout Response: ${response.body}');
+    debugPrint('🔵 Logout Status: ${response.statusCode}');
+    debugPrint('🔵 Logout Response: ${response.body}');
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;
@@ -289,7 +289,7 @@ class AuthService {
       throw Exception('Authentication required. Please log in again.');
     }
 
-    var url = Uri.parse('$baseUrl/user/delete');
+    var url = Uri.parse(AppUrl.deleteAccount);
 
     var response = await http.delete(
       url,
@@ -299,8 +299,8 @@ class AuthService {
       },
     );
 
-    print('🔴 Delete Account Status: ${response.statusCode}');
-    print('🔴 Delete Account Response: ${response.body}');
+    debugPrint('🔴 Delete Account Status: ${response.statusCode}');
+    debugPrint('🔴 Delete Account Response: ${response.body}');
 
     var decodedResponse = _safeJsonDecode(response.body);
     decodedResponse['statusCode'] = response.statusCode;

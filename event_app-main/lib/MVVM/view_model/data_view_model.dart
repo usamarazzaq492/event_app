@@ -36,18 +36,20 @@ class DataViewModel extends GetxController {
         userId: userId,
         isFollowing: prevState,
       );
-      
-      print('Follow API Response: $response');
-      
+
+      debugPrint('Follow API Response: $response');
+
       // Update follower count from API response if available
       if (response['followersCount'] != null) {
         followersCount.value = response['followersCount'] as int;
       }
-      
+
       // Show success message
       Get.snackbar(
         prevState ? 'Unfollowed' : 'Followed',
-        prevState ? 'You unfollowed this user' : 'You are now following this user',
+        prevState
+            ? 'You unfollowed this user'
+            : 'You are now following this user',
         backgroundColor: AppColors.blueColor,
         colorText: Colors.white,
         duration: const Duration(seconds: 2),
@@ -56,7 +58,7 @@ class DataViewModel extends GetxController {
       // 🔴 Revert changes on failure
       isFollowing.value = prevState;
       followersCount.value = prevCount;
-      print('Follow toggle failed: $e');
+      debugPrint('Follow toggle failed: $e');
       Get.snackbar(
         'Error',
         'Failed to ${prevState ? 'unfollow' : 'follow'} user: ${e.toString()}',
@@ -101,7 +103,7 @@ class DataViewModel extends GetxController {
     } catch (e) {
       Get.snackbar(
         "Error",
-        e.toString(),
+        "Failed to update profile",
         backgroundColor: Colors.red,
         colorText: AppColors.whiteColor,
       );
@@ -118,7 +120,7 @@ class DataViewModel extends GetxController {
       final profile = await userService.fetchProfile();
       user.value = profile; // Directly assign the ProfileModel object
     } catch (e) {
-      print("Error fetching user profile: $e");
+      debugPrint("Error fetching user profile: $e");
       Get.snackbar(
         "Error",
         "Failed to fetch profile",

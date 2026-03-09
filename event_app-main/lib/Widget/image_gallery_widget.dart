@@ -356,7 +356,7 @@ class _FullScreenGalleryState extends State<FullScreenGallery> {
                     decoration: BoxDecoration(
                       color: _currentIndex == index
                           ? AppColors.blueColor
-                          : Colors.white.withOpacity(0.5),
+                          : Colors.white.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(1.h),
                     ),
                   ),

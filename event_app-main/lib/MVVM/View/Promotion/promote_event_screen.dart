@@ -29,8 +29,8 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
   String? _error;
 
   // Single boost option: $35 for 10 days
-  static const double BOOST_PRICE = 35.00;
-  static const int BOOST_DURATION_DAYS = 10;
+  static const double boostPrice = 35.00;
+  static const int boostDurationDays = 10;
 
   @override
   void initState() {
@@ -59,8 +59,8 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
           // Fallback to default boost values
           setState(() {
             _boostPackage = {
-              'price': BOOST_PRICE,
-              'durationDays': BOOST_DURATION_DAYS,
+              'price': boostPrice,
+              'durationDays': boostDurationDays,
               'name': 'Event Go-Live Boost',
               'description':
                   'Boost your event for 10 days to increase visibility',
@@ -72,8 +72,8 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
         // Fallback to default boost values
         setState(() {
           _boostPackage = {
-            'price': BOOST_PRICE,
-            'durationDays': BOOST_DURATION_DAYS,
+            'price': boostPrice,
+            'durationDays': boostDurationDays,
             'name': 'Event Go-Live Boost',
             'description':
                 'Boost your event for 10 days to increase visibility',
@@ -82,12 +82,12 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
         });
       }
     } catch (e) {
-      print('Error loading boost package: $e');
+      debugPrint('Error loading boost package: $e');
       // Use fallback values on error
       setState(() {
         _boostPackage = {
-          'price': BOOST_PRICE,
-          'durationDays': BOOST_DURATION_DAYS,
+          'price': boostPrice,
+          'durationDays': boostDurationDays,
           'name': 'Event Go-Live Boost',
           'description': 'Boost your event for 10 days to increase visibility',
         };
@@ -379,7 +379,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                             ),
                           )
                         : Text(
-                            'Promote Now - \$${_boostPackage?['price']?.toStringAsFixed(0) ?? BOOST_PRICE.toStringAsFixed(0)}',
+                            'Promote Now - \$${_boostPackage?['price']?.toStringAsFixed(0) ?? boostPrice.toStringAsFixed(0)}',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 13.sp,
@@ -419,7 +419,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                     SizedBox(width: 3.w),
                     Expanded(
                       child: Text(
-                        'Your event will be boosted for ${_boostPackage?['durationDays'] ?? BOOST_DURATION_DAYS} days. You can boost again after it expires.',
+                        'Your event will be boosted for ${_boostPackage?['durationDays'] ?? boostDurationDays} days. You can boost again after it expires.',
                         style: TextStyle(
                           fontSize: 10.sp,
                           color: Colors.white60,
@@ -515,10 +515,10 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
   }
 
   Widget _buildBoostCard(Map<String, dynamic> boostData) {
-    final price = boostData['price']?.toStringAsFixed(2) ??
-        BOOST_PRICE.toStringAsFixed(2);
+    final price =
+        boostData['price']?.toStringAsFixed(2) ?? boostPrice.toStringAsFixed(2);
     final durationDays =
-        boostData['durationDays']?.toString() ?? BOOST_DURATION_DAYS.toString();
+        boostData['durationDays']?.toString() ?? boostDurationDays.toString();
     final name = boostData['name']?.toString() ?? 'Event Boost';
     final description = boostData['description']?.toString() ??
         'Boost your event visibility for 10 days';

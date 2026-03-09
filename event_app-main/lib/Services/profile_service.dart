@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:event_app/MVVM/body_model/ViewProfileModel.dart';
+import 'package:event_app/MVVM/body_model/view_profile_model.dart';
 import 'package:event_app/MVVM/body_model/profile_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';

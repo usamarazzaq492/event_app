@@ -14,7 +14,7 @@ class InviteViewModel extends GetxController {
 
   void setEventId(int id) {
     eventId = id;
-    print("✅ Event ID set to $eventId");
+    debugPrint("✅ Event ID set to $eventId");
   }
 
   void toggleInvite(int userId) {
@@ -22,7 +22,7 @@ class InviteViewModel extends GetxController {
       Get.snackbar("Already Invited", "You already invited this user.");
     } else {
       selectedUserIds.add(userId);
-      print("✅ Selected User IDs: $selectedUserIds");
+      debugPrint("✅ Selected User IDs: $selectedUserIds");
     }
   }
 
@@ -34,21 +34,23 @@ class InviteViewModel extends GetxController {
 
     try {
       isLoading.value = true;
-      print("🔄 Sending invites to: $selectedUserIds for eventId: $eventId");
+      debugPrint(
+          "🔄 Sending invites to: $selectedUserIds for eventId: $eventId");
 
       final result = await _inviteService.inviteUsers(
         eventId: eventId,
         userIds: selectedUserIds,
       );
 
-      responseMessage.value = result['message'] ?? "Invitations sent successfully.";
-      print("✅ Invite API response: $result");
+      responseMessage.value =
+          result['message'] ?? "Invitations sent successfully.";
+      debugPrint("✅ Invite API response: $result");
 
       Get.snackbar("Success", responseMessage.value);
       Get.offAll(() => const BottomNavBar());
     } catch (e) {
       responseMessage.value = "Failed to send invitations.";
-      print("❌ Error sending invites: $e");
+      debugPrint("❌ Error sending invites: $e");
       Get.snackbar("Error", responseMessage.value);
     } finally {
       isLoading.value = false;
@@ -67,10 +69,10 @@ class InviteViewModel extends GetxController {
       inviteError.value = '';
       final invites = await _inviteService.getReceivedInvites();
       receivedInvites.assignAll(invites);
-      print("✅ Fetched ${invites.length} invites");
+      debugPrint("✅ Fetched ${invites.length} invites");
     } catch (e) {
       inviteError.value = e.toString();
-      print("❌ Error fetching invites: $e");
+      debugPrint("❌ Error fetching invites: $e");
       receivedInvites.clear();
     } finally {
       isLoadingInvites.value = false;
@@ -85,10 +87,10 @@ class InviteViewModel extends GetxController {
         inviteId: inviteId,
         response: response,
       );
-      
+
       // Refresh invites list
       await fetchReceivedInvites();
-      
+
       Get.snackbar(
         "Success",
         "Invite ${response == 'accepted' ? 'accepted' : 'declined'} successfully",
@@ -96,8 +98,8 @@ class InviteViewModel extends GetxController {
         colorText: Colors.white,
       );
     } catch (e) {
-      print("❌ Error responding to invite: $e");
-      Get.snackbar("Error", "Failed to respond to invite: ${e.toString()}");
+      debugPrint("❌ Error responding to invite: $e");
+      Get.snackbar("Error", "Failed to respond to invite");
     } finally {
       isLoading.value = false;
     }

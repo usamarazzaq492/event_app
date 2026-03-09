@@ -16,6 +16,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     super.initState();
     // Navigate to OnboardingScreen after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
+      if (!mounted) return;
       HapticUtils.light();
       Navigator.pushReplacementNamed(context, RouteName.onboardScreen);
     });

@@ -233,7 +233,8 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
           } catch (e) {
             // If date parsing fails, exclude the event to be safe
             isNotPast = false;
-            print('Error parsing event date: ${event.startDate}, error: $e');
+            debugPrint(
+                'Error parsing event date: ${event.startDate}, error: $e');
           }
         }
         // If no start date, isNotPast remains false (event excluded)
@@ -318,7 +319,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
           HapticUtils.navigation();
           navController.changeTab(0);

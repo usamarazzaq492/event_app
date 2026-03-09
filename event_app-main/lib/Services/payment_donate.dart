@@ -104,6 +104,7 @@
 // }
 
 import 'dart:convert';
+import 'package:event_app/app/config/app_url.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:webview_flutter/webview_flutter.dart';
@@ -132,13 +133,13 @@ class _DonatePaymentPageState extends State<DonatePaymentPage> {
         'FlutterWebView',
         onMessageReceived: (JavaScriptMessage message) async {
           final nonce = message.message;
-          print('Received Square Token (nonce): $nonce');
+          debugPrint('Received Square Token (nonce): $nonce');
           await sendToBackend(nonce);
         },
       )
       ..setNavigationDelegate(NavigationDelegate())
       ..loadRequest(
-          Uri.parse('https://eventgo-live.com/square-donate/${widget.donate}'));
+          Uri.parse('${AppUrl.baseUrl}/square-donate/${widget.donate}'));
   }
 
   void _showSnackbar(String message) {
@@ -148,7 +149,7 @@ class _DonatePaymentPageState extends State<DonatePaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('amount ${widget.donate}');
+    debugPrint('amount ${widget.donate}');
     return Scaffold(
       appBar: AppBar(title: const Text('Complete Payment')),
       body: Stack(
@@ -167,8 +168,7 @@ class _DonatePaymentPageState extends State<DonatePaymentPage> {
 
     try {
       final response = await http.post(
-        Uri.parse(
-            'https://eventgo-live.com/api/v1/ads/${widget.donate}/donate'),
+        Uri.parse('${AppUrl.baseUrl}/api/v1/ads/${widget.donate}/donate'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -182,14 +182,15 @@ class _DonatePaymentPageState extends State<DonatePaymentPage> {
       );
 
       if (response.statusCode == 200) {
+        if (!mounted) return;
         Navigator.pop(context, true);
         _showSnackbar("Payment successful!");
       } else {
-        print('Payment failed: ${response.body}');
+        debugPrint('Payment failed: ${response.body}');
         _showSnackbar("Payment failed!");
       }
     } catch (e) {
-      print('Exception: $e');
+      debugPrint('Exception: $e');
       _showSnackbar("Something went wrong!");
     } finally {
       setState(() => isLoading = false);

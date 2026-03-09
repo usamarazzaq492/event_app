@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Services/profile_service.dart';
-import '../body_model/ViewProfileModel.dart';
+import '../body_model/view_profile_model.dart';
 
 class PublicProfileController extends GetxController {
   final Rxn<ViewPublicProfileModel> profile = Rxn<ViewPublicProfileModel>();
@@ -67,15 +67,15 @@ class PublicProfileController extends GetxController {
       if (result != null) {
         profile.value = result;
         error.value = '';
-        print(
+        debugPrint(
             '🔷 Profile loaded successfully - isFollowing: ${result.isFollowing}, followersCount: ${result.followersCount}');
       } else {
         error.value = 'Failed to load profile';
-        print('❌ Profile result is null');
+        debugPrint('❌ Profile result is null');
       }
     } catch (e) {
-      error.value = e.toString();
-      print('❌ Error loading profile: $e');
+      error.value = "Failed to load profile";
+      debugPrint('❌ Error loading profile: $e');
     } finally {
       isLoading.value = false;
     }
@@ -95,19 +95,12 @@ class PublicProfileController extends GetxController {
       } else {
         userProfile.value = result;
         error.value = ''; // Clear error on success
-        print("Fetched user profile: ${userProfile.value?.data?.name}");
+        debugPrint("Fetched user profile: ${userProfile.value?.data?.name}");
       }
     } catch (e) {
-      // Extract user-friendly error message
-      String errorMessage = 'Failed to load profile';
-      if (e.toString().contains('Exception: ')) {
-        errorMessage = e.toString().replaceFirst('Exception: ', '');
-      } else {
-        errorMessage = e.toString();
-      }
-      error.value = errorMessage;
+      error.value = "Failed to load profile";
       userProfile.value = null;
-      print("Error fetching user profile: $e");
+      debugPrint("Error fetching user profile: $e");
     } finally {
       isLoading.value = false;
     }
@@ -153,7 +146,7 @@ class PublicProfileController extends GetxController {
     } catch (e) {
       Get.snackbar(
         "Error",
-        e.toString(),
+        "Failed to update profile",
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

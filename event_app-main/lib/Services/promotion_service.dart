@@ -1,11 +1,10 @@
+import 'package:event_app/app/config/app_url.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
 
 class PromotionService {
-  final String baseUrl = "https://eventgo-live.com/api/v1";
-
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
@@ -25,7 +24,7 @@ class PromotionService {
     try {
       // Public endpoint - only send basic headers, no auth token needed
       final response = await http.get(
-        Uri.parse('$baseUrl/promotion/packages'),
+        Uri.parse("${AppUrl.baseUrl}/promotion/packages"),
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
@@ -46,7 +45,7 @@ class PromotionService {
             'Failed to load packages: ${response.statusCode}');
       }
     } catch (e) {
-      print('Promotion service error: $e');
+      debugPrint('Promotion service error: $e');
       if (e is FormatException) {
         throw Exception('Invalid response format from server');
       }
@@ -63,13 +62,16 @@ class PromotionService {
     try {
       final headers = await _getHeaders();
       final response = await http.post(
-        Uri.parse('$baseUrl/events/$eventId/promote'),
+        Uri.parse('${AppUrl.events}/$eventId/promote'),
         headers: headers,
         body: json.encode({
           'package': package,
           'payment_nonce': paymentNonce,
         }),
       );
+
+      debugPrint(
+          'Purchase promotion response: ${response.statusCode} - ${response.body}');
 
       if (response.statusCode == 200) {
         return json.decode(response.body);
@@ -78,6 +80,7 @@ class PromotionService {
         throw Exception(errorBody['message'] ?? 'Failed to promote event');
       }
     } catch (e) {
+      debugPrint('Error promoting event: $e');
       throw Exception('Error promoting event: $e');
     }
   }
@@ -87,7 +90,7 @@ class PromotionService {
     try {
       final headers = await _getHeaders();
       final response = await http.get(
-        Uri.parse('$baseUrl/events/$eventId/promotion-status'),
+        Uri.parse('${AppUrl.events}/$eventId/promotion-status'),
         headers: headers,
       );
 

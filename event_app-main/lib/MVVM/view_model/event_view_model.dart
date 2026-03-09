@@ -157,7 +157,7 @@ class EventController extends GetxController {
       myEvents.assignAll(events);
     } catch (e) {
       error.value = 'Failed to fetch your events: $e';
-      print('getMyEvents Error: $e');
+      debugPrint('getMyEvents Error: $e');
     } finally {
       isLoading.value = false;
     }
@@ -290,12 +290,13 @@ class EventController extends GetxController {
             "Update failed. Status: ${response.statusCode}";
         Get.snackbar("Error", errorMessage,
             backgroundColor: Colors.red, colorText: Colors.white);
-        print("Update Event Error: ${response.statusCode} - ${response.body}");
+        debugPrint(
+            "Update Event Error: ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to update event: ${e.toString()}",
           backgroundColor: Colors.red, colorText: Colors.white);
-      print("Update Event Exception: $e");
+      debugPrint("Update Event Exception: $e");
     } finally {
       isLoading.value = false;
     }

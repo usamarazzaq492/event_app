@@ -144,12 +144,14 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
       if (mounted) {
         if (success) {
           await _checkSquareStatus();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Square account disconnected'),
-              backgroundColor: Colors.orange,
-            ),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Square account disconnected'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

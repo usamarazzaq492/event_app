@@ -21,7 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       /// ✅ Pre-cache splash and welcome images for smooth UI
+      if (!mounted) return;
       await precacheImage(const AssetImage(AppImages.logo2), context);
+      if (!mounted) return;
       await precacheImage(const AssetImage(AppImages.welcomeImg), context);
 
       /// ✅ Delay splash screen for branding then check login

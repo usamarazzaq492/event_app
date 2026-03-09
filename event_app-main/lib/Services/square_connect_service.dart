@@ -54,7 +54,7 @@ class SquareConnectService {
       final token = prefs.getString('token');
 
       if (token == null) {
-        print('Square Connect: No authentication token found');
+        debugPrint('Square Connect: No authentication token found');
         return {
           'success': false,
           'error': 'No authentication token found',
@@ -62,8 +62,9 @@ class SquareConnectService {
         };
       }
 
-      print('Square Connect: Making request to $baseUrl/api/v1/square/connect');
-      print('Square Connect: Using token: ${token.substring(0, 20)}...');
+      debugPrint(
+          'Square Connect: Making request to $baseUrl/api/v1/square/connect');
+      debugPrint('Square Connect: Using token: ${token.substring(0, 20)}...');
 
       final response = await http.get(
         Uri.parse('$baseUrl/api/v1/square/connect'),
@@ -78,9 +79,9 @@ class SquareConnectService {
         },
       );
 
-      print('Square Connect API Response Status: ${response.statusCode}');
-      print('Square Connect API Response Headers: ${response.headers}');
-      print('Square Connect API Response Body: ${response.body}');
+      debugPrint('Square Connect API Response Status: ${response.statusCode}');
+      debugPrint('Square Connect API Response Headers: ${response.headers}');
+      debugPrint('Square Connect API Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         try {
@@ -91,8 +92,8 @@ class SquareConnectService {
               'oauth_url': data['oauth_url'],
             };
           } else {
-            print('Square Connect: oauth_url not found in response');
-            print('Response data: $data');
+            debugPrint('Square Connect: oauth_url not found in response');
+            debugPrint('Response data: $data');
             return {
               'success': false,
               'error': 'OAuth URL not found in server response',
@@ -101,8 +102,8 @@ class SquareConnectService {
             };
           }
         } catch (e) {
-          print('Square Connect: JSON decode error: $e');
-          print('Raw response: ${response.body}');
+          debugPrint('Square Connect: JSON decode error: $e');
+          debugPrint('Raw response: ${response.body}');
           return {
             'success': false,
             'error': 'Invalid JSON response from server: $e',
@@ -122,9 +123,9 @@ class SquareConnectService {
             errorMessage =
                 errorData['message'] ?? errorData['error'] ?? errorMessage;
           }
-          print('Error details: $errorData');
+          debugPrint('Error details: $errorData');
         } catch (e) {
-          print('Could not parse error response: $e');
+          debugPrint('Could not parse error response: $e');
           errorMessage =
               'Server error ${response.statusCode}: ${response.body}';
         }
@@ -138,7 +139,7 @@ class SquareConnectService {
         };
       }
     } on http.ClientException catch (e) {
-      print('Square Connect: Network error: $e');
+      debugPrint('Square Connect: Network error: $e');
       return {
         'success': false,
         'error': 'Network error: ${e.message}',
@@ -146,7 +147,7 @@ class SquareConnectService {
         'exception': e.toString(),
       };
     } on Exception catch (e) {
-      print('Square Connect: Exception getting OAuth URL: $e');
+      debugPrint('Square Connect: Exception getting OAuth URL: $e');
       return {
         'success': false,
         'error': 'Error: ${e.toString()}',
@@ -154,7 +155,7 @@ class SquareConnectService {
         'exception': e.toString(),
       };
     } catch (e) {
-      print('Square Connect: Unexpected error: $e');
+      debugPrint('Square Connect: Unexpected error: $e');
       return {
         'success': false,
         'error': 'Unexpected error: $e',
@@ -184,7 +185,7 @@ class SquareConnectService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Error disconnecting Square: $e');
+      debugPrint('Error disconnecting Square: $e');
       return false;
     }
   }

@@ -66,7 +66,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
         }
       }
     } catch (e) {
-      print('Error initializing scanner: $e');
+      debugPrint('Error initializing scanner: $e');
       setState(() {
         _hasPermission = false;
         _isInitializing = false;
@@ -102,7 +102,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
         );
       }
     } catch (e) {
-      print('Error requesting camera permission: $e');
+      debugPrint('Error requesting camera permission: $e');
       Get.snackbar(
         'Error',
         'Failed to request camera permission. Please try again.',
@@ -132,19 +132,19 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
       // Clean and prepare the QR code data
       String cleanedValue = rawValue.trim();
 
-      print('🔍 Scanned QR Code - Raw value: $rawValue');
-      print('🔍 Scanned QR Code - Length: ${rawValue.length}');
+      debugPrint('🔍 Scanned QR Code - Raw value: $rawValue');
+      debugPrint('🔍 Scanned QR Code - Length: ${rawValue.length}');
 
       // Try URL decoding in case the QR code was URL-encoded
       try {
         final decoded = Uri.decodeComponent(cleanedValue);
         if (decoded != cleanedValue) {
-          print('🔍 URL decoded QR code');
+          debugPrint('🔍 URL decoded QR code');
           cleanedValue = decoded;
         }
       } catch (e) {
         // If URL decoding fails, use original value
-        print('⚠️ URL decode failed, using original: $e');
+        debugPrint('⚠️ URL decode failed, using original: $e');
       }
 
       // Try to parse as JSON (ticket QR codes are JSON strings)
@@ -154,10 +154,10 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
       try {
         // First, try parsing directly
         qrData = jsonDecode(cleanedValue);
-        print('✅ Successfully parsed QR code as JSON');
-        print('🔍 QR Data keys: ${qrData?.keys.toList() ?? []}');
+        debugPrint('✅ Successfully parsed QR code as JSON');
+        debugPrint('🔍 QR Data keys: ${qrData?.keys.toList() ?? []}');
       } catch (e) {
-        print('⚠️ Direct JSON parse failed: $e');
+        debugPrint('⚠️ Direct JSON parse failed: $e');
         // If direct parsing fails, try parsing as a string that contains JSON
         try {
           // Remove any surrounding quotes if present
@@ -166,15 +166,15 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
             // Unescape JSON string
             cleanedValue =
                 cleanedValue.replaceAll('\\"', '"').replaceAll('\\\\', '\\');
-            print('🔍 Removed surrounding quotes');
+            debugPrint('🔍 Removed surrounding quotes');
           }
           qrData = jsonDecode(cleanedValue);
           qrDataString = cleanedValue;
-          print('✅ Successfully parsed QR code after cleaning');
+          debugPrint('✅ Successfully parsed QR code after cleaning');
         } catch (e2) {
-          print('❌ QR Code parsing error: $e2');
-          print('📋 Raw QR value: $rawValue');
-          print('📋 Cleaned value: $cleanedValue');
+          debugPrint('❌ QR Code parsing error: $e2');
+          debugPrint('📋 Raw QR value: $rawValue');
+          debugPrint('📋 Cleaned value: $cleanedValue');
           debugPrint(
               '📋 First 100 chars: ${cleanedValue.length > 100 ? cleanedValue.substring(0, 100) : cleanedValue}');
           throw Exception(
@@ -184,7 +184,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
 
       // Verify required fields
       if (qrData == null || !qrData.containsKey('booking_id')) {
-        print('Missing booking_id in QR data: $qrData');
+        debugPrint('Missing booking_id in QR data: $qrData');
         throw Exception('Invalid ticket QR code format. Missing booking_id.');
       }
 
@@ -193,12 +193,13 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           !qrData.containsKey('ticket_num') || !qrData.containsKey('hash');
 
       if (isOldFormat) {
-        print('⚠️ Old format QR code detected (missing ticket_num or hash)');
-        print('📋 QR Data: $qrData');
+        debugPrint(
+            '⚠️ Old format QR code detected (missing ticket_num or hash)');
+        debugPrint('📋 QR Data: $qrData');
         // Still try to check in - backend will handle old format
         // But show a warning to the user
       } else {
-        print('✅ New format QR code detected (has ticket_num and hash)');
+        debugPrint('✅ New format QR code detected (has ticket_num and hash)');
       }
 
       // Use the cleaned JSON string for the API call

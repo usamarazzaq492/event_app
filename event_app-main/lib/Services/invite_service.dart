@@ -1,10 +1,10 @@
+import 'package:event_app/app/config/app_url.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InviteService {
-  final String baseUrl = "https://eventgo-live.com/api/v1";
-
   Future<Map<String, dynamic>> inviteUsers({
     required int eventId, // <-- pass eventId here
     required List<int> userIds,
@@ -16,9 +16,9 @@ class InviteService {
       throw Exception('Missing token');
     }
 
-    final uri = Uri.parse('$baseUrl/invite/$eventId');
-    print('🔗 Invite API URL: $uri');
-    print('➡️ Sending userIds: $userIds');
+    final uri = Uri.parse('${AppUrl.baseUrl}/invite/$eventId');
+    debugPrint('🔗 Invite API URL: $uri');
+    debugPrint('➡️ Sending userIds: $userIds');
 
     final response = await http.post(
       uri,
@@ -30,8 +30,8 @@ class InviteService {
       body: jsonEncode({"userIds": userIds}),
     );
 
-    print('✅ Status: ${response.statusCode}');
-    print('📄 Body: ${response.body}');
+    debugPrint('✅ Status: ${response.statusCode}');
+    debugPrint('📄 Body: ${response.body}');
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -49,8 +49,8 @@ class InviteService {
       throw Exception('Missing token');
     }
 
-    final uri = Uri.parse('$baseUrl/invite/get-invites');
-    print('🔗 Fetching invites from: $uri');
+    final uri = Uri.parse('${AppUrl.baseUrl}/invite/get-invites');
+    debugPrint('🔗 Fetching invites from: $uri');
 
     final response = await http.get(
       uri,
@@ -60,8 +60,8 @@ class InviteService {
       },
     );
 
-    print('✅ Invites Status: ${response.statusCode}');
-    print('📄 Invites Body: ${response.body}');
+    debugPrint('✅ Invites Status: ${response.statusCode}');
+    debugPrint('📄 Invites Body: ${response.body}');
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -86,8 +86,8 @@ class InviteService {
       throw Exception('Missing token');
     }
 
-    final uri = Uri.parse('$baseUrl/invite/$inviteId/respond');
-    print('🔗 Responding to invite: $uri');
+    final uri = Uri.parse('${AppUrl.baseUrl}/invite/$inviteId/respond');
+    debugPrint('🔗 Responding to invite: $uri');
 
     final httpResponse = await http.post(
       uri,
@@ -99,8 +99,8 @@ class InviteService {
       body: jsonEncode({"response": response}),
     );
 
-    print('✅ Respond Status: ${httpResponse.statusCode}');
-    print('📄 Respond Body: ${httpResponse.body}');
+    debugPrint('✅ Respond Status: ${httpResponse.statusCode}');
+    debugPrint('📄 Respond Body: ${httpResponse.body}');
 
     if (httpResponse.statusCode == 200) {
       return jsonDecode(httpResponse.body);
