@@ -24,8 +24,9 @@ class EventService {
     required String eventcategory,
     required String eventaddress,
     required String eventcity,
-    required String latitude,
-    required String longitude,
+    required String eventstate,
+    String? latitude,
+    String? longitude,
     required String eventimage, // File path
     String? liveStreamUrl,
   }) async {
@@ -51,8 +52,13 @@ class EventService {
     request.fields['category'] = eventcategory;
     request.fields['address'] = eventaddress;
     request.fields['city'] = eventcity;
-    request.fields['latitude'] = latitude;
-    request.fields['longitude'] = longitude;
+    request.fields['state'] = eventstate;
+    if (latitude != null && latitude.isNotEmpty) {
+      request.fields['latitude'] = latitude;
+    }
+    if (longitude != null && longitude.isNotEmpty) {
+      request.fields['longitude'] = longitude;
+    }
     if (liveStreamUrl != null && liveStreamUrl.isNotEmpty) {
       request.fields['live_stream_url'] = liveStreamUrl;
     }
@@ -394,6 +400,7 @@ class EventService {
     required String eventcategory,
     required String eventaddress,
     required String eventcity,
+    required String eventstate,
     String? latitude,
     String? longitude,
     File? eventImage,
@@ -419,6 +426,7 @@ class EventService {
     request.fields['category'] = eventcategory;
     request.fields['address'] = eventaddress;
     request.fields['city'] = eventcity;
+    request.fields['state'] = eventstate;
     if (latitude != null) request.fields['latitude'] = latitude;
     if (longitude != null) request.fields['longitude'] = longitude;
     if (liveStreamUrl != null && liveStreamUrl.isNotEmpty) {

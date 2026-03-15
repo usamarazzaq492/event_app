@@ -127,12 +127,18 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
           .toList();
       suggestions.addAll(matchingTitles);
 
-      // Add matching cities
+      // Add matching cities (show "City, State" when state is present)
       final matchingCities = controller.events
-          .where((event) => event.city?.toLowerCase().contains(query) ?? false)
-          .map((event) => event.city ?? '')
-          .where((city) => city.isNotEmpty)
-          .toSet() // Remove duplicates
+          .where((event) =>
+              (event.city?.toLowerCase().contains(query) ?? false) ||
+              (event.state?.toLowerCase().contains(query) ?? false))
+          .map((event) {
+            final c = event.city ?? '';
+            final s = event.state ?? '';
+            return s.isNotEmpty ? '$c, $s' : c;
+          })
+          .where((loc) => loc.isNotEmpty)
+          .toSet()
           .take(2)
           .toList();
       suggestions.addAll(matchingCities);
@@ -165,6 +171,10 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                     .contains(_searchController.text.toLowerCase()) ??
                 false) ||
             (event.city
+                    ?.toLowerCase()
+                    .contains(_searchController.text.toLowerCase()) ??
+                false) ||
+            (event.state
                     ?.toLowerCase()
                     .contains(_searchController.text.toLowerCase()) ??
                 false) ||

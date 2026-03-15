@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -27,6 +28,7 @@ class EventController extends Controller
             'category' => 'required|string|max:50',
             'address' => 'required|string|max:500',
             'city' => 'required|string|max:50',
+            'state' => 'nullable|string|max:100',
             'eventImage' => 'required|image|max:2048',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
@@ -47,6 +49,20 @@ class EventController extends Controller
 
         $path = $request->file('eventImage')->store('events', 'public');
 
+        $latitude = $request->input('latitude');
+        $longitude = $request->input('longitude');
+        if (($latitude === null || $latitude === '') || ($longitude === null || $longitude === '')) {
+            $coords = $this->geocodeAddress(
+                $validated['address'],
+                $validated['city'],
+                $request->input('state')
+            );
+            if ($coords) {
+                $latitude = (string) $coords['lat'];
+                $longitude = (string) $coords['lon'];
+            }
+        }
+
         $eventId = DB::table('events')->insertGetId([
             'userId' => $request->user()->userId,
             'eventTitle' => $validated['eventTitle'],
@@ -60,9 +76,10 @@ class EventController extends Controller
             'category' => $validated['category'],
             'address' => $validated['address'],
             'city' => $validated['city'],
+            'state' => $request->input('state'),
             'eventImage' => "/storage/public/$path",
-            'latitude' => $request->input('latitude'),
-            'longitude' => $request->input('longitude'),
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'live_stream_url' => $request->input('live_stream_url'),
             'isActive' => 1,
             'addDate' => now(),
@@ -113,6 +130,7 @@ class EventController extends Controller
             'category',
             'address',
             'city',
+            'state',
             'eventImage',
             'latitude',
             'longitude',
@@ -233,6 +251,7 @@ class EventController extends Controller
                     'events.category',
                     'events.address',
                     'events.city',
+                    'events.state',
                     'events.eventImage',
                     'events.latitude',
                     'events.longitude',
@@ -363,6 +382,7 @@ class EventController extends Controller
             'category' => 'sometimes|required|string|max:50',
             'address' => 'sometimes|required|string|max:500',
             'city' => 'sometimes|required|string|max:50',
+            'state' => 'nullable|string|max:100',
             'eventImage' => 'nullable|image|max:2048',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
@@ -397,6 +417,26 @@ class EventController extends Controller
         // Add live stream URL to update data
         if ($request->has('live_stream_url')) {
             $dataToUpdate['live_stream_url'] = $request->input('live_stream_url');
+        }
+
+        // State (nullable) - allow updating to empty
+        if ($request->has('state')) {
+            $dataToUpdate['state'] = $request->input('state');
+        }
+
+        // Geocode address if latitude/longitude not provided
+        $lat = $dataToUpdate['latitude'] ?? $request->input('latitude');
+        $lon = $dataToUpdate['longitude'] ?? $request->input('longitude');
+        if (empty($lat) || empty($lon)) {
+            $coords = $this->geocodeAddress(
+                $dataToUpdate['address'] ?? $event->address,
+                $dataToUpdate['city'] ?? $event->city,
+                $dataToUpdate['state'] ?? $event->state ?? ''
+            );
+            if ($coords) {
+                $dataToUpdate['latitude'] = (string) $coords['lat'];
+                $dataToUpdate['longitude'] = (string) $coords['lon'];
+            }
         }
 
         $dataToUpdate['editDate'] = now();
@@ -478,6 +518,41 @@ class EventController extends Controller
         $pattern = '/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/';
         preg_match($pattern, $url, $matches);
         return isset($matches[1]) ? $matches[1] : null;
+    }
+
+    /**
+     * Geocode address + city + state to latitude/longitude using OpenStreetMap Nominatim.
+     * Returns ['lat' => float, 'lon' => float] or null on failure.
+     */
+    private function geocodeAddress(?string $address, ?string $city, ?string $state): ?array
+    {
+        $parts = array_filter([trim((string) $address), trim((string) $city), trim((string) $state)]);
+        if (empty($parts)) {
+            return null;
+        }
+        $query = implode(', ', $parts);
+        try {
+            $response = Http::withHeaders(['User-Agent' => 'EventGoApp/1.0 (https://eventgo-live.com)'])
+                ->get('https://nominatim.openstreetmap.org/search', [
+                    'q' => $query,
+                    'format' => 'json',
+                    'limit' => 1,
+                ]);
+            if (!$response->successful()) {
+                return null;
+            }
+            $data = $response->json();
+            if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
+                return null;
+            }
+            return [
+                'lat' => (float) $data[0]['lat'],
+                'lon' => (float) $data[0]['lon'],
+            ];
+        } catch (\Throwable $e) {
+            Log::warning('Geocode failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
     /** Get blocked user IDs for optional auth (Guideline 1.2) */

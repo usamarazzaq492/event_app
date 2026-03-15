@@ -240,9 +240,24 @@
                                id="city"
                                name="city"
                                value="{{ old('city') }}"
-                               placeholder="Enter city name"
+                               placeholder="e.g. Memphis"
                                required>
                         @error('city')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text"
+                               class="form-control @error('state') is-invalid @enderror"
+                               id="state"
+                               name="state"
+                               value="{{ old('state') }}"
+                               placeholder="e.g. Tennessee">
+                        @error('state')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

@@ -1,6 +1,7 @@
 import 'package:event_app/MVVM/view_model/auth_view_model.dart';
 import 'package:event_app/MVVM/view_model/event_view_model.dart';
 import 'package:event_app/MVVM/body_model/event_detail_model.dart';
+import 'package:event_app/app/config/app_asset.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_text_style.dart';
@@ -374,18 +375,33 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 onSelected: (value) async {
                   HapticUtils.light();
                   if (value == 'share') {
-                    ShareUtils.shareEvent(
-                      eventTitle: event.eventTitle ?? 'Event',
-                      eventDescription: event.description ?? '',
-                      eventDate: event.startDate ?? '',
-                      eventTime: event.startTime ?? '',
-                      eventLocation: '${event.address} ${event.city}',
-                      eventImageUrl:
-                          'https://eventgo-live.com/${event.eventImage}',
-                      eventUrl:
-                          'https://eventgo-live.com/event/${event.eventId}',
-                      organizerName: hostProfile?.name,
-                    );
+                    // Defer so the popup menu closes before showing the share sheet
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      try {
+                        await ShareUtils.shareEvent(
+                          eventTitle: event.eventTitle ?? 'Event',
+                          eventDescription: event.description ?? '',
+                          eventDate: event.startDate ?? '',
+                          eventTime: event.startTime ?? '',
+                          eventLocation: _formatEventLocation(event.address, event.city, event.state),
+                          eventImageUrl:
+                              'https://eventgo-live.com/${event.eventImage}',
+                          eventUrl:
+                              'https://eventgo-live.com/events/${event.eventId}',
+                          organizerName: hostProfile?.name,
+                        );
+                      } catch (e) {
+                        if (context.mounted) {
+                          Get.snackbar(
+                            'Share failed',
+                            'Could not open share. Please try again.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: AppColors.blueColor,
+                            colorText: Colors.white,
+                          );
+                        }
+                      }
+                    });
                   } else if (value == 'report') {
                     if (!authViewModel.isLoggedIn.value) {
                       Get.snackbar(
@@ -734,13 +750,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
                         color: Colors.white.withValues(alpha: 0.05),
+                        child: Image.asset(
+                          AppImages.profilePlaceholder,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                       errorWidget: (context, url, error) => Container(
                         color: Colors.white.withValues(alpha: 0.05),
-                        child: Icon(
-                          Icons.person_rounded,
-                          color: Colors.white24,
-                          size: 25.sp,
+                        child: Image.asset(
+                          AppImages.profilePlaceholder,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
@@ -851,7 +870,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               SizedBox(height: 0.5.h),
               Text(
-                event.city ?? 'City not provided',
+                _formatCityState(event.city, event.state),
                 style: TextStyles.regularwhite.copyWith(
                   fontSize: 11.sp,
                   color: Colors.white70,
@@ -1109,6 +1128,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         ),
       ),
     );
+  }
+
+  static String _formatCityState(String? city, String? state) {
+    if (city == null || city.isEmpty) return 'City not provided';
+    if (state != null && state.trim().isNotEmpty) return '$city, $state';
+    return city;
+  }
+
+  static String _formatEventLocation(String? address, String? city, String? state) {
+    final parts = <String>[];
+    if (address != null && address.trim().isNotEmpty) parts.add(address.trim());
+    if (city != null && city.trim().isNotEmpty) {
+      parts.add(state != null && state.trim().isNotEmpty ? '$city, $state' : city);
+    } else if (state != null && state.trim().isNotEmpty) {
+      parts.add(state);
+    }
+    return parts.isEmpty ? 'Location TBA' : parts.join(' ');
   }
 
   Widget _buildAboutSection(EventDetailModel event) {

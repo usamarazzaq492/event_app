@@ -18,6 +18,8 @@ class AppImages {
 
   static const logo = '${baseUrl}logo.png';
   static const logo2 = '${baseUrl}logo2.png';
+  /// Shown when user has no profile photo (e.g. avatar placeholder).
+  static const profilePlaceholder = '${baseUrl}logo2.png';
   static const editProfile = '${baseUrl}account_img.png';
   static const passwordimg = '${baseUrl}password_img.png';
   static const passwordsetting = '${baseUrl}pass_setting.png';

@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:event_app/MVVM/View/EventDetailScreen/event_detail_screen.dart';
 import 'package:event_app/MVVM/View/ProfileScreen/public_profile_screen.dart';
 import 'package:event_app/MVVM/view_model/notification_view_model.dart';
+import 'package:event_app/app/config/app_asset.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/utils/haptic_utils.dart';
 import 'package:event_app/utils/navigation_utils.dart';
@@ -305,12 +306,8 @@ class _NotificationScreenState extends State<NotificationScreen>
                                           ? actorImage.toString()
                                           : 'https://eventgo-live.com/$actorImage',
                                     )
-                                  : null,
-                              child: actorImage == null ||
-                                      actorImage.toString().isEmpty
-                                  ? Icon(Icons.person_rounded,
-                                      color: Colors.white24, size: 18.sp)
-                                  : null,
+                                  : const AssetImage(AppImages.profilePlaceholder) as ImageProvider?,
+                              child: null,
                             ),
                           ),
                         ],

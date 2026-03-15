@@ -11,6 +11,7 @@ class EventModel {
   final String? category;
   final String? address;
   final String? city;
+  final String? state;
   final String? eventImage;
   final String? latitude;
   final String? longitude;
@@ -39,6 +40,7 @@ class EventModel {
     this.category,
     this.address,
     this.city,
+    this.state,
     this.eventImage,
     this.latitude,
     this.longitude,
@@ -69,6 +71,7 @@ class EventModel {
       category: json['category'],
       address: json['address'],
       city: json['city'],
+      state: json['state'],
       eventImage: json['eventImage'],
       latitude: json['latitude'],
       longitude: json['longitude'],

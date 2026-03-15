@@ -23,6 +23,7 @@ class Event extends Model
         'category',
         'address',
         'city',
+        'state',
         'latitude',
         'longitude',
         'eventImage',

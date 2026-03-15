@@ -12,6 +12,7 @@ class MyEventModel {
   String? category;
   String? address;
   String? city;
+  String? state;
   String? eventImage;
   int? isActive;
   String? addDate;
@@ -35,6 +36,7 @@ class MyEventModel {
         this.category,
         this.address,
         this.city,
+        this.state,
         this.eventImage,
         this.isActive,
         this.addDate,
@@ -58,6 +60,7 @@ class MyEventModel {
     category = json['category'];
     address = json['address'];
     city = json['city'];
+    state = json['state'];
     eventImage = json['eventImage'];
     isActive = json['isActive'];
     addDate = json['addDate'];
@@ -83,6 +86,7 @@ class MyEventModel {
     data['category'] = category;
     data['address'] = address;
     data['city'] = city;
+    data['state'] = state;
     data['eventImage'] = eventImage;
     data['isActive'] = isActive;
     data['addDate'] = addDate;

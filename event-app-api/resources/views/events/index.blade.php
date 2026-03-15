@@ -140,7 +140,7 @@
                                 <i class="fas fa-calendar-alt me-1"></i>{{ \Carbon\Carbon::parse($event->startDate)->format('M d, Y') }}
                             </p>
                             <p class="card-text text-muted small mb-2">
-                                <i class="fas fa-map-marker-alt me-1"></i>{{ $event->city ?? 'Location TBA' }}
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ $event->state ? trim($event->city . ', ' . $event->state) : ($event->city ?? 'Location TBA') }}
                             </p>
                             <p class="card-text text-muted small">
                                 <i class="fas fa-dollar-sign me-1"></i>
@@ -276,7 +276,7 @@
                 <div class="event-text">
                     <h5>{{ strtoupper($event->eventTitle) }}</h5>
                     <div class="meta">
-                        <span><i class="fas fa-map-marker-alt me-1"></i>{{ $event->city ?? 'Location TBA' }}</span>
+                        <span><i class="fas fa-map-marker-alt me-1"></i>{{ $event->state ? trim($event->city . ', ' . $event->state) : ($event->city ?? 'Location TBA') }}</span>
                         <span>|</span>
                         <span><i class="fas fa-calendar-alt me-1"></i>{{ \Carbon\Carbon::parse($event->startDate)->format('M d') }} - {{ \Carbon\Carbon::parse($event->endDate)->format('M d Y') }}</span>
                         @if($event->category)

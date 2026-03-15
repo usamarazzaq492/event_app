@@ -520,7 +520,7 @@ class _SearchScreenState extends State<SearchScreen>
                       SizedBox(width: 1.w),
                       Expanded(
                         child: Text(
-                          '${event.address} ${event.city}',
+                          '${event.address} ${event.city}${event.state != null && event.state!.isNotEmpty ? ' ${event.state}' : ''}',
                           overflow: TextOverflow.ellipsis,
                           style:
                               TextStyle(fontSize: 9.sp, color: Colors.white70),

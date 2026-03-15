@@ -31,7 +31,8 @@ class EventWebController extends Controller
                 $q->where('eventTitle', 'like', "%{$searchTerm}%")
                   ->orWhere('description', 'like', "%{$searchTerm}%")
                   ->orWhere('category', 'like', "%{$searchTerm}%")
-                  ->orWhere('city', 'like', "%{$searchTerm}%");
+                  ->orWhere('city', 'like', "%{$searchTerm}%")
+                  ->orWhere('state', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -119,6 +120,7 @@ class EventWebController extends Controller
             'description' => 'required|string|min:50',
             'category' => 'required|string|max:100',
             'city' => 'required|string|max:100',
+            'state' => 'nullable|string|max:100',
             'startDate' => 'required|date|after_or_equal:today',
             'endDate' => 'required|date|after_or_equal:startDate',
             'startTime' => 'required',
@@ -152,6 +154,7 @@ class EventWebController extends Controller
                 'description' => $request->description,
                 'category' => $request->category,
                 'city' => $request->city,
+                'state' => $request->state,
                 'startDate' => $request->startDate,
                 'endDate' => $request->endDate,
                 'startTime' => $request->startTime,
@@ -214,6 +217,7 @@ class EventWebController extends Controller
             'description' => 'required|string|min:50',
             'category' => 'required|string|max:100',
             'city' => 'required|string|max:100',
+            'state' => 'nullable|string|max:100',
             'startDate' => 'required|date',
             'endDate' => 'required|date|after_or_equal:startDate',
             'startTime' => 'required',
@@ -238,6 +242,7 @@ class EventWebController extends Controller
                 'description' => $request->description,
                 'category' => $request->category,
                 'city' => $request->city,
+                'state' => $request->state,
                 'startDate' => $request->startDate,
                 'endDate' => $request->endDate,
                 'startTime' => $request->startTime,

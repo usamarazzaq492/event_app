@@ -513,6 +513,7 @@ class BookingController extends Controller
             'events.eventImage',
             'events.address',
             'events.city',
+            'events.state',
             'tickets.ticketNumber',
             'tickets.qrCodeData', // Include QR code data for check-in
             DB::raw("CONCAT('" . url('/tickets') . "/', tickets.ticketNumber, '/download') as download_url")

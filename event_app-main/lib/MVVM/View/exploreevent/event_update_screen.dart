@@ -10,9 +10,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-import '../../../Services/location_service.dart';
 
 class EventUpdateScreen extends StatefulWidget {
   final String eventId;
@@ -30,6 +27,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
   late TextEditingController titlecontroller;
   late TextEditingController desccontroller;
   late TextEditingController cityccontroller;
+  late TextEditingController stateccontroller;
   late TextEditingController addessccontroller;
   late TextEditingController categoryccontroller;
   late TextEditingController priceccontroller;
@@ -45,13 +43,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
   String? _startTimeError;
   String? _endTimeError;
   String? _imageError;
-  // Location state
-  double? _pickedLat;
-  double? _pickedLon;
-  bool _isGettingLocation = false;
-  // Inline banner
-  String? _bannerText;
-  Color _bannerColor = Colors.transparent;
 
   String _normalizePrice(String raw) {
     final text = raw.trim();
@@ -59,13 +50,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
     final value = double.tryParse(text);
     if (value == null) return text;
     return value.toStringAsFixed(2);
-  }
-
-  void _showBanner(String message, {Color color = Colors.blue}) {
-    setState(() {
-      _bannerText = message;
-      _bannerColor = color;
-    });
   }
 
   @override
@@ -76,6 +60,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
     titlecontroller = TextEditingController();
     desccontroller = TextEditingController();
     cityccontroller = TextEditingController();
+    stateccontroller = TextEditingController();
     addessccontroller = TextEditingController();
     categoryccontroller = TextEditingController();
     priceccontroller = TextEditingController();
@@ -89,6 +74,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
           titlecontroller.text = event.eventTitle ?? '';
           desccontroller.text = event.description ?? '';
           cityccontroller.text = event.city ?? '';
+          stateccontroller.text = event.state ?? '';
           addessccontroller.text = event.address ?? '';
           categoryccontroller.text = event.category ?? '';
           priceccontroller.text = _normalizePrice(event.eventPrice ?? '');
@@ -101,19 +87,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
         });
       });
     });
-
-    // Invalidate picked coords on manual edits
-    addessccontroller.addListener(_invalidatePickedCoordinatesOnManualEdit);
-    cityccontroller.addListener(_invalidatePickedCoordinatesOnManualEdit);
-  }
-
-  void _invalidatePickedCoordinatesOnManualEdit() {
-    if (_pickedLat != null || _pickedLon != null) {
-      setState(() {
-        _pickedLat = null;
-        _pickedLon = null;
-      });
-    }
   }
 
   @override
@@ -131,12 +104,11 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                 EdgeInsets.only(top: 4.h, left: 5.w, right: 5.w, bottom: 3.h),
             child: Form(
               key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeaderModern(),
-                  if (_bannerText != null) _buildBanner(),
-                  SizedBox(height: 2.5.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeaderModern(),
+                      SizedBox(height: 2.5.h),
 
                   // Details Section
                   _buildSection(
@@ -157,15 +129,15 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                     ),
                   ),
 
-                  // Location Section
+                  // Location Section (City + State disambiguate same-named cities)
                   _buildSection(
                     title: 'Location',
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildValidatedInput(cityccontroller, 'Name of City'),
-                        buildValidatedInput(addessccontroller, 'Enter Address'),
-                        _buildUseCurrentLocationRow(),
+                        buildValidatedInput(cityccontroller, 'City (e.g. Memphis)'),
+                        buildValidatedInput(stateccontroller, 'State (e.g. Tennessee)'),
+                        buildValidatedInput(addessccontroller, 'Address'),
                       ],
                     ),
                   ),
@@ -485,22 +457,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                       _startTimeError == null &&
                       _endTimeError == null &&
                       _imageError == null) {
-                    // Determine coordinates: prefer picked; else geocode from Address+City
-                    double? lat = _pickedLat;
-                    double? lon = _pickedLon;
-                    if (lat == null || lon == null) {
-                      final fullAddress =
-                          '${addessccontroller.text}, ${cityccontroller.text}';
-                      try {
-                        final locations =
-                            await locationFromAddress(fullAddress);
-                        if (locations.isNotEmpty) {
-                          lat = locations.first.latitude;
-                          lon = locations.first.longitude;
-                        }
-                      } catch (_) {}
-                    }
-
+                    // Backend will geocode address + city + state to get latitude/longitude
                     // Normalize prices so backend always receives 2 decimal places
                     final normalizedPrice =
                         _normalizePrice(priceccontroller.text);
@@ -521,9 +478,10 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                       description: desccontroller.text,
                       category: categoryccontroller.text,
                       address: addessccontroller.text,
-                      city: cityccontroller.text,
-                      latitude: lat?.toStringAsFixed(6),
-                      longitude: lon?.toStringAsFixed(6),
+                      city: cityccontroller.text.trim(),
+                      state: stateccontroller.text.trim(),
+                      latitude: null,
+                      longitude: null,
                       image: imageFile,
                       liveStreamUrl: liveStreamController.text.isNotEmpty
                           ? liveStreamController.text
@@ -582,115 +540,12 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
     }
   }
 
-  Widget _buildUseCurrentLocationRow() {
-    return Row(
-      children: [
-        ElevatedButton.icon(
-          onPressed: _isGettingLocation ? null : _useCurrentLocation,
-          icon: _isGettingLocation
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2))
-              : const Icon(Icons.my_location),
-          label:
-              Text(_isGettingLocation ? 'Locating…' : 'Use current location'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.blueColor,
-            foregroundColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Future<void> _useCurrentLocation() async {
-    try {
-      setState(() => _isGettingLocation = true);
-      final Position? pos = await LocationService.getCurrentLocation();
-      if (pos == null) {
-        setState(() => _isGettingLocation = false);
-        Get.snackbar('Location error', 'Could not get your current location',
-            backgroundColor: Colors.red, colorText: Colors.white);
-        return;
-      }
-      _pickedLat = pos.latitude;
-      _pickedLon = pos.longitude;
-      _showBanner(
-          'Location set: Lat ${_pickedLat!.toStringAsFixed(6)}, Lon ${_pickedLon!.toStringAsFixed(6)}',
-          color: AppColors.blueColor);
-
-      // Reverse-geocode to fill fields best-effort
-      try {
-        final placemarks =
-            await placemarkFromCoordinates(pos.latitude, pos.longitude);
-        if (placemarks.isNotEmpty) {
-          final p = placemarks.first;
-          cityccontroller.text = p.locality ?? cityccontroller.text;
-          final lineParts = [
-            p.street,
-            p.subLocality,
-            p.administrativeArea,
-            p.country
-          ].whereType<String>().where((e) => e.isNotEmpty).toList();
-          if (lineParts.isNotEmpty) {
-            addessccontroller.text = lineParts.join(', ');
-          }
-        }
-      } catch (_) {}
-
-      setState(() => _isGettingLocation = false);
-    } catch (e) {
-      setState(() => _isGettingLocation = false);
-      Get.snackbar('Location error', e.toString().replaceAll('Exception: ', ''),
-          backgroundColor: Colors.red, colorText: Colors.white);
-    }
-  }
-
   bool _isValidLiveStreamUrl(String url) {
     final youtubePattern = RegExp(
         r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})');
     final facebookPattern = RegExp(r'facebook\.com');
 
     return youtubePattern.hasMatch(url) || facebookPattern.hasMatch(url);
-  }
-
-  Widget _buildBanner() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.2.h),
-      margin: EdgeInsets.only(top: 1.h),
-      decoration: BoxDecoration(
-        color: _bannerColor.withValues(alpha: 0.15),
-        border: Border.all(color: _bannerColor.withValues(alpha: 0.4)),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            _bannerColor == Colors.red
-                ? Icons.error_outline
-                : Icons.check_circle_outline,
-            color: _bannerColor,
-          ),
-          SizedBox(width: 2.w),
-          Expanded(
-            child: Text(
-              _bannerText ?? '',
-              style: TextStyles.regularwhite,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.close, color: Colors.white70, size: 18),
-            onPressed: () => setState(() => _bannerText = null),
-          )
-        ],
-      ),
-    );
   }
 
   Widget _buildSection({required String title, required Widget child}) {

@@ -1,8 +1,14 @@
+import 'dart:ui' show Rect;
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 
 class ShareUtils {
+  /// Non-zero rect for iOS/iPad so share sheet does not throw (avoids zero-origin validation).
+  static Rect? get _sharePositionOrigin =>
+      kIsWeb ? null : Rect.fromLTWH(0, 0, 1, 1);
+
   /// Share event with enhanced content
   static Future<void> shareEvent({
     required String eventTitle,
@@ -16,25 +22,32 @@ class ShareUtils {
   }) async {
     final formattedDate = _formatDate(eventDate);
     final formattedTime = _formatTime(eventTime);
+    final descSnippet = eventDescription.isNotEmpty
+        ? (eventDescription.length > 120
+            ? '${eventDescription.substring(0, 117)}...'
+            : eventDescription)
+        : '';
 
-    final shareText = '''
-🎉 Check out this amazing event!
-
-📅 **$eventTitle**
-🗓️ $formattedDate at $formattedTime
+    // Short message + URL on its own line so apps (WhatsApp, iMessage, etc.)
+    // detect the link and show a rich preview from the site's Open Graph meta.
+    final shareText = eventUrl != null && eventUrl.isNotEmpty
+        ? '''$eventTitle
+🗓 $formattedDate at $formattedTime
 📍 $eventLocation
-${organizerName != null ? '👤 Organized by $organizerName' : ''}
+${organizerName != null ? '👤 $organizerName' : ''}
+${descSnippet.isNotEmpty ? '\n$descSnippet' : ''}
 
-${eventDescription.isNotEmpty ? '📝 $eventDescription' : ''}
-
-${eventUrl != null ? '🔗 $eventUrl' : ''}
-
-#EventGo #Events #${eventTitle.replaceAll(' ', '')}
-''';
+$eventUrl'''
+        : '''$eventTitle
+🗓 $formattedDate at $formattedTime
+📍 $eventLocation
+${organizerName != null ? '👤 $organizerName' : ''}
+${descSnippet.isNotEmpty ? '\n$descSnippet' : ''}''';
 
     await Share.share(
       shareText,
       subject: 'Check out this event: $eventTitle',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
@@ -73,6 +86,7 @@ ${eventUrl != null ? '🔗 $eventUrl' : ''}
     await Share.share(
       shareText,
       subject: 'Check out this event: $eventTitle',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
@@ -97,6 +111,7 @@ Download now and never miss out on great events again!
     await Share.share(
       message,
       subject: 'Check out EventGo - The best event discovery app!',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
@@ -133,6 +148,7 @@ See you at the event! 🎉
     await Share.share(
       shareText,
       subject: 'My ticket for $eventTitle',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
@@ -166,6 +182,7 @@ Check out EventGo to discover more amazing events!
     await Share.share(
       shareText,
       subject: 'My event collection: $collectionName',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
@@ -193,6 +210,7 @@ Check out this amazing event on EventGo!
     await Share.share(
       shareText,
       subject: 'My review of $eventTitle',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
@@ -226,6 +244,7 @@ Join me at this amazing event! Download EventGo to get your ticket.
     await Share.share(
       shareText,
       subject: 'You\'re invited to $eventTitle',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
@@ -258,6 +277,7 @@ See you there! 🎉
     await Share.share(
       shareText,
       subject: 'Reminder: $eventTitle',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
@@ -287,11 +307,13 @@ What an amazing year of events! Thanks EventGo for helping me discover so many g
     await Share.share(
       shareText,
       subject: 'My EventGo Year in Review',
+      sharePositionOrigin: _sharePositionOrigin,
     );
   }
 
   /// Format date for sharing
   static String _formatDate(String date) {
+    if (date.isEmpty) return date;
     try {
       final parsedDate = DateTime.parse(date);
       return DateFormat('EEEE, MMM d, yyyy').format(parsedDate);
@@ -300,10 +322,13 @@ What an amazing year of events! Thanks EventGo for helping me discover so many g
     }
   }
 
-  /// Format time for sharing
+  /// Format time for sharing (accepts both "HH:mm" and "HH:mm:ss")
   static String _formatTime(String time) {
+    if (time.isEmpty) return time;
     try {
-      final parsedTime = DateFormat("HH:mm:ss").parse(time);
+      final parsedTime = time.length > 5
+          ? DateFormat("HH:mm:ss").parse(time)
+          : DateFormat("HH:mm").parse(time);
       return DateFormat("h:mm a").format(parsedTime);
     } catch (e) {
       return time;

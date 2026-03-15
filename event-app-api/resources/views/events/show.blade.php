@@ -2,6 +2,29 @@
 
 @section('title', $event->eventTitle . ' - EventGo')
 
+@push('meta')
+{{-- Open Graph / rich link preview (WhatsApp, iMessage, Facebook, etc.) --}}
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:title" content="{{ $event->eventTitle }} - EventGo">
+<meta property="og:description" content="{{ Str::limit(strip_tags($event->description ?? $event->eventTitle), 160) }}">
+@if($event->eventImage)
+<meta property="og:image" content="{{ asset($event->eventImage) }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+@endif
+<meta property="og:site_name" content="EventGo">
+<meta property="og:locale" content="en_US">
+{{-- Twitter Card --}}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ url()->current() }}">
+<meta name="twitter:title" content="{{ $event->eventTitle }} - EventGo">
+<meta name="twitter:description" content="{{ Str::limit(strip_tags($event->description ?? $event->eventTitle), 200) }}">
+@if($event->eventImage)
+<meta name="twitter:image" content="{{ asset($event->eventImage) }}">
+@endif
+@endpush
+
 @push('styles')
 <style>
 :root {
@@ -114,7 +137,7 @@
                     @endif
                     <div>
                         <h5 class="mb-2">{{ $event->eventTitle }}</h5>
-                        <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ $event->city ?? 'Location TBA' }}</p>
+                        <p class="mb-1"><i class="bi bi-geo-alt-fill"></i> {{ $event->state ? trim($event->city . ', ' . $event->state) : ($event->city ?? 'Location TBA') }}</p>
                         <p class="mb-1">
                             <i class="bi bi-calendar-event"></i>
                             {{ \Carbon\Carbon::parse($event->startDate)->format('M d') }} -

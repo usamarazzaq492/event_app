@@ -5,6 +5,7 @@ import 'package:event_app/MVVM/View/ProfileScreen/profile_tab/event_tab.dart';
 import 'package:event_app/MVVM/View/exploreevent/create_event.dart';
 import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
 import 'package:event_app/MVVM/view_model/ad_view_model.dart';
+import 'package:event_app/app/config/app_asset.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_text_style.dart';
@@ -546,14 +547,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ? CachedNetworkImageProvider(
                     'https://eventgo-live.com/${profile.data!.profileImageUrl}',
                   )
-                : null,
-            child: profile.data?.profileImageUrl == null
-                ? Icon(
-                    Icons.person_rounded,
-                    size: 40.sp,
-                    color: Colors.white24,
-                  )
-                : null,
+                : const AssetImage(AppImages.profilePlaceholder) as ImageProvider?,
+            child: null,
           ),
         ),
       ),

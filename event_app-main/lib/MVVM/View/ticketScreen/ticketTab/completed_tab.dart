@@ -74,6 +74,7 @@ class CompletedTab extends StatelessWidget {
           final endTime = ticket['endTime'] ?? '';
           final address = ticket['address'] ?? '';
           final city = ticket['city'] ?? '';
+          final state = ticket['state'] ?? '';
           final eventImage = ticket['eventImage'] ?? '';
           final status = ticket['status'] ?? 'Completed';
 
@@ -100,12 +101,13 @@ class CompletedTab extends StatelessWidget {
             }
           }
 
-          // Format location
+          // Format location (City, State disambiguate same-named cities)
           String location = 'Location TBA';
+          final cityState = state.isNotEmpty ? '$city, $state' : city;
           if (address.isNotEmpty && city.isNotEmpty) {
-            location = '$address, $city';
+            location = state.isNotEmpty ? '$address, $city, $state' : '$address, $city';
           } else if (city.isNotEmpty) {
-            location = city;
+            location = cityState;
           } else if (address.isNotEmpty) {
             location = address;
           }

@@ -308,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen>
             backgroundColor: AppColors.signinoptioncolor,
             backgroundImage: imageUrl.isNotEmpty
                 ? NetworkImage(imageUrl)
-                : const AssetImage(AppImages.profileicon) as ImageProvider,
+                : const AssetImage(AppImages.profilePlaceholder) as ImageProvider,
           ),
         ),
       );
@@ -683,7 +683,10 @@ class _HomeScreenState extends State<HomeScreen>
                 fontWeight: FontWeight.bold,
                 fontSize: 11.sp),
             maxLines: 2),
-        subtitle: Text(event.city ?? '',
+        subtitle: Text(
+            event.state != null && event.state!.isNotEmpty
+                ? '${event.city ?? ''}, ${event.state}'
+                : (event.city ?? ''),
             style: TextStyle(color: Colors.white60, fontSize: 9.sp)),
         onTap: () => NavigationUtils.push(
             context, EventDetailScreen(eventId: '${event.eventId}'),

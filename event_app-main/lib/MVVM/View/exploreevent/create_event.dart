@@ -10,9 +10,6 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import '../../../Services/location_service.dart';
 import 'package:flutter/services.dart';
 
 class CreateEvent extends StatefulWidget {
@@ -29,6 +26,7 @@ class _CreateEventState extends State<CreateEvent> {
   final titleController = TextEditingController();
   final descController = TextEditingController();
   final cityController = TextEditingController();
+  final stateController = TextEditingController();
   final addressController = TextEditingController();
   final categoryController = TextEditingController();
   final priceController = TextEditingController();
@@ -43,9 +41,6 @@ class _CreateEventState extends State<CreateEvent> {
   String? _endTimeError;
 
   File? imageFile;
-  double? _pickedLat;
-  double? _pickedLon;
-  bool _isGettingLocation = false;
   String? _bannerText;
   Color _bannerColor = Colors.transparent;
 
@@ -82,6 +77,7 @@ class _CreateEventState extends State<CreateEvent> {
                 ? Icons.error_outline
                 : Icons.check_circle_outline,
             color: _bannerColor,
+            size: 20,
           ),
           SizedBox(width: 2.w),
           Expanded(
@@ -95,6 +91,11 @@ class _CreateEventState extends State<CreateEvent> {
           IconButton(
             icon: const Icon(Icons.close, color: Colors.white70, size: 18),
             onPressed: () => setState(() => _bannerText = null),
+            style: IconButton.styleFrom(
+              minimumSize: Size.zero,
+              padding: EdgeInsets.all(1.w),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           )
         ],
       ),
@@ -198,17 +199,18 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
 
-                        // Location Section
+                        // Location Section (City + State disambiguate same-named cities)
                         _buildSection(
                           title: 'LOCATION',
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildInputField(
-                                  'City', cityController, 'Name of City'),
+                                  'City', cityController, 'e.g. Memphis'),
+                              _buildInputField(
+                                  'State', stateController, 'e.g. Tennessee'),
                               _buildInputField('Address', addressController,
-                                  'Event Address'),
-                              _buildUseCurrentLocationRow(),
+                                  'Street address or venue'),
                             ],
                           ),
                         ),
@@ -303,23 +305,6 @@ class _CreateEventState extends State<CreateEvent> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Clear picked coordinates when user edits address/city manually
-    addressController.addListener(_invalidatePickedCoordinatesOnManualEdit);
-    cityController.addListener(_invalidatePickedCoordinatesOnManualEdit);
-  }
-
-  void _invalidatePickedCoordinatesOnManualEdit() {
-    if (_pickedLat != null || _pickedLon != null) {
-      setState(() {
-        _pickedLat = null;
-        _pickedLon = null;
-      });
-    }
-  }
-
   Widget _buildSection({required String title, required Widget child}) {
     return Container(
       margin: EdgeInsets.only(bottom: 2.h),
@@ -394,20 +379,29 @@ class _CreateEventState extends State<CreateEvent> {
                   icon: Icon(Icons.arrow_back_ios_new_rounded,
                       color: Colors.white, size: 16.sp),
                   onPressed: () => Get.back(),
+                  style: IconButton.styleFrom(
+                    minimumSize: Size.zero,
+                    padding: EdgeInsets.all(2.w),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
                 ),
               ),
             ),
           ),
-          Text(
-            'CREATE EVENT',
-            style: TextStyle(
-              fontSize: 10.sp,
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2.0,
+          Expanded(
+            child: Text(
+              'CREATE EVENT',
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: 48), // Spacer to center title
+          SizedBox(width: 10.w), // Spacer to balance back button
         ],
       ),
     );
@@ -488,96 +482,6 @@ class _CreateEventState extends State<CreateEvent> {
         SizedBox(height: 2.5.h),
       ],
     );
-  }
-
-  Widget _buildUseCurrentLocationRow() {
-    return InkWell(
-      onTap: _isGettingLocation ? null : _useCurrentLocation,
-      borderRadius: BorderRadius.circular(1.5.h),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
-        decoration: BoxDecoration(
-          color: AppColors.blueColor.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(1.5.h),
-          border: Border.all(
-            color: AppColors.blueColor.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _isGettingLocation
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(AppColors.blueColor)),
-                  )
-                : Icon(Icons.my_location_rounded,
-                    color: AppColors.blueColor, size: 16.sp),
-            SizedBox(width: 3.w),
-            Text(
-              _isGettingLocation
-                  ? 'GETTING POSITION...'
-                  : 'USE CURRENT LOCATION',
-              style: TextStyle(
-                color: AppColors.blueColor,
-                fontWeight: FontWeight.w900,
-                fontSize: 9.sp,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _useCurrentLocation() async {
-    try {
-      setState(() => _isGettingLocation = true);
-      final Position? pos = await LocationService.getCurrentLocation();
-      if (pos == null) {
-        setState(() => _isGettingLocation = false);
-        Get.snackbar('Location error', 'Could not get your current location',
-            backgroundColor: Colors.red, colorText: Colors.white);
-        return;
-      }
-      _pickedLat = pos.latitude;
-      _pickedLon = pos.longitude;
-      _showBanner(
-        'Location set: Lat ${_pickedLat!.toStringAsFixed(6)}, Lon ${_pickedLon!.toStringAsFixed(6)}',
-        color: AppColors.blueColor,
-      );
-
-      // Reverse-geocode to fill city and address best-effort
-      try {
-        final placemarks =
-            await placemarkFromCoordinates(pos.latitude, pos.longitude);
-        if (placemarks.isNotEmpty) {
-          final p = placemarks.first;
-          cityController.text = p.locality ?? cityController.text;
-          final lineParts = [
-            p.street,
-            p.subLocality,
-            p.administrativeArea,
-            p.country
-          ].whereType<String>().where((e) => e.isNotEmpty).toList();
-          if (lineParts.isNotEmpty) {
-            addressController.text = lineParts.join(', ');
-          }
-        }
-      } catch (_) {}
-
-      setState(() => _isGettingLocation = false);
-    } catch (e) {
-      setState(() => _isGettingLocation = false);
-      Get.snackbar('Location error', e.toString().replaceAll('Exception: ', ''),
-          backgroundColor: Colors.red, colorText: Colors.white);
-    }
   }
 
   Widget _buildDateField(
@@ -674,14 +578,18 @@ class _CreateEventState extends State<CreateEvent> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  value == label ? 'Select $label' : value,
-                  style: TextStyle(
-                    color: value == label ? Colors.white12 : Colors.white,
-                    fontSize: 10.sp,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    value == label ? 'Select $label' : value,
+                    style: TextStyle(
+                      color: value == label ? Colors.white12 : Colors.white,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                SizedBox(width: 2.w),
                 Icon(Icons.access_time_rounded,
                     color: Colors.white24, size: 16.sp),
               ],
@@ -831,34 +739,7 @@ class _CreateEventState extends State<CreateEvent> {
       final normalizedVipPrice = _normalizePrice(vipPriceController.text);
       vipPriceController.text = normalizedVipPrice;
       _showBanner('Submitting your event…', color: AppColors.blueColor);
-      // Prefer picked coords; else geocode Address+City
-      double lat;
-      double lon;
-      if (_pickedLat != null && _pickedLon != null) {
-        lat = _pickedLat!;
-        lon = _pickedLon!;
-      } else {
-        final fullAddress = '${addressController.text}, ${cityController.text}';
-        try {
-          final locations = await locationFromAddress(fullAddress);
-          if (locations.isEmpty) {
-            _showBanner('Could not resolve address to coordinates',
-                color: Colors.red);
-            Get.snackbar('Location not found',
-                'Could not resolve address to coordinates',
-                backgroundColor: Colors.red, colorText: Colors.white);
-            return;
-          }
-          lat = locations.first.latitude;
-          lon = locations.first.longitude;
-        } catch (e) {
-          _showBanner('Failed to geocode address', color: Colors.red);
-          Get.snackbar('Location error', 'Failed to geocode address',
-              backgroundColor: Colors.red, colorText: Colors.white);
-          return;
-        }
-      }
-
+      // Backend will geocode address + city + state to get latitude/longitude
       await eventController.createEvent(
         eventTitle: titleController.text,
         startDate: sdateController.text,
@@ -870,9 +751,10 @@ class _CreateEventState extends State<CreateEvent> {
         eventDescription: descController.text,
         eventCategory: categoryController.text,
         eventAddress: addressController.text,
-        eventCity: cityController.text,
-        eventLatitude: lat.toStringAsFixed(6),
-        eventLongitude: lon.toStringAsFixed(6),
+        eventCity: cityController.text.trim(),
+        eventState: stateController.text.trim(),
+        eventLatitude: null,
+        eventLongitude: null,
         eventImage: imageFile!,
         liveStreamUrl: liveStreamController.text.isNotEmpty
             ? liveStreamController.text
