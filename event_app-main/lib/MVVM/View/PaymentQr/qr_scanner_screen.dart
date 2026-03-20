@@ -198,7 +198,8 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const CircularProgressIndicator(color: AppColors.blueColor),
+                      const CircularProgressIndicator(
+                          color: AppColors.blueColor),
                       SizedBox(height: 2.h),
                       const Text('Validating...',
                           style: TextStyle(

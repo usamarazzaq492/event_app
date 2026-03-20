@@ -261,7 +261,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
         border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: DropdownButtonFormField<String>(
-        initialValue: _selectedTicketType,
+        value: _selectedTicketType,
         dropdownColor: const Color(0xFF1C1C23),
         decoration: InputDecoration(
           contentPadding:

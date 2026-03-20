@@ -413,7 +413,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
         ),
         SizedBox(height: 2.h),
         DropdownButtonFormField<String>(
-          initialValue: _selectedSortBy,
+          value: _selectedSortBy,
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(2.h),

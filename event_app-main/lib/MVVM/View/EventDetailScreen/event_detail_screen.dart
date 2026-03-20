@@ -383,7 +383,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           eventDescription: event.description ?? '',
                           eventDate: event.startDate ?? '',
                           eventTime: event.startTime ?? '',
-                          eventLocation: _formatEventLocation(event.address, event.city, event.state),
+                          eventLocation: _formatEventLocation(
+                              event.address, event.city, event.state),
                           eventImageUrl:
                               'https://eventgo-live.com/${event.eventImage}',
                           eventUrl:
@@ -1136,11 +1137,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     return city;
   }
 
-  static String _formatEventLocation(String? address, String? city, String? state) {
+  static String _formatEventLocation(
+      String? address, String? city, String? state) {
     final parts = <String>[];
     if (address != null && address.trim().isNotEmpty) parts.add(address.trim());
     if (city != null && city.trim().isNotEmpty) {
-      parts.add(state != null && state.trim().isNotEmpty ? '$city, $state' : city);
+      parts.add(
+          state != null && state.trim().isNotEmpty ? '$city, $state' : city);
     } else if (state != null && state.trim().isNotEmpty) {
       parts.add(state);
     }

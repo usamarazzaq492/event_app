@@ -208,11 +208,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           radius: 50,
                           backgroundColor: AppColors.signinoptioncolor,
                           backgroundImage: (profileImage != null
-                              ? FileImage(profileImage!)
-                              : (existingImageUrl != null
-                                  ? CachedNetworkImageProvider(
-                                      existingImageUrl!)
-                                  : const AssetImage(AppImages.profilePlaceholder))) as ImageProvider?,
+                                  ? FileImage(profileImage!)
+                                  : (existingImageUrl != null
+                                      ? CachedNetworkImageProvider(
+                                          existingImageUrl!)
+                                      : const AssetImage(
+                                          AppImages.profilePlaceholder)))
+                              as ImageProvider?,
                           child: null,
                         ),
                       ),

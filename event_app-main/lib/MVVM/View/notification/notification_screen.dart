@@ -306,7 +306,9 @@ class _NotificationScreenState extends State<NotificationScreen>
                                           ? actorImage.toString()
                                           : 'https://eventgo-live.com/$actorImage',
                                     )
-                                  : const AssetImage(AppImages.profilePlaceholder) as ImageProvider?,
+                                  : const AssetImage(
+                                          AppImages.profilePlaceholder)
+                                      as ImageProvider?,
                               child: null,
                             ),
                           ),

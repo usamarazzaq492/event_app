@@ -547,7 +547,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ? CachedNetworkImageProvider(
                     'https://eventgo-live.com/${profile.data!.profileImageUrl}',
                   )
-                : const AssetImage(AppImages.profilePlaceholder) as ImageProvider?,
+                : const AssetImage(AppImages.profilePlaceholder)
+                    as ImageProvider?,
             child: null,
           ),
         ),

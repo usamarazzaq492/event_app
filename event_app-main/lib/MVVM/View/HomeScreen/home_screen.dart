@@ -308,7 +308,8 @@ class _HomeScreenState extends State<HomeScreen>
             backgroundColor: AppColors.signinoptioncolor,
             backgroundImage: imageUrl.isNotEmpty
                 ? NetworkImage(imageUrl)
-                : const AssetImage(AppImages.profilePlaceholder) as ImageProvider,
+                : const AssetImage(AppImages.profilePlaceholder)
+                    as ImageProvider,
           ),
         ),
       );

@@ -1,6 +1,7 @@
 class ViewPublicProfileModel {
   int? userId;
   String? name;
+  String? email;
   String? profileImageUrl;
   String? shortBio;
   List<String>? interests;
@@ -11,6 +12,7 @@ class ViewPublicProfileModel {
   ViewPublicProfileModel({
     this.userId,
     this.name,
+    this.email,
     this.profileImageUrl,
     this.shortBio,
     this.interests,
@@ -22,6 +24,7 @@ class ViewPublicProfileModel {
   ViewPublicProfileModel.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     name = json['name'];
+    email = json['email'];
     profileImageUrl = json['profileImageUrl'];
     shortBio = json['shortBio'];
 
@@ -50,6 +53,7 @@ class ViewPublicProfileModel {
     final Map<String, dynamic> data = {};
     data['userId'] = userId;
     data['name'] = name;
+    data['email'] = email;
     data['profileImageUrl'] = profileImageUrl;
     data['shortBio'] = shortBio;
     data['interests'] = interests;
