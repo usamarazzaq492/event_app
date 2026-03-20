@@ -168,7 +168,7 @@ class _DonatePaymentPageState extends State<DonatePaymentPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('${AppUrl.baseUrl}/api/v1/ads/${widget.donate}/donate'),
+        Uri.parse('${AppUrl.baseUrl}/ads/${widget.donate}/donate'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',

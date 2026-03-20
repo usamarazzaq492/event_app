@@ -1,4 +1,5 @@
 class AppUrl {
+  static const String webBaseUrl = "https://eventgo-live.com";
   static const String baseUrl = "https://eventgo-live.com/api/v1";
 
   // Auth Endpoints
@@ -33,6 +34,6 @@ class AppUrl {
   static String getImageUrl(String? path) {
     if (path == null || path.isEmpty) return '';
     if (path.startsWith('http')) return path;
-    return "https://eventgo-live.com/$path";
+    return "$webBaseUrl/$path";
   }
 }

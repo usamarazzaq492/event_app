@@ -44,8 +44,8 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
         },
       )
       ..loadRequest(Uri.parse(widget.isPromotion
-          ? '${AppUrl.baseUrl}/square-payment/${widget.id}?is_promotion=true&package=${widget.category}'
-          : '${AppUrl.baseUrl}/square-payment/${widget.id}?quantity=${widget.seats}&ticket_type=${widget.category}'));
+          ? '${AppUrl.webBaseUrl}/square-payment/${widget.id}?is_promotion=true&package=${widget.category}'
+          : '${AppUrl.webBaseUrl}/square-payment/${widget.id}?quantity=${widget.seats}&ticket_type=${widget.category}'));
   }
 
   Future<void> sendToBackend(String nonce) async {
@@ -56,8 +56,8 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
 
     try {
       final String apiUrl = widget.isPromotion
-          ? '${AppUrl.baseUrl}/api/v1/events/${widget.id}/promote'
-          : '${AppUrl.baseUrl}/api/v1/events/${widget.id}/book';
+          ? '${AppUrl.baseUrl}/events/${widget.id}/promote'
+          : '${AppUrl.baseUrl}/events/${widget.id}/book';
 
       final Map<String, dynamic> requestBody = widget.isPromotion
           ? {
