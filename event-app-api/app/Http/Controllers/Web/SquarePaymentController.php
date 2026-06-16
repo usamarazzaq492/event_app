@@ -280,12 +280,17 @@ class SquarePaymentController extends Controller
         $quantity = $request->get('quantity', session('quantity', 1));
         $ticketType = $request->get('ticket_type', session('ticket_type', 'general'));
 
-        // Get the correct price based on ticket type
-        $ticketPrice = $ticketType === 'vip'
-            ? ($event->vipPrice ?? $event->eventPrice ?? 0)
-            : ($event->eventPrice ?? 0);
+        if ($request->has('subtotal')) {
+            $subtotal = (float) $request->get('subtotal');
+            $ticketPrice = $quantity > 0 ? $subtotal / $quantity : $subtotal;
+        } else {
+            // Get the correct price based on ticket type
+            $ticketPrice = $ticketType === 'vip'
+                ? ($event->vipPrice ?? $event->eventPrice ?? 0)
+                : ($event->eventPrice ?? 0);
 
-        $subtotal = $ticketPrice * $quantity;
+            $subtotal = $ticketPrice * $quantity;
+        }
 
         // Calculate fees (service fee removed, only Square's processing fee)
         $serviceFee = 0; // Service fee removed

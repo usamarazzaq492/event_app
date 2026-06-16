@@ -89,5 +89,13 @@ class HomeController extends Controller
     {
         return view('privacy');
     }
+
+    /**
+     * Display the account deletion page
+     */
+    public function accountDeletion()
+    {
+        return view('account-deletion');
+    }
 }
 

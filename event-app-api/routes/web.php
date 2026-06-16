@@ -21,6 +21,7 @@ Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/privacy', [HomeController::class, 'privacy'])->name('privacy');
+Route::get('/account-deletion', [HomeController::class, 'accountDeletion'])->name('account-deletion');
 
 // Events routes
 Route::get('/events', [EventWebController::class, 'index'])->name('events.index');

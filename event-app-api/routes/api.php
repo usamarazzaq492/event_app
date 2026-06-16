@@ -12,6 +12,7 @@ use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\PaymentQrController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\TicketTierController;
 
 Route::prefix('v1')->group(function () {
     // 🔐 Auth
@@ -41,7 +42,10 @@ Route::prefix('v1')->group(function () {
     // 📅 Events list (Public - browse without login, same as Explore/Discover)
     Route::get('/events', [EventController::class, 'index']);
     Route::post('/events', [EventController::class, 'index']);
-    Route::get('/events/{id}', [EventController::class, 'show']);  // Public event detail (guests can view)
+    Route::get('/events/{id}', [EventController::class, 'show'])->where('id', '[0-9]+');  // Public event detail (guests can view)
+
+    // 🎫 Ticket Tiers (Public - read tiers without login)
+    Route::get('/events/{id}/tiers', [TicketTierController::class, 'index'])->where('id', '[0-9]+');
 
     // 👤 Public user/organizer profile (guests can view)
     Route::get('/user/{id}', [UserController::class, 'viewPublicProfile']);
@@ -78,9 +82,14 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}', [EventController::class, 'update']);         // Update event
             Route::delete('/{id}', [EventController::class, 'destroy']);     // Delete event
 
-            // 🎟️ Booking
+            // 🎫 Booking
             Route::post('/{id}/book', [BookingController::class, 'bookEvent']);
             Route::get('/bookings/history', [BookingController::class, 'getBookingHistory']);
+
+            // 🎫 Ticket Tier Management (organizer only)
+            Route::post('/{id}/tiers', [TicketTierController::class, 'store']);
+            Route::put('/{id}/tiers/{tierId}', [TicketTierController::class, 'update']);
+            Route::delete('/{id}/tiers/{tierId}', [TicketTierController::class, 'destroy']);
 
             // 💰 Promotion
             Route::post('/{id}/promote', [PromotionController::class, 'purchasePromotion']);

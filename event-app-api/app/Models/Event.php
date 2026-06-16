@@ -57,6 +57,14 @@ class Event extends Model
         return $this->hasMany(Booking::class, 'eventId', 'eventId');
     }
 
+    // Relationship with ticket tiers
+    public function ticketTiers()
+    {
+        return $this->hasMany(EventTicketTier::class, 'eventId', 'eventId')
+                    ->where('isActive', 1)
+                    ->orderBy('sortOrder');
+    }
+
     // Check if user has valid ticket for this event
     public function hasValidTicket($userId)
     {

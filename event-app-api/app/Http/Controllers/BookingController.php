@@ -50,26 +50,30 @@ class BookingController extends Controller
     }
 
     /**
-     * Book tickets for an event with Square payment processing
+     * Book tickets for an event — supports multiple tiers in one transaction.
+     * Request body: { tiers: [{tier_id, quantity}], payment_nonce, save_card }
      */
     public function bookEvent(Request $request, $eventId)
     {
         $user = $request->user();
 
         $validator = Validator::make($request->all(), [
-            'ticket_type' => 'required|in:vip,general',
-            'quantity' => 'required|integer|min:1|max:10',
-            'payment_nonce' => 'required|string',
+            'tiers'             => 'required|array|min:1',
+            'tiers.*.tier_id'   => 'required|integer',
+            'tiers.*.quantity'  => 'required|integer|min:1|max:50',
+            'payment_nonce'     => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'error' => 'Validation failed',
-                'details' => $validator->errors()
+                'error'   => 'Validation failed',
+                'details' => $validator->errors(),
             ], 422);
         }
 
         return DB::transaction(function () use ($request, $eventId, $user) {
+
+            // ── Load & lock the event ────────────────────────────────────────
             $event = DB::table('events')
                 ->where('eventId', $eventId)
                 ->where('isActive', 1)
@@ -80,31 +84,88 @@ class BookingController extends Controller
                 throw new \Exception('Event not found or inactive', 404);
             }
 
-            // Get the correct price based on ticket type
-            $ticketPrice = $request->ticket_type === 'vip'
-                ? ($event->vipPrice ?? $event->eventPrice)
-                : ($event->eventPrice ?? 0);
+            // ── Load & lock requested tiers ──────────────────────────────────
+            $requestedTierIds = collect($request->tiers)->pluck('tier_id');
 
-            $pricing = $this->calculatePricing(
-                $ticketPrice,
-                $request->ticket_type,
-                $request->quantity
-            );
+            $tiersFromDb = DB::table('event_ticket_tiers')
+                ->whereIn('tierId', $requestedTierIds)
+                ->where('eventId', $eventId)
+                ->where('isActive', 1)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('tierId');
 
-            $paymentResponse = $this->processSquarePayment(
-                $request->payment_nonce,
-                $pricing['total_amount'],
-                $pricing['commission'],
-                "Event: {$event->eventTitle}",
-                $user->userId,
-                $event
-            );
-
-            if (!$paymentResponse->getPayment() || !$paymentResponse->getPayment()->getId()) {
-                throw new \Exception('Invalid payment response from Square', 500);
+            foreach ($request->tiers as $requestedTier) {
+                if (!$tiersFromDb->has($requestedTier['tier_id'])) {
+                    throw new \Exception(
+                        "Tier ID {$requestedTier['tier_id']} is not valid for this event.",
+                        422
+                    );
+                }
             }
 
-            // Get organizer's Square account info (if connected)
+            // ── Validate capacity and build line items ───────────────────────
+            $selectedTiers    = [];
+            $subtotal         = 0;
+            $tierSummaryParts = [];
+
+            foreach ($request->tiers as $item) {
+                $tier = $tiersFromDb[$item['tier_id']];
+                $qty  = (int) $item['quantity'];
+
+                if ($tier->quantityCap !== null) {
+                    $remaining = $tier->quantityCap - $tier->quantitySold;
+                    if ($qty > $remaining) {
+                        throw new \Exception(
+                            "Not enough '{$tier->tierName}' tickets available. "
+                            . "Requested: {$qty}, Available: {$remaining}.",
+                            422
+                        );
+                    }
+                }
+
+                $lineTotal = round((float) $tier->price * $qty, 2);
+                $subtotal += $lineTotal;
+
+                $selectedTiers[]    = ['tier' => $tier, 'quantity' => $qty, 'lineTotal' => $lineTotal];
+                $tierSummaryParts[] = "{$tier->tierName} x{$qty}";
+            }
+
+            $subtotal    = round($subtotal, 2);
+            $tierSummary = implode(', ', $tierSummaryParts);
+            $isFree      = $subtotal == 0;
+
+            // ── Calculate fees ───────────────────────────────────────────────
+            $processingFee   = $isFree ? 0 : round(($subtotal * self::PROCESSING_FEE_PERCENT / 100) + self::FIXED_PROCESSING_FEE, 2);
+            $totalAmount     = round($subtotal + $processingFee, 2);
+            $commission      = round($subtotal * (self::COMMISSION_RATE / 100), 2);
+            $organizerPayout = round(($subtotal - $commission) + $processingFee, 2);
+
+            // ── Process Square payment (skip for free bookings) ──────────────
+            $squarePaymentId = null;
+
+            if (!$isFree) {
+                if (empty($request->payment_nonce)) {
+                    throw new \Exception('payment_nonce is required for paid events.', 422);
+                }
+
+                $paymentResponse = $this->processSquarePayment(
+                    $request->payment_nonce,
+                    $totalAmount,
+                    $commission,
+                    "Event: {$event->eventTitle}",
+                    $user->userId,
+                    $event
+                );
+
+                if (!$paymentResponse->getPayment() || !$paymentResponse->getPayment()->getId()) {
+                    throw new \Exception('Invalid payment response from Square', 500);
+                }
+
+                $squarePaymentId = $paymentResponse->getPayment()->getId();
+            }
+
+            // ── Get organizer Square account metadata ────────────────────────
             $organizerSquareAccount = DB::table('organizer_square_accounts')
                 ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
                 ->where('organizers.userId', $event->userId)
@@ -112,55 +173,102 @@ class BookingController extends Controller
                 ->select('organizer_square_accounts.squareMerchantId', 'organizer_square_accounts.squareLocationId')
                 ->first();
 
+            // ── Insert booking row ───────────────────────────────────────────
             $bookingId = DB::table('booking')->insertGetId([
-                'eventId' => $eventId,
-                'userId' => $user->userId,
-                'ticketType' => $request->ticket_type,
-                'quantity' => $request->quantity,
-                'basePrice' => $event->eventPrice,
-                'subtotal' => $pricing['subtotal'],
-                'serviceFee' => 0, // Service fee removed
-                'processingFee' => $pricing['processing_fee'],
-                'totalAmount' => $pricing['total_amount'],
-                'squarePaymentId' => $paymentResponse->getPayment()->getId(),
-                'appOwnerCommission' => $pricing['commission'],
-                'organizerPayout' => $pricing['organizer_payout'],
+                'eventId'                   => $eventId,
+                'userId'                    => $user->userId,
+                'ticketType'                => $tierSummary,
+                'quantity'                  => collect($selectedTiers)->sum('quantity'),
+                'basePrice'                 => $selectedTiers[0]['tier']->price ?? 0,
+                'subtotal'                  => $subtotal,
+                'serviceFee'                => 0,
+                'processingFee'             => $processingFee,
+                'totalAmount'               => $totalAmount,
+                'squarePaymentId'           => $squarePaymentId,
+                'appOwnerCommission'        => $commission,
+                'organizerPayout'           => $organizerPayout,
                 'organizerSquareMerchantId' => $organizerSquareAccount->squareMerchantId ?? null,
                 'organizerSquareLocationId' => $organizerSquareAccount->squareLocationId ?? null,
-                'paymentType' => $organizerSquareAccount ? 'split' : 'direct',
-                'splitPaymentDetails' => json_encode([
-                    'commission_rate' => self::COMMISSION_RATE,
-                    'commission_amount' => $pricing['commission'],
-                    'organizer_payout_amount' => $pricing['organizer_payout'],
-                    'organizer_has_square' => $organizerSquareAccount ? true : false,
+                'paymentType'               => $organizerSquareAccount ? 'split' : 'direct',
+                'splitPaymentDetails'       => json_encode([
+                    'commission_rate'         => self::COMMISSION_RATE,
+                    'commission_amount'       => $commission,
+                    'organizer_payout_amount' => $organizerPayout,
+                    'organizer_has_square'    => $organizerSquareAccount ? true : false,
                 ]),
-                'feeBreakdown' => json_encode($pricing['fee_breakdown']),
+                'feeBreakdown' => json_encode([
+                    'tiers'                     => $tierSummary,
+                    'subtotal'                  => $subtotal,
+                    'processing_fee_percentage' => self::PROCESSING_FEE_PERCENT,
+                    'fixed_processing_fee'      => self::FIXED_PROCESSING_FEE,
+                    'processing_fee'            => $processingFee,
+                    'commission_rate'           => self::COMMISSION_RATE,
+                    'commission_amount'         => $commission,
+                    'organizer_payout_amount'   => $organizerPayout,
+                    'is_free'                   => $isFree,
+                ]),
                 'bookingDate' => now(),
-                'status' => 'confirmed'
+                'status'      => 'confirmed',
             ]);
 
-            $tickets = $this->generateTickets($bookingId, $request->quantity, $event, $user);
+            // ── Insert booking_tiers rows + increment quantitySold ───────────
+            foreach ($selectedTiers as $item) {
+                DB::table('booking_tiers')->insert([
+                    'bookingId' => $bookingId,
+                    'tierId'    => $item['tier']->tierId,
+                    'tierName'  => $item['tier']->tierName,
+                    'unitPrice' => $item['tier']->price,
+                    'quantity'  => $item['quantity'],
+                    'lineTotal' => $item['lineTotal'],
+                ]);
 
-            if ($request->save_card) {
+                DB::table('event_ticket_tiers')
+                    ->where('tierId', $item['tier']->tierId)
+                    ->increment('quantitySold', $item['quantity']);
+            }
+
+            // ── Generate tickets (one per ticket per tier) ───────────────────
+            $allTickets = [];
+            foreach ($selectedTiers as $item) {
+                $tierTickets = $this->generateTickets(
+                    $bookingId,
+                    $item['quantity'],
+                    $event,
+                    $user,
+                    $item['tier']->tierName,
+                    (float) $item['tier']->price
+                );
+                $allTickets = array_merge($allTickets, $tierTickets);
+            }
+
+            if ($request->save_card && !$isFree) {
                 $this->saveCustomerCard($user->userId, $request->payment_nonce);
             }
 
-            Log::info('Booking created', [
-                'booking_id' => $bookingId,
-                'user_id' => $user->userId,
-                'amount' => $pricing['total_amount']
+            Log::info('Booking created (multi-tier)', [
+                'booking_id'   => $bookingId,
+                'user_id'      => $user->userId,
+                'tier_summary' => $tierSummary,
+                'amount'       => $totalAmount,
+                'is_free'      => $isFree,
             ]);
 
             return response()->json([
-                'success' => true,
-                'booking_id' => $bookingId,
-                'tickets' => $tickets,
-                'receipt_url' => $this->generateReceiptUrl($bookingId),
-                'amount_charged' => $pricing['total_amount'],
-                'fee_breakdown' => $pricing['fee_breakdown']
+                'success'        => true,
+                'booking_id'     => $bookingId,
+                'tier_summary'   => $tierSummary,
+                'tickets'        => $allTickets,
+                'receipt_url'    => $this->generateReceiptUrl($bookingId),
+                'amount_charged' => $totalAmount,
+                'fee_breakdown'  => [
+                    'subtotal'       => $subtotal,
+                    'processing_fee' => $processingFee,
+                    'total'          => $totalAmount,
+                    'is_free'        => $isFree,
+                ],
             ]);
 
-        }, 3); // Retry transaction up to 3 times
+        }, 3); // Retry up to 3 times on deadlock
     }
 
     /**
@@ -397,32 +505,39 @@ class BookingController extends Controller
     }
 }
 
-    private function generateTickets($bookingId, $quantity, $event, $user)
+    private function generateTickets($bookingId, $quantity, $event, $user, string $tierName = 'general', float $tierPrice = 0)
     {
         $tickets = [];
+        // Build a short 3-letter prefix from the tier name (e.g. "VIP" → "VIP", "Adult" → "ADL", "Child" → "CHD")
+        $prefix = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $tierName), 0, 3));
+        if (strlen($prefix) < 3) $prefix = str_pad($prefix, 3, 'X');
 
         for ($i = 1; $i <= $quantity; $i++) {
-            $ticketNumber = "EVT-" . strtoupper(Str::random(3)) . "-{$bookingId}-" . str_pad($i, 3, '0', STR_PAD_LEFT);
+            $ticketNumber = "EVT-{$prefix}-{$bookingId}-" . str_pad($i, 3, '0', STR_PAD_LEFT);
 
             $tickets[] = [
-                'ticket_id' => $ticketNumber,
+                'ticket_id'    => $ticketNumber,
+                'tier'         => $tierName,
+                'tier_price'   => $tierPrice,
                 'qr_code_data' => json_encode([
-                    'event_id' => $event->eventId,
+                    'event_id'   => $event->eventId,
                     'booking_id' => $bookingId,
                     'ticket_num' => $i,
-                    'user_id' => $user->userId,
-                    'hash' => hash_hmac('sha256', "{$bookingId}|{$i}", env('TICKET_SECRET'))
+                    'user_id'    => $user->userId,
+                    'tier_name'  => $tierName,
+                    'tier_price' => $tierPrice,
+                    'hash'       => hash_hmac('sha256', "{$bookingId}|{$i}|{$tierName}", env('TICKET_SECRET')),
                 ]),
-                'download_url' => url("/tickets/{$ticketNumber}/download")
+                'download_url' => url("/tickets/{$ticketNumber}/download"),
             ];
         }
 
         DB::table('tickets')->insert(array_map(function ($ticket) use ($bookingId) {
             return [
-                'bookingId' => $bookingId,
+                'bookingId'    => $bookingId,
                 'ticketNumber' => $ticket['ticket_id'],
-                'qrCodeData' => $ticket['qr_code_data'],
-                'created_at' => now()
+                'qrCodeData'   => $ticket['qr_code_data'],
+                'created_at'   => now(),
             ];
         }, $tickets));
 

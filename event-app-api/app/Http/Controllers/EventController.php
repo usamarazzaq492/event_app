@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\Models\Event;
 use App\Models\Booking;
+use App\Models\EventTicketTier;
 
 class EventController extends Controller
 {
@@ -336,6 +337,28 @@ class EventController extends Controller
     $eventArray['isBooked'] = $isBooked;
     $eventArray['isOrganizer'] = $isOrganizer;
     $eventArray['hasLiveStreamAccess'] = $hasLiveStreamAccess;
+
+    // ── Append active ticket tiers ───────────────────────────────────────────
+    $tiers = EventTicketTier::where('eventId', $id)
+        ->where('isActive', 1)
+        ->orderBy('sortOrder')
+        ->get()
+        ->map(function ($tier) {
+            $available = $tier->quantityCap !== null
+                ? max(0, $tier->quantityCap - $tier->quantitySold)
+                : null;
+            return [
+                'tierId'       => $tier->tierId,
+                'tierName'     => $tier->tierName,
+                'price'        => (float) $tier->price,
+                'description'  => $tier->description,
+                'quantityCap'  => $tier->quantityCap,
+                'quantitySold' => $tier->quantitySold,
+                'available'    => $available,
+                'isSoldOut'    => $tier->quantityCap !== null && $tier->quantitySold >= $tier->quantityCap,
+            ];
+        });
+    $eventArray['ticket_tiers'] = $tiers;
 
     // Only include live stream URL if user has access
     if (!$hasLiveStreamAccess) {
