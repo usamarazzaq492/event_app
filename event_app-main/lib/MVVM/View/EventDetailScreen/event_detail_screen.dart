@@ -23,6 +23,7 @@ import '../Promotion/promote_event_screen.dart';
 import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart';
 import 'package:event_app/MVVM/View/PaymentQr/generate_payment_qr_screen.dart';
 import 'package:event_app/MVVM/View/TicketCheckIn/ticket_checkin_scanner.dart';
+import 'package:event_app/MVVM/View/ManageTiers/manage_tiers_screen.dart';
 import 'package:event_app/Services/payment_qr_service.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:convert';
@@ -1478,6 +1479,27 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             });
                           },
                         ),
+
+                      SizedBox(height: 2.h),
+
+                      // Manage Ticket Tiers
+                      _buildActionButton(
+                        title: 'MANAGE TICKET TIERS',
+                        icon: Icons.confirmation_num_rounded,
+                        color: Colors.teal,
+                        onTap: () {
+                          HapticUtils.buttonPress();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ManageTiersScreen(
+                                eventId: event.eventId!,
+                                eventTitle: event.eventTitle ?? 'Event',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
 
                       SizedBox(height: 2.h),
 

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:event_app/MVVM/body_model/ticket_tier_model.dart';
 import 'package:event_app/Services/payment_web_view.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/utils/haptic_utils.dart';
@@ -6,15 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 class PaymentMethodScreen extends StatefulWidget {
+  // Legacy single-tier params kept for backward compatibility
   final String category;
   final int seats;
   final int? id;
+
+  // New multi-tier params
+  final List<TicketTier>? selectedTiers;
+  final double? totalAmount;
 
   const PaymentMethodScreen({
     super.key,
     required this.category,
     required this.seats,
     required this.id,
+    this.selectedTiers,
+    this.totalAmount,
   });
 
   @override
@@ -99,6 +107,9 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                                     category: widget.category,
                                     seats: widget.seats,
                                     id: widget.id,
+                                    // Pass multi-tier data if available
+                                    selectedTiers: widget.selectedTiers,
+                                    totalAmount: widget.totalAmount,
                                   ),
                                 ),
                               );

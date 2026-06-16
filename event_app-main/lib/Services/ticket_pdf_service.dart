@@ -5,19 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:media_store_plus/media_store_plus.dart';
 import 'package:flutter/foundation.dart';
 
 Future<void> generateTicketPdf(Map<String, dynamic> ticketData) async {
   final pdf = pw.Document();
-
-  // 🔷 Request storage permission
-  var status = await Permission.manageExternalStorage.request();
-  if (!status.isGranted) {
-    throw Exception("Storage permission not granted");
-  }
 
   // 🔷 Initialize MediaStore
   MediaStore.appFolder = "EventGo";

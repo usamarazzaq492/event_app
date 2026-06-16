@@ -11,6 +11,12 @@ import 'app/config/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Configure edge-to-edge system UI icon brightness
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarIconBrightness: Brightness.light,
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
+
   // Preload fonts to ensure they're available immediately
   await _preloadFonts();
 

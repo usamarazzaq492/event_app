@@ -100,14 +100,10 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200 && responseData['success'] == true) {
-        final eventData = responseData['data'];
-
         Get.back();
         Get.to(
           () => BookEventScreen(
             id: eventId,
-            preFilledTicketType: ticketType,
-            preFilledPrice: eventData['price']?.toDouble() ?? 0.0,
           ),
         );
       } else {

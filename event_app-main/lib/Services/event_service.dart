@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:event_app/MVVM/body_model/event_detail_model.dart';
 import 'package:event_app/MVVM/body_model/event_model.dart';
 import 'package:event_app/MVVM/body_model/my_event_model.dart';
+import 'package:event_app/MVVM/body_model/ticket_tier_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -280,6 +281,112 @@ class EventService {
     } catch (e) {
       throw Exception('Failed to get categories: $e');
     }
+  }
+
+  // ─── Organizer Tier Management ──────────────────────────────────────────────
+
+  /// 🎫 Create a new ticket tier (organizer only)
+  Future<http.Response> storeTier({
+    required int eventId,
+    required String tierName,
+    required double price,
+    int? quantityCap,
+    String? description,
+    int? sortOrder,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final body = <String, dynamic>{
+      'tierName': tierName,
+      'price': price,
+      if (quantityCap != null) 'quantityCap': quantityCap,
+      if (description != null && description.isNotEmpty) 'description': description,
+      if (sortOrder != null) 'sortOrder': sortOrder,
+    };
+
+    return http.post(
+      Uri.parse('${AppUrl.events}/$eventId/tiers'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(body),
+    );
+  }
+
+  /// 🎫 Update an existing ticket tier (organizer only)
+  Future<http.Response> updateTier({
+    required int eventId,
+    required int tierId,
+    String? tierName,
+    double? price,
+    int? quantityCap,
+    String? description,
+    int? sortOrder,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final body = <String, dynamic>{
+      if (tierName != null) 'tierName': tierName,
+      if (price != null) 'price': price,
+      if (quantityCap != null) 'quantityCap': quantityCap,
+      if (description != null) 'description': description,
+      if (sortOrder != null) 'sortOrder': sortOrder,
+    };
+
+    return http.put(
+      Uri.parse('${AppUrl.events}/$eventId/tiers/$tierId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(body),
+    );
+  }
+
+  /// 🎫 Deactivate (soft-delete) a ticket tier (organizer only)
+  Future<http.Response> deleteTier({
+    required int eventId,
+    required int tierId,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    return http.delete(
+      Uri.parse('${AppUrl.events}/$eventId/tiers/$tierId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+    );
+  }
+
+  /// 🎫 Fetch Ticket Tiers for an Event (public, no auth needed)
+  Future<List<TicketTier>> fetchEventTiers(int eventId) async {
+    final uri = Uri.parse('${AppUrl.events}/$eventId/tiers');
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final headers = <String, String>{'Accept': 'application/json'};
+    if (token != null && token.isNotEmpty && token.toLowerCase() != 'null') {
+      headers['Authorization'] = 'Bearer $token';
+    }
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final body = json.decode(response.body);
+      if (body['success'] == true && body['tiers'] != null) {
+        final List data = body['tiers'];
+        return data.map((e) => TicketTier.fromJson(e as Map<String, dynamic>)).toList();
+      }
+      return [];
+    }
+    throw Exception('Failed to load ticket tiers. Status: ${response.statusCode}');
   }
 
   /// 🔷 Fetch Event Detail by ID (works without auth for guests)

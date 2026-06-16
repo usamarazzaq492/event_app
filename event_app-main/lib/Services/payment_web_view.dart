@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:event_app/MVVM/body_model/ticket_tier_model.dart';
 import 'package:event_app/app/config/app_url.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,9 @@ class SquarePaymentPage extends StatefulWidget {
   final int seats;
   final int? id;
   final bool isPromotion;
+  // New multi-tier params
+  final List<TicketTier>? selectedTiers;
+  final double? totalAmount;
 
   const SquarePaymentPage({
     super.key,
@@ -19,6 +23,8 @@ class SquarePaymentPage extends StatefulWidget {
     required this.seats,
     required this.id,
     this.isPromotion = false,
+    this.selectedTiers,
+    this.totalAmount,
   });
 
   @override
@@ -44,8 +50,8 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
         },
       )
       ..loadRequest(Uri.parse(widget.isPromotion
-          ? '${AppUrl.webBaseUrl}/square-payment/${widget.id}?is_promotion=true&package=${widget.category}'
-          : '${AppUrl.webBaseUrl}/square-payment/${widget.id}?quantity=${widget.seats}&ticket_type=${widget.category}'));
+          ? '${AppUrl.webBaseUrl}/square-payment/${widget.id}?is_promotion=true&package=${Uri.encodeComponent(widget.category)}'
+          : '${AppUrl.webBaseUrl}/square-payment/${widget.id}?quantity=${widget.seats}&ticket_type=${Uri.encodeComponent(widget.category)}&subtotal=${widget.totalAmount}'));
   }
 
   Future<void> sendToBackend(String nonce) async {
@@ -65,8 +71,18 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
               'payment_nonce': nonce,
             }
           : {
-              'ticket_type': widget.category,
-              'quantity': widget.seats,
+              // Multi-tier payload: send tiers[] array if available
+              if (widget.selectedTiers != null &&
+                  widget.selectedTiers!.isNotEmpty)
+                'tiers': widget.selectedTiers!
+                    .map((t) => t.toBookingPayload())
+                    .toList()
+              else ...{
+                // Legacy fallback: single tier derived from category + seats
+                'tiers': [
+                  {'tier_id': 0, 'quantity': widget.seats}
+                ],
+              },
               'payment_nonce': nonce,
               'save_card': true,
             };

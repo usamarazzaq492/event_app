@@ -115,14 +115,10 @@ class DeepLinkHandler {
         }
 
         if (response.statusCode == 200 && data['success'] == true) {
-          final eventData = data['data'];
-
-          // Navigate to booking screen
+          // Navigate to booking screen — tiers are loaded dynamically by BookEventScreen
           Get.to(
             () => BookEventScreen(
               id: eventId,
-              preFilledTicketType: ticketType,
-              preFilledPrice: eventData['price']?.toDouble() ?? 0.0,
             ),
           );
         } else {

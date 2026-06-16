@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:event_app/MVVM/body_model/event_detail_model.dart';
 import 'package:event_app/MVVM/body_model/event_model.dart';
 import 'package:event_app/MVVM/body_model/my_event_model.dart';
+import 'package:event_app/MVVM/body_model/ticket_tier_model.dart';
 import 'package:event_app/Services/event_service.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,24 @@ class EventController extends GetxController {
   var timelineEvents =
       <EventModel>[].obs; // Timeline: events from followed users
   var eventDetail = Rxn<EventDetailModel>();
+
+  // 🎫 Ticket tiers for the currently viewed event
+  var tiers = <TicketTier>[].obs;
+  var tiersLoading = false.obs;
+
+  /// Computed: total booking amount across all selected tiers
+  double get bookingTotal => tiers.fold(
+      0.0, (sum, t) => sum + (t.price * t.selectedQuantity));
+
+  /// Computed: total ticket count selected
+  int get totalSelectedTickets =>
+      tiers.fold(0, (sum, t) => sum + t.selectedQuantity);
+
+  /// Tier summary string e.g. "Adult x2, Child x1"
+  String get tierSummary => tiers
+      .where((t) => t.selectedQuantity > 0)
+      .map((t) => '${t.tierName} x${t.selectedQuantity}')
+      .join(', ');
 
   var isLoading = false.obs;
   var isDeleting = false.obs;
@@ -59,10 +78,11 @@ class EventController extends GetxController {
       final upcoming = <EventModel>[];
       final past = <EventModel>[];
 
+      final today = DateTime(now.year, now.month, now.day);
       for (var event in result) {
         final startDate = DateTime.tryParse(event.startDate ?? '');
         if (startDate != null) {
-          if (startDate.isAfter(now)) {
+          if (!startDate.isBefore(today)) {
             upcoming.add(event);
           } else {
             past.add(event);
@@ -94,9 +114,10 @@ class EventController extends GetxController {
       isLoading.value = true;
       final result = await _eventService.fetchEvents();
       final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
       final upcoming = result.where((event) {
         final startDate = DateTime.tryParse(event.startDate ?? '');
-        return startDate != null && startDate.isAfter(now);
+        return startDate != null && !startDate.isBefore(today);
       }).toList();
       upcomingEvents.assignAll(upcoming);
     } catch (e) {
@@ -120,7 +141,102 @@ class EventController extends GetxController {
     }
   }
 
-  /// 🔷 Fetch event detail by ID
+  /// 🎫 Fetch ticket tiers for an event
+  Future<void> fetchEventTiers(int eventId) async {
+    try {
+      tiersLoading.value = true;
+      tiers.clear();
+      final result = await _eventService.fetchEventTiers(eventId);
+      tiers.assignAll(result);
+    } catch (e) {
+      tiers.clear();
+      debugPrint('fetchEventTiers error: $e');
+    } finally {
+      tiersLoading.value = false;
+    }
+  }
+
+  /// 🎫 Create a new tier (organizer only)
+  Future<bool> createTier({
+    required int eventId,
+    required String tierName,
+    required double price,
+    int? quantityCap,
+    String? description,
+  }) async {
+    try {
+      final response = await _eventService.storeTier(
+        eventId: eventId,
+        tierName: tierName,
+        price: price,
+        quantityCap: quantityCap,
+        description: description,
+      );
+      final data = json.decode(response.body);
+      if (response.statusCode == 201 && data['success'] == true) {
+        await fetchEventTiers(eventId);
+        return true;
+      }
+      final msg = data['error'] ?? data['message'] ?? 'Failed to create tier';
+      Get.snackbar('Error', msg, backgroundColor: Colors.red, colorText: Colors.white);
+      return false;
+    } catch (e) {
+      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+      return false;
+    }
+  }
+
+  /// 🎫 Update an existing tier (organizer only)
+  Future<bool> editTier({
+    required int eventId,
+    required int tierId,
+    required String tierName,
+    required double price,
+    int? quantityCap,
+    String? description,
+  }) async {
+    try {
+      final response = await _eventService.updateTier(
+        eventId: eventId,
+        tierId: tierId,
+        tierName: tierName,
+        price: price,
+        quantityCap: quantityCap,
+        description: description,
+      );
+      final data = json.decode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        await fetchEventTiers(eventId);
+        return true;
+      }
+      final msg = data['error'] ?? data['message'] ?? 'Failed to update tier';
+      Get.snackbar('Error', msg, backgroundColor: Colors.red, colorText: Colors.white);
+      return false;
+    } catch (e) {
+      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+      return false;
+    }
+  }
+
+  /// 🎫 Deactivate (soft-delete) a tier (organizer only)
+  Future<bool> removeTier({required int eventId, required int tierId}) async {
+    try {
+      final response = await _eventService.deleteTier(eventId: eventId, tierId: tierId);
+      final data = json.decode(response.body);
+      if (response.statusCode == 200 && data['success'] == true) {
+        await fetchEventTiers(eventId);
+        return true;
+      }
+      final msg = data['error'] ?? data['message'] ?? 'Failed to remove tier';
+      Get.snackbar('Error', msg, backgroundColor: Colors.red, colorText: Colors.white);
+      return false;
+    } catch (e) {
+      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+      return false;
+    }
+  }
+
+  /// 🎫 Fetch event detail by ID
   Future<void> fetchEventDetailById(String eventId,
       {Function(EventDetailModel)? onLoaded}) async {
     try {
