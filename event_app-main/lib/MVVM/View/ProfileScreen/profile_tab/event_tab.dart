@@ -112,14 +112,6 @@ class EventTab extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    Text(
-                      event.eventPrice != null ? '\$${event.eventPrice}' : '',
-                      style: TextStyles.regularwhite.copyWith(
-                        fontSize: 14.sp,
-                        color: Colors.green,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
                   ],
                 ),
 

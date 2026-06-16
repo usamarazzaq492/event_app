@@ -1017,24 +1017,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                           },
                         ),
                       SizedBox(height: 1.h),
-                      if (event.eventPrice != null &&
-                          event.eventPrice != '0.00')
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 2.w, vertical: 0.4.h),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(0.6.h),
-                          ),
-                          child: Text(
-                            '\$${event.eventPrice}',
-                            style: TextStyle(
-                              color: Colors.greenAccent,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
+
                     ],
                   ),
                 ),

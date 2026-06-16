@@ -148,50 +148,6 @@
                         @enderror
                     </div>
                 </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="eventPrice" class="form-label">General Admission Price <span class="required">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number"
-                                   class="form-control @error('eventPrice') is-invalid @enderror"
-                                   id="eventPrice"
-                                   name="eventPrice"
-                                   value="{{ old('eventPrice', 0) }}"
-                                   min="0"
-                                   step="0.01"
-                                   placeholder="0.00"
-                                   required>
-                        </div>
-                        <small class="text-muted">Price for General Admission tickets</small>
-                        @error('eventPrice')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="vipPrice" class="form-label">VIP Price <span class="required">*</span></label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number"
-                                   class="form-control @error('vipPrice') is-invalid @enderror"
-                                   id="vipPrice"
-                                   name="vipPrice"
-                                   value="{{ old('vipPrice', 0) }}"
-                                   min="0"
-                                   step="0.01"
-                                   placeholder="0.00"
-                                   required>
-                        </div>
-                        <small class="text-muted">Price for VIP tickets</small>
-                        @error('vipPrice')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
             </div>
 
             <div class="form-group">

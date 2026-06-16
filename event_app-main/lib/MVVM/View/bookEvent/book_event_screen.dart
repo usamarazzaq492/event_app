@@ -98,8 +98,8 @@ class _BookEventScreenState extends State<BookEventScreen>
           id:            widget.id,
           selectedTiers: _selectedTiers,
           totalAmount:   _total,
-          // Keep legacy params for backward compat — derived from tiers
-          category: _selectedTiers.first.tierName,
+          // Combine all selected tiers into a single string for the payment webview
+          category: _selectedTiers.map((t) => '${t.selectedQuantity}x ${t.tierName}').join(', '),
           seats:    _totalCount,
         ),
       ),

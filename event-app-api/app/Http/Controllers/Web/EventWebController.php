@@ -126,7 +126,6 @@ class EventWebController extends Controller
             'startTime' => 'required',
             'endTime' => 'required',
             'address' => 'required|string|max:500',
-            'eventPrice' => 'required|numeric|min:0',
             'eventImage' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'live_stream_url' => 'nullable|url|max:500',
         ], [
@@ -160,8 +159,6 @@ class EventWebController extends Controller
                 'startTime' => $request->startTime,
                 'endTime' => $request->endTime,
                 'address' => $request->address,
-                'eventPrice' => $request->eventPrice,
-                'vipPrice' => $request->vipPrice,
                 'eventImage' => $imageUrl,
                 'live_stream_url' => $request->live_stream_url,
                 'isActive' => 1,
@@ -223,8 +220,6 @@ class EventWebController extends Controller
             'startTime' => 'required',
             'endTime' => 'required',
             'address' => 'required|string|max:500',
-            'eventPrice' => 'required|numeric|min:0',
-            'vipPrice' => 'required|numeric|min:0',
             'eventImage' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'live_stream_url' => 'nullable|url|max:500',
         ], [
@@ -248,8 +243,6 @@ class EventWebController extends Controller
                 'startTime' => $request->startTime,
                 'endTime' => $request->endTime,
                 'address' => $request->address,
-                'eventPrice' => $request->eventPrice,
-                'vipPrice' => $request->vipPrice,
                 'live_stream_url' => $request->live_stream_url,
                 'editDate' => now(),
             ];

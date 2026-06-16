@@ -30,8 +30,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
   late TextEditingController stateccontroller;
   late TextEditingController addessccontroller;
   late TextEditingController categoryccontroller;
-  late TextEditingController priceccontroller;
-  late TextEditingController vipPriceController;
   late TextEditingController sdateController;
   late TextEditingController edateController;
   TextEditingController liveStreamController = TextEditingController();
@@ -44,14 +42,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
   String? _endTimeError;
   String? _imageError;
 
-  String _normalizePrice(String raw) {
-    final text = raw.trim();
-    if (text.isEmpty) return '0.00';
-    final value = double.tryParse(text);
-    if (value == null) return text;
-    return value.toStringAsFixed(2);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -63,8 +53,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
     stateccontroller = TextEditingController();
     addessccontroller = TextEditingController();
     categoryccontroller = TextEditingController();
-    priceccontroller = TextEditingController();
-    vipPriceController = TextEditingController();
     sdateController = TextEditingController();
     edateController = TextEditingController();
 
@@ -77,8 +65,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
           stateccontroller.text = event.state ?? '';
           addessccontroller.text = event.address ?? '';
           categoryccontroller.text = event.category ?? '';
-          priceccontroller.text = _normalizePrice(event.eventPrice ?? '');
-          vipPriceController.text = _normalizePrice(event.vipPrice ?? '');
           sdateController.text = event.startDate ?? '';
           edateController.text = event.endDate ?? '';
           liveStreamController.text = event.liveStreamUrl ?? '';
@@ -120,9 +106,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                         buildValidatedMultiLineField(
                             desccontroller, 'Description'),
                         buildValidatedInput(categoryccontroller, 'Category'),
-                        buildValidatedInput(
-                            priceccontroller, 'General Admission Price'),
-                        buildValidatedInput(vipPriceController, 'VIP Price'),
                         buildValidatedInput(
                             liveStreamController, 'Live Stream URL (Optional)'),
                       ],
@@ -183,32 +166,15 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
       padding: EdgeInsets.only(bottom: 2.h),
       child: TextFormField(
         controller: controller,
-        keyboardType: hint == 'Price of Event'
-            ? const TextInputType.numberWithOptions(decimal: true)
-            : TextInputType.text,
+        keyboardType: TextInputType.text,
         style: const TextStyle(color: Colors.white),
         decoration: inputDecoration(hint),
-        onEditingComplete: () {
-          // Automatically format price to 2 decimals when user leaves the field
-          if (hint == 'General Admission Price' || hint == 'VIP Price') {
-            final text = controller.text.trim();
-            if (text.isEmpty) return;
-            final value = double.tryParse(text);
-            if (value != null) {
-              controller.text = value.toStringAsFixed(2);
-            }
-          }
-        },
         validator: (value) {
           if (value == null || value.trim().isEmpty) {
             if (hint.contains('Live Stream URL')) {
               return null; // Optional field, no error for empty value
             }
             return 'This field is required';
-          }
-          if (hint == 'General Admission Price' || hint == 'VIP Price') {
-            final v = double.tryParse(value);
-            if (v == null || v < 0) return 'Enter a valid price';
           }
           if (hint.contains('Live Stream URL') && value.isNotEmpty) {
             if (!_isValidLiveStreamUrl(value)) {
@@ -458,14 +424,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                       _endTimeError == null &&
                       _imageError == null) {
                     // Backend will geocode address + city + state to get latitude/longitude
-                    // Normalize prices so backend always receives 2 decimal places
-                    final normalizedPrice =
-                        _normalizePrice(priceccontroller.text);
-                    priceccontroller.text = normalizedPrice;
-                    final normalizedVipPrice =
-                        _normalizePrice(vipPriceController.text);
-                    vipPriceController.text = normalizedVipPrice;
-
                     await eventController.updateEvent(
                       id: widget.eventId,
                       eventTitle: titlecontroller.text,
@@ -473,8 +431,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                       endDate: edateController.text,
                       startTime: _startTime,
                       endTime: _endTime,
-                      eventPrice: normalizedPrice,
-                      vipPrice: normalizedVipPrice,
                       description: desccontroller.text,
                       category: categoryccontroller.text,
                       address: addessccontroller.text,

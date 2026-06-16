@@ -564,100 +564,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       ),
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      if (event.eventPrice != null &&
-                          event.eventPrice != '0.00')
-                        Container(
-                          margin: EdgeInsets.only(bottom: 1.h),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 3.w, vertical: 0.8.h),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.8),
-                            borderRadius: BorderRadius.circular(2.h),
-                            border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1),
-                                width: 1),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'REGULAR: ',
-                                style: TextStyles.regularwhite.copyWith(
-                                  fontSize: 10.sp,
-                                  color: Colors.white70,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '\$${event.eventPrice}',
-                                style: TextStyles.regularwhite.copyWith(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (event.vipPrice != null && event.vipPrice != '0.00')
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 3.w, vertical: 0.8.h),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.amber.shade900.withValues(alpha: 0.9),
-                                Colors.black.withValues(alpha: 0.9),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(2.h),
-                            border: Border.all(
-                                color: Colors.amber.withValues(alpha: 0.3),
-                                width: 1),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'VIP: ',
-                                style: TextStyles.regularwhite.copyWith(
-                                  fontSize: 10.sp,
-                                  color: Colors.amber,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '\$${event.vipPrice}',
-                                style: TextStyles.regularwhite.copyWith(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.amber,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
+
                 ],
               ),
             ),
@@ -970,85 +877,69 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (event.eventPrice != null && event.eventPrice != '0.00')
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Regular Access',
-                      style: TextStyles.regularwhite.copyWith(
-                        fontSize: 11.sp,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    Text(
-                      '\$${event.eventPrice}',
-                      style: TextStyles.regularhometext1.copyWith(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ],
-                ),
-              if (event.eventPrice != null &&
-                  event.eventPrice != '0.00' &&
-                  event.vipPrice != null &&
-                  event.vipPrice != '0.00')
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 0.8.h),
-                  child: Divider(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    thickness: 1,
-                  ),
-                ),
-              if (event.vipPrice != null && event.vipPrice != '0.00')
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          'VIP Access',
-                          style: TextStyles.regularwhite.copyWith(
-                            fontSize: 11.sp,
-                            color: Colors.amber.shade200,
+              if (event.ticketTiers != null && event.ticketTiers!.isNotEmpty)
+                ...event.ticketTiers!.map((tier) => Padding(
+                      padding: EdgeInsets.only(bottom: 1.h),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                tier.tierEmoji,
+                                style: TextStyle(fontSize: 12.sp),
+                              ),
+                              SizedBox(width: 2.w),
+                              Text(
+                                tier.tierName,
+                                style: TextStyles.regularwhite.copyWith(
+                                  fontSize: 11.sp,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              if (tier.tierName
+                                  .toLowerCase()
+                                  .contains('vip')) ...[
+                                SizedBox(width: 2.w),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 1.5.w, vertical: 0.2.h),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(0.5.h),
+                                    border: Border.all(
+                                        color:
+                                            Colors.amber.withValues(alpha: 0.5),
+                                        width: 0.5),
+                                  ),
+                                  child: Text(
+                                    'BEST VALUE',
+                                    style: TextStyle(
+                                      fontSize: 9.sp,
+                                      color: Colors.amber,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
-                        ),
-                        SizedBox(width: 2.w),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 1.5.w, vertical: 0.2.h),
-                          decoration: BoxDecoration(
-                            color: Colors.amber.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(0.5.h),
-                            border: Border.all(
-                                color: Colors.amber.withValues(alpha: 0.5),
-                                width: 0.5),
-                          ),
-                          child: Text(
-                            'BEST VALUE',
-                            style: TextStyle(
-                              fontSize: 9.sp,
-                              color: Colors.amber,
+                          Text(
+                            tier.price == 0
+                                ? 'Free'
+                                : '\$${tier.price.toStringAsFixed(2)}',
+                            style: TextStyles.regularhometext1.copyWith(
+                              fontSize: 13.sp,
                               fontWeight: FontWeight.bold,
+                              color: tier.tierName.toLowerCase().contains('vip')
+                                  ? Colors.amber
+                                  : Colors.green,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '\$${event.vipPrice}',
-                      style: TextStyles.regularhometext1.copyWith(
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.amber,
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              if ((event.eventPrice == null || event.eventPrice == '0.00') &&
-                  (event.vipPrice == null || event.vipPrice == '0.00'))
+                    ))
+              else
                 Text(
                   'Free Event',
                   style: TextStyles.regularhometext1.copyWith(

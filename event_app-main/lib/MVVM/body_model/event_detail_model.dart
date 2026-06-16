@@ -1,3 +1,5 @@
+import 'ticket_tier_model.dart';
+
 class EventDetailModel {
   int? eventId;
   int? userId;
@@ -28,6 +30,7 @@ class EventDetailModel {
   String? promotionStartDate;
   String? promotionEndDate;
   String? promotionPackage;
+  List<TicketTier>? ticketTiers;
 
   EventDetailModel({
     this.eventId,
@@ -59,6 +62,7 @@ class EventDetailModel {
     this.promotionStartDate,
     this.promotionEndDate,
     this.promotionPackage,
+    this.ticketTiers,
   });
 
   EventDetailModel.fromJson(Map<String, dynamic> json) {
@@ -91,6 +95,12 @@ class EventDetailModel {
     promotionStartDate = json['promotionStartDate'];
     promotionEndDate = json['promotionEndDate'];
     promotionPackage = json['promotionPackage'];
+    if (json['ticket_tiers'] != null) {
+      ticketTiers = [];
+      json['ticket_tiers'].forEach((v) {
+        ticketTiers!.add(TicketTier.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -120,6 +130,9 @@ class EventDetailModel {
     data['addDate'] = addDate;
     data['editDate'] = editDate;
     data['isBooked'] = isBooked; // updated
+    if (ticketTiers != null) {
+      data['ticket_tiers'] = ticketTiers!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 

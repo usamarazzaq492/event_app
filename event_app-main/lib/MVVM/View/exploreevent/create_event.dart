@@ -29,8 +29,6 @@ class _CreateEventState extends State<CreateEvent> {
   final stateController = TextEditingController();
   final addressController = TextEditingController();
   final categoryController = TextEditingController();
-  final priceController = TextEditingController();
-  final vipPriceController = TextEditingController();
   final sdateController = TextEditingController();
   final edateController = TextEditingController();
   final liveStreamController = TextEditingController();
@@ -43,14 +41,6 @@ class _CreateEventState extends State<CreateEvent> {
   File? imageFile;
   String? _bannerText;
   Color _bannerColor = Colors.transparent;
-
-  String _normalizePrice(String raw) {
-    final text = raw.trim();
-    if (text.isEmpty) return '0.00';
-    final value = double.tryParse(text);
-    if (value == null) return text;
-    return value.toStringAsFixed(2);
-  }
 
   void _showBanner(String message, {Color color = Colors.blue}) {
     setState(() {
@@ -160,27 +150,6 @@ class _CreateEventState extends State<CreateEvent> {
                                   maxLines: 4),
                               _buildInputField(
                                   'Category', categoryController, 'Category'),
-                              _buildInputField(
-                                  'General Admission Price',
-                                  priceController,
-                                  'Price for General Admission',
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                          decimal: true)),
-                              _buildInputField('VIP Price', vipPriceController,
-                                  'Price for VIP tickets',
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                          decimal: true)),
-                              Padding(
-                                padding:
-                                    EdgeInsets.only(left: 1.w, bottom: 2.h),
-                                child: Text('Enter 0 for free events',
-                                    style: TextStyle(
-                                        color: Colors.white24,
-                                        fontSize: 9.sp,
-                                        fontWeight: FontWeight.w600)),
-                              ),
                               _buildInputField(
                                   'Live Stream URL (Optional)',
                                   liveStreamController,
@@ -733,11 +702,6 @@ class _CreateEventState extends State<CreateEvent> {
         _startTimeError == null &&
         _endTimeError == null &&
         imageFile != null) {
-      // Normalize prices so backend always receives 2 decimal places
-      final normalizedPrice = _normalizePrice(priceController.text);
-      priceController.text = normalizedPrice;
-      final normalizedVipPrice = _normalizePrice(vipPriceController.text);
-      vipPriceController.text = normalizedVipPrice;
       _showBanner('Submitting your event…', color: AppColors.blueColor);
       // Backend will geocode address + city + state to get latitude/longitude
       await eventController.createEvent(
@@ -746,8 +710,6 @@ class _CreateEventState extends State<CreateEvent> {
         endDate: edateController.text,
         startTime: _startTime,
         endTime: _endTime,
-        eventPrice: normalizedPrice,
-        vipPrice: normalizedVipPrice,
         eventDescription: descController.text,
         eventCategory: categoryController.text,
         eventAddress: addressController.text,
