@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:event_app/Services/payment_qr_service.dart';
+import 'package:event_app/Services/event_service.dart' as event_service;
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
@@ -31,12 +32,14 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
   final TextEditingController _expiresAtController = TextEditingController();
   final TextEditingController _maxUsesController = TextEditingController();
 
-  String? _selectedTicketType = 'general';
+  String? _selectedTicketType;
   DateTime? _selectedExpiresAt;
   int? _maxUses;
   bool _isGenerating = false;
   bool _isLoadingQrCodes = false;
+  bool _isLoadingTiers = false;
   List<dynamic> _existingQrCodes = [];
+  List<dynamic> _ticketTiers = [];
   Map<String, dynamic>? _newQrData;
   String? _errorMessage;
   String? _successMessage;
@@ -45,6 +48,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
   void initState() {
     super.initState();
     _loadExistingQrCodes();
+    _loadTicketTiers();
   }
 
   @override
@@ -254,6 +258,13 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
   }
 
   Widget _buildDropdown() {
+    if (_isLoadingTiers) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.05),
@@ -269,11 +280,14 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
           border: InputBorder.none,
         ),
         style: TextStyle(color: Colors.white, fontSize: 11.sp),
-        items: const [
-          DropdownMenuItem(value: 'general', child: Text('General Admission')),
-          DropdownMenuItem(value: 'vip', child: Text('VIP Ticket')),
-        ],
+        items: _ticketTiers.map((tier) {
+          return DropdownMenuItem<String>(
+            value: tier['tierId'].toString(),
+            child: Text(tier['tierName']),
+          );
+        }).toList(),
         onChanged: (value) => setState(() => _selectedTicketType = value),
+        hint: const Text('Select a ticket tier', style: TextStyle(color: Colors.white38)),
       ),
     );
   }
@@ -447,6 +461,41 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     }
   }
 
+  Future<void> _loadTicketTiers() async {
+    setState(() {
+      _isLoadingTiers = true;
+    });
+    try {
+      final eventServiceInstance = event_service.EventService();
+      final tiers = await eventServiceInstance.fetchEventTiers(widget.eventId);
+      setState(() {
+        if (tiers.isNotEmpty) {
+          _ticketTiers = tiers.map((t) => {
+            'tierId': t.tierId,
+            'tierName': '${t.tierName} (\$${t.price})'
+          }).toList();
+        } else {
+          _ticketTiers = [
+            {'tierId': -1, 'tierName': 'General Admission'}
+          ];
+        }
+        if (_ticketTiers.isNotEmpty) {
+          _selectedTicketType = _ticketTiers.first['tierId'].toString();
+        }
+        _isLoadingTiers = false;
+      });
+    } catch (e) {
+      debugPrint('Error loading ticket tiers: $e');
+      setState(() {
+        _ticketTiers = [
+          {'tierId': -1, 'tierName': 'General Admission'}
+        ];
+        _selectedTicketType = '-1';
+        _isLoadingTiers = false;
+      });
+    }
+  }
+
   Widget _buildHeader() {
     return ClipRRect(
       child: BackdropFilter(
@@ -550,7 +599,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                 _buildTicketTypeBadge(qrData['ticketType']),
                 SizedBox(height: 1.5.h),
                 Text(
-                  'USD ${qrData['price'].toStringAsFixed(2)}',
+                  'USD ${double.parse(qrData['price'].toString()).toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 16.sp,
                     color: Colors.black,
@@ -658,7 +707,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     }
 
     final qrString = qrDataMap['web'] ?? (qrDataMap['app'] ?? qrCodeData);
-    final ticketType = qr['ticketType'] ?? 'general';
+    final ticketType = qrDataMap['ticketType'] ?? qr['ticketType'] ?? 'general';
     final currentUses = qr['currentUses'] ?? 0;
     final maxUses = qr['maxUses'];
     final expiresAt = qr['expiresAt'];
@@ -783,7 +832,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
 
       final response = await _qrService.generatePaymentQr(
         eventId: widget.eventId,
-        ticketType: _selectedTicketType!,
+        tierId: _selectedTicketType!,
         expiresAt: expiresAtString,
         maxUses: _maxUses,
       );

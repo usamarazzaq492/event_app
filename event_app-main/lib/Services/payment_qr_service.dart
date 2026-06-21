@@ -8,7 +8,7 @@ class PaymentQrService {
   /// Generate payment QR code for an event (organizer only)
   Future<http.Response> generatePaymentQr({
     required int eventId,
-    required String ticketType,
+    required String tierId,
     String? expiresAt,
     int? maxUses,
   }) async {
@@ -17,7 +17,7 @@ class PaymentQrService {
     String? token = prefs.getString('token');
 
     final body = {
-      'ticket_type': ticketType,
+      'tier_id': int.parse(tierId),
       if (expiresAt != null) 'expires_at': expiresAt,
       if (maxUses != null) 'max_uses': maxUses,
     };
@@ -46,7 +46,7 @@ class PaymentQrService {
     final body = {
       'token': token,
       'event_id': eventId,
-      'ticket_type': ticketType,
+      'tier_id': int.tryParse(ticketType) ?? -1,
     };
 
     final response = await http.post(

@@ -126,30 +126,21 @@ class _TicketScreenState extends State<TicketScreen> {
           ),
         );
       }
-      return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          backgroundColor: AppColors.backgroundColor,
-          body: Column(
-            children: [
-              _buildPremiumHeader("My Tickets"),
-              _buildTabBar(),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _buildTicketList('general'),
-                    _buildTicketList('vip'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+      return Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        body: Column(
+          children: [
+            _buildPremiumHeader("My Tickets"),
+            Expanded(
+              child: _buildTicketList(),
+            ),
+          ],
         ),
       );
     });
   }
 
-  Widget _buildTicketList(String type) {
+  Widget _buildTicketList() {
     return Obx(() {
       if (ticketVM.isLoading.value) {
         return const Center(
@@ -157,15 +148,13 @@ class _TicketScreenState extends State<TicketScreen> {
         );
       }
 
-      final filtered = ticketVM.tickets
-          .where((ticket) => ticket['ticketType'] == type)
-          .toList();
+      final filtered = ticketVM.tickets;
 
       if (filtered.isEmpty) {
-        return Center(
+        return const Center(
           child: Text(
-            "No $type tickets",
-            style: const TextStyle(color: Colors.white38),
+            "No tickets found",
+            style: TextStyle(color: Colors.white38),
           ),
         );
       }
@@ -407,37 +396,5 @@ class _TicketScreenState extends State<TicketScreen> {
     );
   }
 
-  Widget _buildTabBar() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(1.5.h),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-      ),
-      child: TabBar(
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white38,
-        indicatorSize: TabBarIndicatorSize.tab,
-        dividerColor: Colors.transparent,
-        onTap: (index) => HapticUtils.selection(),
-        indicator: BoxDecoration(
-          color: AppColors.blueColor,
-          borderRadius: BorderRadius.circular(1.2.h),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.blueColor.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        tabs: const [
-          Tab(text: 'General Admission'),
-          Tab(text: 'VIP'),
-        ],
-      ),
-    );
-  }
+
 }

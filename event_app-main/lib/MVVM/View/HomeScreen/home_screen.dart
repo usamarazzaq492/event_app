@@ -83,12 +83,17 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   @override
-  void refreshData() {
+  Future<void> refreshData() async {
     if (authViewModel.isLoggedIn.value) {
-      authViewModel.fetchUsers();
-      controller.fetchTimelineEvents().then((_) => _shuffleEvents());
+      await Future.wait([
+        authViewModel.fetchUsers(),
+        controller.fetchTimelineEvents(),
+        controller.fetchAllEvents(),
+      ]);
+      _shuffleEvents();
     } else {
-      controller.fetchAllEvents().then((_) => _shuffleEvents());
+      await controller.fetchAllEvents();
+      _shuffleEvents();
     }
   }
 

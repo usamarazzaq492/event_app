@@ -1,5 +1,6 @@
 import 'package:event_app/Services/notification_service.dart';
 import 'package:event_app/Services/invite_service.dart';
+import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart' as book_event;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -31,7 +32,7 @@ class NotificationViewModel extends GetxController {
   /// Respond to an invite
   Future<void> respondToInvite(int inviteId, String response) async {
     try {
-      await _inviteService.respondToInvite(
+      final res = await _inviteService.respondToInvite(
         inviteId: inviteId,
         response: response,
       );
@@ -46,6 +47,14 @@ class NotificationViewModel extends GetxController {
         colorText: Colors.white,
         duration: const Duration(seconds: 2),
       );
+
+      if (response == 'accepted' && res['is_paid'] == true && res['eventId'] != null) {
+        // Redirect to BookEventScreen so they can buy the ticket
+        // Using Future.delayed to let the snackbar show
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.to(() => book_event.BookEventScreen(id: int.parse(res['eventId'].toString())));
+        });
+      }
     } catch (e) {
       debugPrint("❌ Error responding to invite: $e");
       Get.snackbar(

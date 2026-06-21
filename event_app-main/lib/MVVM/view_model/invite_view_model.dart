@@ -1,5 +1,6 @@
 import 'package:event_app/MVVM/View/bottombar/bottom_navigation_bar.dart';
 import 'package:event_app/Services/invite_service.dart';
+import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart' as book_event;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -83,7 +84,7 @@ class InviteViewModel extends GetxController {
   Future<void> respondToInvite(int inviteId, String response) async {
     try {
       isLoading.value = true;
-      await _inviteService.respondToInvite(
+      final res = await _inviteService.respondToInvite(
         inviteId: inviteId,
         response: response,
       );
@@ -97,6 +98,12 @@ class InviteViewModel extends GetxController {
         backgroundColor: response == 'accepted' ? Colors.green : Colors.orange,
         colorText: Colors.white,
       );
+
+      if (response == 'accepted' && res['is_paid'] == true && res['eventId'] != null) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.to(() => book_event.BookEventScreen(id: int.parse(res['eventId'].toString())));
+        });
+      }
     } catch (e) {
       debugPrint("❌ Error responding to invite: $e");
       Get.snackbar("Error", "Failed to respond to invite");

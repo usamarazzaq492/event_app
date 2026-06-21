@@ -55,10 +55,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   AuthViewModel get authViewModel => Get.put(AuthViewModel());
 
   @override
-  void refreshData() {
+  Future<void> refreshData() async {
     if (mounted && authViewModel.isLoggedIn.value) {
-      controller.fetchUserProfile();
-      adVM.fetchAds();
+      await controller.fetchUserProfile();
+      await adVM.fetchAds();
     }
   }
 

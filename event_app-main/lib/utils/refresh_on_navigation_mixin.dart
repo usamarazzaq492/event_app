@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 /// 
 /// class _MyScreenState extends State<MyScreen> with RefreshOnNavigation {
 ///   @override
-///   void refreshData() {
+///   Future<void> refreshData() async {
 ///     // Call your refresh methods here
 ///     controller.fetchData();
 ///   }
@@ -22,7 +22,7 @@ mixin RefreshOnNavigation<T extends StatefulWidget> on State<T> {
   bool _hasRefreshed = false;
   
   /// Override this method to define what should be refreshed
-  void refreshData();
+  Future<void> refreshData();
 
   @override
   void initState() {

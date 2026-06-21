@@ -27,8 +27,8 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
   final authViewModel = Get.put(AuthViewModel());
 
   @override
-  void refreshData() {
-    adVM.fetchAds();
+  Future<void> refreshData() async {
+    await adVM.fetchAds();
   }
 
   @override

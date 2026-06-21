@@ -33,6 +33,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
   late TextEditingController sdateController;
   late TextEditingController edateController;
   TextEditingController liveStreamController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
 
   String _startTime = 'Start Time';
   String _endTime = 'End Time';
@@ -68,6 +69,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
           sdateController.text = event.startDate ?? '';
           edateController.text = event.endDate ?? '';
           liveStreamController.text = event.liveStreamUrl ?? '';
+          priceController.text = event.eventPrice ?? '';
           _startTime = event.startTime ?? 'Start Time';
           _endTime = event.endTime ?? 'End Time';
         });
@@ -105,6 +107,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                         buildValidatedInput(titlecontroller, 'Name of Event'),
                         buildValidatedMultiLineField(
                             desccontroller, 'Description'),
+                        buildValidatedOptionalPriceInput(priceController, 'Base Price (Optional)'),
                         buildValidatedInput(categoryccontroller, 'Category'),
                         buildValidatedInput(
                             liveStreamController, 'Live Stream URL (Optional)'),
@@ -180,6 +183,25 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
             if (!_isValidLiveStreamUrl(value)) {
               return 'Please enter a valid YouTube or Facebook URL';
             }
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget buildValidatedOptionalPriceInput(TextEditingController controller, String hint) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 2.h),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        style: const TextStyle(color: Colors.white),
+        decoration: inputDecoration(hint),
+        validator: (value) {
+          if (value != null && value.trim().isNotEmpty) {
+            final v = double.tryParse(value);
+            if (v == null || v < 0) return 'Invalid price';
           }
           return null;
         },
@@ -442,6 +464,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                       liveStreamUrl: liveStreamController.text.isNotEmpty
                           ? liveStreamController.text
                           : null,
+                      eventPrice: priceController.text.isNotEmpty ? priceController.text : null,
                     );
                   } else {
                     Get.snackbar(

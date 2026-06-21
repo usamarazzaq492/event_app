@@ -25,8 +25,8 @@ class _NotificationScreenState extends State<NotificationScreen>
   final NotificationViewModel viewModel = Get.put(NotificationViewModel());
 
   @override
-  void refreshData() {
-    viewModel.fetchNotifications();
+  Future<void> refreshData() async {
+    await viewModel.fetchNotifications();
   }
 
   String getTimeAgo(String? dateString) {

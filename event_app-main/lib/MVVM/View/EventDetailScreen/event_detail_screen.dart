@@ -564,7 +564,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
@@ -939,6 +938,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         ],
                       ),
                     ))
+              else if (event.eventPrice != null &&
+                  event.eventPrice != '0' &&
+                  event.eventPrice != '0.00' &&
+                  event.eventPrice != '')
+                Text(
+                  '\$${double.parse(event.eventPrice!).toStringAsFixed(2)}',
+                  style: TextStyles.regularhometext1.copyWith(
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                )
               else
                 Text(
                   'Free Event',
@@ -948,14 +959,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     color: Colors.green,
                   ),
                 ),
-              SizedBox(height: 0.5.h),
-              Text(
-                'Per person',
-                style: TextStyles.regularwhite.copyWith(
-                  fontSize: 11.sp,
-                  color: Colors.white70,
-                ),
-              ),
             ],
           ),
         ),

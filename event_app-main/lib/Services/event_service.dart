@@ -28,6 +28,7 @@ class EventService {
     String? longitude,
     required String eventimage, // File path
     String? liveStreamUrl,
+    String? eventPrice,
   }) async {
     final uri = Uri.parse(AppUrl.addEvent);
     final prefs = await SharedPreferences.getInstance();
@@ -58,6 +59,9 @@ class EventService {
     }
     if (liveStreamUrl != null && liveStreamUrl.isNotEmpty) {
       request.fields['live_stream_url'] = liveStreamUrl;
+    }
+    if (eventPrice != null && eventPrice.isNotEmpty) {
+      request.fields['eventPrice'] = eventPrice;
     }
 
     // Image file
@@ -504,8 +508,9 @@ class EventService {
     required String eventstate,
     String? latitude,
     String? longitude,
-    File? eventImage,
+    File? image,
     String? liveStreamUrl,
+    String? eventPrice,
   }) async {
     final uri = Uri.parse("${AppUrl.events}/$eventId");
     final prefs = await SharedPreferences.getInstance();
@@ -531,14 +536,17 @@ class EventService {
     if (liveStreamUrl != null && liveStreamUrl.isNotEmpty) {
       request.fields['live_stream_url'] = liveStreamUrl;
     }
+    if (eventPrice != null && eventPrice.isNotEmpty) {
+      request.fields['eventPrice'] = eventPrice;
+    }
 
     // Image file - only add if file exists and is valid
-    if (eventImage != null && await eventImage.exists()) {
+    if (image != null && await image.exists()) {
       try {
         request.files.add(await http.MultipartFile.fromPath(
           'eventImage',
-          eventImage.path,
-          filename: basename(eventImage.path),
+          image.path,
+          filename: basename(image.path),
         ));
       } catch (e) {
         debugPrint("Error adding image file: $e");

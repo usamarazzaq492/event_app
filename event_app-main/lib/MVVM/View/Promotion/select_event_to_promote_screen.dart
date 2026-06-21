@@ -28,8 +28,8 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
   Timer? _timer;
 
   @override
-  void refreshData() {
-    eventController.getMyEvents();
+  Future<void> refreshData() async {
+    await eventController.getMyEvents();
   }
 
   @override

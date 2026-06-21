@@ -52,8 +52,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
   ];
 
   @override
-  void refreshData() {
-    loadProfile();
+  Future<void> refreshData() async {
+    await loadProfile();
   }
 
   Future<void> loadProfile() async {

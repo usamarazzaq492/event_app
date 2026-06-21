@@ -32,6 +32,7 @@ class _CreateEventState extends State<CreateEvent> {
   final sdateController = TextEditingController();
   final edateController = TextEditingController();
   final liveStreamController = TextEditingController();
+  final priceController = TextEditingController();
 
   String _startTime = 'Start Time';
   String _endTime = 'End Time';
@@ -148,6 +149,9 @@ class _CreateEventState extends State<CreateEvent> {
                               _buildInputField('Description', descController,
                                   'Event Description',
                                   maxLines: 4),
+                              _buildInputField(
+                                  'Base Price (Optional)', priceController, 'e.g. 5.00',
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true)),
                               _buildInputField(
                                   'Category', categoryController, 'Category'),
                               _buildInputField(
@@ -721,6 +725,7 @@ class _CreateEventState extends State<CreateEvent> {
         liveStreamUrl: liveStreamController.text.isNotEmpty
             ? liveStreamController.text
             : null,
+        eventPrice: priceController.text.isNotEmpty ? priceController.text : null,
       );
       _showBanner('Event created successfully', color: AppColors.blueColor);
     } else if (imageFile == null) {

@@ -295,6 +295,7 @@ class EventController extends GetxController {
     String? eventLongitude,
     required File eventImage,
     String? liveStreamUrl,
+    String? eventPrice,
   }) async {
     try {
       isLoading.value = true;
@@ -313,6 +314,7 @@ class EventController extends GetxController {
         longitude: eventLongitude,
         eventimage: eventImage.path,
         liveStreamUrl: liveStreamUrl,
+        eventPrice: eventPrice,
       );
 
       final data = json.decode(response.body);
@@ -368,6 +370,7 @@ class EventController extends GetxController {
     String? longitude,
     required File? image,
     String? liveStreamUrl,
+    String? eventPrice,
   }) async {
     try {
       isLoading.value = true;
@@ -385,8 +388,9 @@ class EventController extends GetxController {
         eventstate: state,
         latitude: latitude,
         longitude: longitude,
-        eventImage: image,
+        image: image,
         liveStreamUrl: liveStreamUrl,
+        eventPrice: eventPrice,
       );
 
       final data = json.decode(response.body);
