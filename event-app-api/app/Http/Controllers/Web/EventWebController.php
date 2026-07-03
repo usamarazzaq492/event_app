@@ -282,7 +282,7 @@ class EventWebController extends Controller
     {
         $request->validate([
             'quantity' => 'required|integer|min:1|max:10',
-            'ticket_type' => 'required|in:vip,general'
+            'ticket_type' => 'required|string',
         ]);
 
         $event = Event::findOrFail((int)$id);

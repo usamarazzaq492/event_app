@@ -33,7 +33,7 @@ class PaymentQrController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'ticket_type' => 'required|in:vip,general',
+            'tier_id' => 'required|integer',
             'expires_at' => 'nullable|date|after:now',
             'max_uses' => 'nullable|integer|min:1|max:10000',
         ]);
@@ -46,6 +46,22 @@ class PaymentQrController extends Controller
             ], 400);
         }
 
+        // Fetch the tier
+        $tierId = $request->tier_id;
+        $tierName = 'General Admission';
+        $adjustedPrice = $event->eventPrice ?? 0;
+
+        if ($tierId != -1) {
+            $tier = DB::table('event_ticket_tiers')
+                ->where('tierId', $tierId)
+                ->where('eventId', $eventId)
+                ->first();
+            if ($tier) {
+                $tierName = $tier->tierName;
+                $adjustedPrice = $tier->price;
+            }
+        }
+
         // Generate unique token
         $token = Str::random(32);
 
@@ -55,23 +71,20 @@ class PaymentQrController extends Controller
         }
 
         // Generate deep link URL
-        $deepLink = $this->generateDeepLink($eventId, $request->ticket_type, $token);
-
-        // Calculate price based on ticket type
-        $typeMultipliers = [
-            'vip' => 1.5,
-            'general' => 1.0
-        ];
-        $basePrice = $event->eventPrice ?? 0;
-        $adjustedPrice = $basePrice * $typeMultipliers[$request->ticket_type];
+        $deepLink = $this->generateDeepLink($eventId, $tierId, $token);
 
         // Insert QR code record
         $qrId = DB::table('payment_qr_codes')->insertGetId([
             'eventId' => $eventId,
             'userId' => $user->userId,
             'token' => $token,
-            'ticketType' => $request->ticket_type,
-            'qrCodeData' => $deepLink,
+            'ticketType' => 'general', // DB enum constraint bypass
+            'qrCodeData' => json_encode([
+                'web' => $deepLink,
+                'app' => $deepLink,
+                'ticketType' => $tierName,
+                'tierId' => $tierId
+            ]),
             'expiresAt' => $request->expires_at ? Carbon::parse($request->expires_at) : null,
             'maxUses' => $request->max_uses,
             'currentUses' => 0,
@@ -90,11 +103,12 @@ class PaymentQrController extends Controller
             'data' => [
                 'qrId' => $qrCode->qrId,
                 'eventId' => $qrCode->eventId,
-                'ticketType' => $qrCode->ticketType,
+                'ticketType' => $tierName,
+                'tierId' => $tierId,
                 'qrCodeData' => $qrCode->qrCodeData,
                 'token' => $qrCode->token,
                 'price' => $adjustedPrice,
-                'basePrice' => $basePrice,
+                'basePrice' => $adjustedPrice,
                 'expiresAt' => $qrCode->expiresAt,
                 'maxUses' => $qrCode->maxUses,
                 'currentUses' => $qrCode->currentUses,
@@ -111,7 +125,7 @@ class PaymentQrController extends Controller
         $validator = Validator::make($request->all(), [
             'token' => 'required|string|size:32',
             'event_id' => 'required|integer',
-            'ticket_type' => 'required|in:vip,general',
+            'tier_id' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -125,7 +139,6 @@ class PaymentQrController extends Controller
         $qrCode = DB::table('payment_qr_codes')
             ->where('token', $request->token)
             ->where('eventId', $request->event_id)
-            ->where('ticketType', $request->ticket_type)
             ->where('isActive', true)
             ->first();
 
@@ -165,13 +178,21 @@ class PaymentQrController extends Controller
             ], 404);
         }
 
-        // Calculate price
-        $typeMultipliers = [
-            'vip' => 1.5,
-            'general' => 1.0
-        ];
-        $basePrice = $event->eventPrice ?? 0;
-        $adjustedPrice = $basePrice * $typeMultipliers[$qrCode->ticketType];
+        // Get tier
+        $tierId = $request->tier_id;
+        $tierName = 'General Admission';
+        $adjustedPrice = $event->eventPrice ?? 0;
+
+        if ($tierId != -1) {
+            $tier = DB::table('event_ticket_tiers')
+                ->where('tierId', $tierId)
+                ->where('eventId', $event->eventId)
+                ->first();
+            if ($tier) {
+                $tierName = $tier->tierName;
+                $adjustedPrice = $tier->price;
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -179,8 +200,9 @@ class PaymentQrController extends Controller
             'data' => [
                 'eventId' => $event->eventId,
                 'eventTitle' => $event->eventTitle,
-                'ticketType' => $qrCode->ticketType,
-                'basePrice' => $basePrice,
+                'ticketType' => $tierName,
+                'tierId' => $tierId,
+                'basePrice' => $adjustedPrice,
                 'price' => $adjustedPrice,
                 'eventImage' => $event->eventImage,
                 'startDate' => $event->startDate,

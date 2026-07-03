@@ -28,10 +28,11 @@ class EventController extends Controller
             'address' => 'required|string|max:500',
             'city' => 'required|string|max:50',
             'state' => 'nullable|string|max:100',
-            'eventImage' => 'required|image|max:2048',
+            'eventImage' => 'required|image|max:5120',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'live_stream_url' => 'nullable|url|max:500',
+            'eventPrice' => 'nullable|numeric|min:0',
         ]);
 
         // Validate live stream URL if provided
@@ -78,6 +79,7 @@ class EventController extends Controller
             'latitude' => $latitude,
             'longitude' => $longitude,
             'live_stream_url' => $request->input('live_stream_url'),
+            'eventPrice' => $request->input('eventPrice'),
             'isActive' => 1,
             'addDate' => now(),
             'editDate' => now(),
@@ -404,6 +406,7 @@ class EventController extends Controller
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
             'live_stream_url' => 'nullable|url|max:500',
+            'eventPrice' => 'nullable|numeric|min:0',
         ]);
 
         // Validate live stream URL if provided
@@ -434,6 +437,10 @@ class EventController extends Controller
         // Add live stream URL to update data
         if ($request->has('live_stream_url')) {
             $dataToUpdate['live_stream_url'] = $request->input('live_stream_url');
+        }
+
+        if ($request->has('eventPrice')) {
+            $dataToUpdate['eventPrice'] = $request->input('eventPrice');
         }
 
         // State (nullable) - allow updating to empty
@@ -476,6 +483,18 @@ class EventController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        // Check for existing bookings
+        $hasBookings = DB::table('booking')->where('eventId', $id)->exists();
+        if ($hasBookings) {
+            return response()->json(['error' => 'Cannot delete an event that has bookings.'], 400);
+        }
+
+        // Delete dependent records first to avoid foreign key constraint errors
+        DB::table('event_ticket_tiers')->where('eventId', $id)->delete();
+        DB::table('payment_qr_codes')->where('eventId', $id)->delete();
+        DB::table('event_invites')->where('eventId', $id)->delete();
+
+        // Finally, delete the event
         DB::table('events')->where('eventId', $id)->delete();
 
         return response()->json(['message' => 'Event deleted successfully.']);

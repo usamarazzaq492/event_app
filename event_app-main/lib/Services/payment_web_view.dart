@@ -71,6 +71,10 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
               'payment_nonce': nonce,
             }
           : {
+              // Legacy fields to prevent validation errors on older backends (if they accept custom strings)
+              'ticket_type': widget.category,
+              'quantity': widget.seats,
+
               // Multi-tier payload: send tiers[] array if available
               if (widget.selectedTiers != null &&
                   widget.selectedTiers!.isNotEmpty)
@@ -107,19 +111,49 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
         }
       } else {
         debugPrint('❌ Payment failed: ${response.body}');
-        _showSnackbar("Payment failed. Please try again.");
+        String errorMsg = "Payment failed. Please try again.";
+        try {
+          final Map<String, dynamic> body = jsonDecode(response.body);
+          if (body.containsKey('details')) {
+            errorMsg = "Validation: " + body['details'].toString();
+          } else if (body.containsKey('error')) {
+            errorMsg = body['error'].toString();
+          } else if (body.containsKey('message')) {
+            errorMsg = body['message'].toString();
+          }
+        } catch (_) {}
+        _showErrorDialog(errorMsg, response.body);
       }
     } catch (e) {
       debugPrint('❌ Exception: $e');
-      _showSnackbar("Something went wrong. Please try again.");
+      _showErrorDialog("Something went wrong. Please try again.", e.toString());
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
-  void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+  void _showErrorDialog(String title, String details) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.signinoptioncolor,
+        title: Text(title,
+            style: const TextStyle(color: Colors.white, fontSize: 16)),
+        content: SingleChildScrollView(
+          child: Text(details,
+              style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+                const Text('OK', style: TextStyle(color: AppColors.blueColor)),
+          ),
+        ],
+      ),
     );
   }
 

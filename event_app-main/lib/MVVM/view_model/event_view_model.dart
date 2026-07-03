@@ -279,8 +279,8 @@ class EventController extends GetxController {
     }
   }
 
-  /// 🔷 Create a new event
-  Future<void> createEvent({
+  /// 🔷 Create a new event — returns the created eventId, or null on failure
+  Future<int?> createEvent({
     required String eventTitle,
     required String startDate,
     required String endDate,
@@ -320,6 +320,8 @@ class EventController extends GetxController {
       final data = json.decode(response.body);
 
       if (response.statusCode == 200) {
+        final eventId = data['eventId'] as int?;
+
         final message = data['message'] ?? 'Event Created Successfully!';
         Get.snackbar('Success', message,
             backgroundColor: AppColors.blueColor, colorText: Colors.white);
@@ -328,29 +330,101 @@ class EventController extends GetxController {
         await fetchAllEvents();
         await getMyEvents();
 
-        // Navigate to My Events tab
-        Get.offAll(() => const BottomNavBar());
-        Future.microtask(() {
-          BottomNavController? navController;
-          if (Get.isRegistered<BottomNavController>(
-              tag: 'BottomNavController')) {
-            navController =
-                Get.find<BottomNavController>(tag: 'BottomNavController');
-          } else if (Get.isRegistered<BottomNavController>()) {
-            navController = Get.find<BottomNavController>();
-          }
-          navController?.changeTab(1);
-        });
+        return eventId;
       } else {
         Get.snackbar("Error", data['message'] ?? "Failed to create event",
             backgroundColor: Colors.red, colorText: Colors.white);
+        return null;
       }
     } catch (e) {
       Get.snackbar("Error", e.toString(),
           backgroundColor: Colors.red, colorText: Colors.white);
+      return null;
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// 🔷 Create event + attach tiers in one flow.
+  /// Returns the eventId on success, null on failure.
+  Future<int?> createEventWithTiers({
+    required String eventTitle,
+    required String startDate,
+    required String endDate,
+    required String startTime,
+    required String endTime,
+    required String eventDescription,
+    required String eventCategory,
+    required String eventAddress,
+    required String eventCity,
+    required String eventState,
+    String? eventLatitude,
+    String? eventLongitude,
+    required File eventImage,
+    String? liveStreamUrl,
+    String? eventPrice,
+    required List<Map<String, dynamic>> tiersList,
+  }) async {
+    // Step 1: Create the event
+    final eventId = await createEvent(
+      eventTitle: eventTitle,
+      startDate: startDate,
+      endDate: endDate,
+      startTime: startTime,
+      endTime: endTime,
+      eventDescription: eventDescription,
+      eventCategory: eventCategory,
+      eventAddress: eventAddress,
+      eventCity: eventCity,
+      eventState: eventState,
+      eventLatitude: eventLatitude,
+      eventLongitude: eventLongitude,
+      eventImage: eventImage,
+      liveStreamUrl: liveStreamUrl,
+      eventPrice: eventPrice,
+    );
+
+    if (eventId == null) return null;
+
+    // Step 2: Create each tier sequentially
+    int successCount = 0;
+    for (final tier in tiersList) {
+      final ok = await createTier(
+        eventId: eventId,
+        tierName: tier['name'] as String,
+        price: tier['price'] as double,
+        quantityCap: tier['quantityCap'] as int?,
+        description: tier['description'] as String?,
+      );
+      if (ok) successCount++;
+    }
+
+    // Show summary if some tiers failed
+    if (tiersList.isNotEmpty && successCount < tiersList.length) {
+      Get.snackbar(
+        'Partial Success',
+        '$successCount of ${tiersList.length} tiers added. You can add the rest from Manage Tiers.',
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+
+    // Navigate to My Events tab
+    Get.offAll(() => const BottomNavBar());
+    Future.microtask(() {
+      BottomNavController? navController;
+      if (Get.isRegistered<BottomNavController>(
+          tag: 'BottomNavController')) {
+        navController =
+            Get.find<BottomNavController>(tag: 'BottomNavController');
+      } else if (Get.isRegistered<BottomNavController>()) {
+        navController = Get.find<BottomNavController>();
+      }
+      navController?.changeTab(1);
+    });
+
+    return eventId;
   }
 
   /// 🔷 Update an existing event

@@ -45,7 +45,7 @@ class PaymentQrWebController extends Controller
     public function generate(Request $request, $id)
     {
         $request->validate([
-            'ticket_type' => 'required|in:vip,general',
+            'ticket_type' => 'required|string',
             'expires_at' => 'nullable|date|after:now',
             'max_uses' => 'nullable|integer|min:1|max:10000',
         ]);

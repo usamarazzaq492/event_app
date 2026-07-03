@@ -164,8 +164,24 @@ public function getReceivedInvites(Request $request)
             'status' => $request->response
         ]);
 
-    // Auto-book event on acceptance if not already booked
-    if ($request->response === 'accepted') {
+    // Check if event is free
+    $isFree = false;
+    $event = DB::table('events')->where('eventId', $invite->eventId)->first();
+    if ($event) {
+        $hasPaidTiers = DB::table('event_ticket_tiers')
+            ->where('eventId', $invite->eventId)
+            ->where('isActive', 1)
+            ->where('price', '>', 0)
+            ->exists();
+        
+        $basePrice = (float) ($event->eventPrice ?? 0);
+        if ($basePrice <= 0 && !$hasPaidTiers) {
+            $isFree = true;
+        }
+    }
+
+    // Auto-book event on acceptance ONLY if it's free
+    if ($request->response === 'accepted' && $isFree) {
         $alreadyBooked = DB::table('booking')
             ->where('eventId', $invite->eventId)
             ->where('userId', $userId)
@@ -176,11 +192,24 @@ public function getReceivedInvites(Request $request)
                 'eventId' => $invite->eventId,
                 'userId' => $userId,
                 'bookingDate' => now(),
+                'ticketType' => 'general',
+                'quantity' => 1,
+                'totalAmount' => 0.00,
+                'squarePaymentId' => 'invite_' . $inviteId,
+                'basePrice' => 0.00,
+                'subtotal' => 0.00,
+                'serviceFee' => 0.00,
+                'processingFee' => 0.00,
+                'status' => 'confirmed'
             ]);
         }
     }
 
-    return response()->json(['message' => "Invite {$request->response} successfully."]);
+    return response()->json([
+        'message' => "Invite {$request->response} successfully.",
+        'is_paid' => !$isFree,
+        'eventId' => $invite->eventId
+    ]);
 }
 
 }

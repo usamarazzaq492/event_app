@@ -67,7 +67,7 @@ class _BookEventScreenState extends State<BookEventScreen>
   String get _summaryText {
     if (_totalCount == 0) return 'Select at least one ticket';
     return _selectedTiers
-        .map((t) => '${t.tierName} x${t.selectedQuantity}')
+        .map((t) => '${t.tierName} ×${t.selectedQuantity}')
         .join('  •  ');
   }
 
@@ -113,7 +113,7 @@ class _BookEventScreenState extends State<BookEventScreen>
       backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
-          // Background ambient glow
+          // Background ambient glows
           Positioned(
             top: -15.h,
             left: -15.w,
@@ -245,18 +245,32 @@ class _BookEventScreenState extends State<BookEventScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.confirmation_num_outlined,
-                  color: Colors.white24, size: 40.sp),
-              SizedBox(height: 2.h),
-              Text('No ticket types configured',
+              Container(
+                width: 22.w,
+                height: 22.w,
+                decoration: BoxDecoration(
+                  color: AppColors.blueColor.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: AppColors.blueColor.withValues(alpha: 0.2)),
+                ),
+                child: Center(
+                  child: Text('🎫', style: TextStyle(fontSize: 26.sp)),
+                ),
+              ),
+              SizedBox(height: 3.h),
+              Text('No Ticket Types Yet',
                   style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.bold)),
+                      color: Colors.white,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5)),
               SizedBox(height: 1.h),
-              Text('The organizer has not set up ticket tiers yet.\nPlease check back later.',
+              Text(
+                  'The organizer has not set up ticket\ntiers yet. Please check back later.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white38, fontSize: 11.sp)),
+                  style: TextStyle(
+                      color: Colors.white38, fontSize: 11.sp, height: 1.5)),
             ],
           ),
         ),
@@ -264,44 +278,92 @@ class _BookEventScreenState extends State<BookEventScreen>
     }
 
     return ListView(
-      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 3.h),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
       children: [
         // Section heading
         Padding(
-          padding: EdgeInsets.only(bottom: 2.h, left: 0.5.w),
+          padding: EdgeInsets.only(bottom: 1.5.h, left: 0.5.w),
           child: Row(
             children: [
+              Container(
+                width: 4,
+                height: 16,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.blueColor,
+                      AppColors.blueColor.withValues(alpha: 0.5),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              SizedBox(width: 2.5.w),
               Text(
                 'SELECT YOUR TICKETS',
                 style: TextStyle(
                   color: Colors.white38,
                   fontSize: 9.sp,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   letterSpacing: 1.5,
                 ),
               ),
+              const Spacer(),
+              // Ticket count badge
+              if (_totalCount > 0)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 2.5.w, vertical: 0.4.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.blueColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(2.h),
+                    border: Border.all(
+                        color: AppColors.blueColor.withValues(alpha: 0.4)),
+                  ),
+                  child: Text(
+                    '$_totalCount selected',
+                    style: TextStyle(
+                      color: AppColors.blueColor,
+                      fontSize: 8.5.sp,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
 
+        SizedBox(height: 0.5.h),
+
         // Tier cards
         ...List.generate(_localTiers.length, (i) => _buildTierCard(i)),
 
-        SizedBox(height: 2.h),
+        SizedBox(height: 2.5.h),
 
         // Price info note
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 1.w),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 3.5.w, vertical: 1.5.h),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.02),
+            borderRadius: BorderRadius.circular(1.5.h),
+            border:
+                Border.all(color: Colors.white.withValues(alpha: 0.06)),
+          ),
           child: Row(
             children: [
               Icon(Icons.info_outline_rounded,
-                  color: Colors.white24, size: 12.sp),
-              SizedBox(width: 2.w),
+                  color: Colors.white24, size: 13.sp),
+              SizedBox(width: 2.5.w),
               Expanded(
                 child: Text(
                   'Prices shown are per ticket, excluding processing fees.',
-                  style:
-                      TextStyle(color: Colors.white24, fontSize: 9.5.sp),
+                  style: TextStyle(
+                      color: Colors.white30,
+                      fontSize: 9.5.sp,
+                      height: 1.3),
                 ),
               ),
             ],
@@ -318,167 +380,295 @@ class _BookEventScreenState extends State<BookEventScreen>
     final tier = _localTiers[index];
     final isFree = tier.price == 0;
     final qty = tier.selectedQuantity;
+    final isSelected = qty > 0;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      margin: EdgeInsets.only(bottom: 1.8.h),
-      decoration: BoxDecoration(
-        color: qty > 0
-            ? AppColors.blueColor.withValues(alpha: 0.08)
-            : Colors.white.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(2.2.h),
-        border: Border.all(
-          color: tier.isSoldOut
-              ? Colors.red.withValues(alpha: 0.25)
-              : qty > 0
-                  ? AppColors.blueColor.withValues(alpha: 0.45)
-                  : Colors.white.withValues(alpha: 0.09),
-          width: qty > 0 ? 1.5 : 1,
+    return GestureDetector(
+      onTap: tier.isSoldOut
+          ? null
+          : () {
+              // Tap to add first ticket if none selected
+              if (qty == 0) _adjustQty(index, 1);
+            },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        margin: EdgeInsets.only(bottom: 1.5.h),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.blueColor.withValues(alpha: 0.06)
+              : Colors.white.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(2.5.h),
+          border: Border.all(
+            color: tier.isSoldOut
+                ? Colors.red.withValues(alpha: 0.2)
+                : isSelected
+                    ? AppColors.blueColor.withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.08),
+            width: isSelected ? 1.5 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.blueColor.withValues(alpha: 0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(2.2.h),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-          child: Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.2.h),
-            child: Row(
-              children: [
-                // Emoji icon
-                Container(
-                  width: 10.w,
-                  height: 10.w,
-                  decoration: BoxDecoration(
-                    color: tier.isSoldOut
-                        ? Colors.red.withValues(alpha: 0.1)
-                        : AppColors.blueColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(1.2.h),
-                  ),
-                  child: Center(
-                    child: Text(
-                      tier.tierEmoji,
-                      style: TextStyle(fontSize: 16.sp),
-                    ),
-                  ),
-                ),
-
-                SizedBox(width: 3.5.w),
-
-                // Name + description
-                Expanded(
-                  child: Column(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(2.5.h),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: Padding(
+              padding: EdgeInsets.all(3.5.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Top Row: Emoji + Name + Price ──
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      // Emoji icon
+                      Container(
+                        width: 12.w,
+                        height: 12.w,
+                        decoration: BoxDecoration(
+                          gradient: tier.isSoldOut
+                              ? null
+                              : LinearGradient(
+                                  colors: [
+                                    AppColors.blueColor
+                                        .withValues(alpha: 0.15),
+                                    AppColors.blueColor
+                                        .withValues(alpha: 0.05),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                          color: tier.isSoldOut
+                              ? Colors.red.withValues(alpha: 0.1)
+                              : null,
+                          borderRadius: BorderRadius.circular(1.5.h),
+                          border: Border.all(
+                            color: tier.isSoldOut
+                                ? Colors.red.withValues(alpha: 0.2)
+                                : AppColors.blueColor
+                                    .withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            tier.tierEmoji,
+                            style: TextStyle(fontSize: 18.sp),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(width: 3.w),
+
+                      // Name + description
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    tier.tierName,
+                                    style: TextStyle(
+                                      color: tier.isSoldOut
+                                          ? Colors.white38
+                                          : Colors.white,
+                                      fontSize: 13.sp,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: -0.3,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (tier.isSoldOut) ...[
+                                  SizedBox(width: 2.w),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 2.w, vertical: 0.3.h),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red
+                                          .withValues(alpha: 0.15),
+                                      borderRadius:
+                                          BorderRadius.circular(1.h),
+                                      border: Border.all(
+                                          color: Colors.red
+                                              .withValues(alpha: 0.4)),
+                                    ),
+                                    child: Text(
+                                      'SOLD OUT',
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 7.sp,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.5),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            ),
+                            if (tier.description != null &&
+                                tier.description!.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(top: 0.5.h),
+                                child: Text(
+                                  tier.description!,
+                                  style: TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: 9.5.sp,
+                                      height: 1.3),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(width: 2.w),
+
+                      // Price column
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            tier.tierName,
+                            isFree
+                                ? 'FREE'
+                                : '\$${tier.price.toStringAsFixed(2)}',
                             style: TextStyle(
-                              color: tier.isSoldOut
-                                  ? Colors.white38
-                                  : Colors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.3,
+                              color: isFree
+                                  ? Colors.greenAccent
+                                  : tier.isSoldOut
+                                      ? Colors.white24
+                                      : Colors.white,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.8,
                             ),
                           ),
-                          if (tier.isSoldOut) ...[
-                            SizedBox(width: 2.w),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 2.w, vertical: 0.3.h),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(1.h),
-                                border: Border.all(
-                                    color: Colors.red.withValues(alpha: 0.4)),
-                              ),
-                              child: Text(
-                                'SOLD OUT',
-                                style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 7.sp,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.5),
-                              ),
+                          if (!isFree)
+                            Text(
+                              'per ticket',
+                              style: TextStyle(
+                                  color: Colors.white24, fontSize: 8.sp),
                             ),
-                          ],
                         ],
                       ),
-                      if (tier.description != null &&
-                          tier.description!.isNotEmpty)
-                        Padding(
-                          padding: EdgeInsets.only(top: 0.4.h),
-                          child: Text(
-                            tier.description!,
-                            style: TextStyle(
-                                color: Colors.white38, fontSize: 9.5.sp),
-                          ),
-                        ),
-                      if (tier.quantityCap != null && !tier.isSoldOut)
-                        Padding(
-                          padding: EdgeInsets.only(top: 0.4.h),
-                          child: Text(
-                            '${tier.available} left',
-                            style: TextStyle(
-                              color: (tier.available ?? 999) < 10
-                                  ? Colors.orangeAccent
-                                  : Colors.white24,
-                              fontSize: 9.sp,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
-                ),
 
-                // Price
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      isFree ? 'FREE' : '\$${tier.price.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        color: isFree
-                            ? Colors.greenAccent
-                            : tier.isSoldOut
-                                ? Colors.white24
-                                : Colors.white,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
+                  // ── Divider ──
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 1.5.h),
+                    child: Container(
+                      height: 1,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.transparent,
+                            Colors.white.withValues(alpha: 0.06),
+                            Colors.white.withValues(alpha: 0.06),
+                            Colors.transparent,
+                          ],
+                          stops: const [0.0, 0.2, 0.8, 1.0],
+                        ),
                       ),
                     ),
-                    if (!isFree)
-                      Text(
-                        'per ticket',
-                        style:
-                            TextStyle(color: Colors.white24, fontSize: 8.5.sp),
-                      ),
-                  ],
-                ),
+                  ),
 
-                SizedBox(width: 3.w),
+                  // ── Bottom Row: Availability + Counter ──
+                  Row(
+                    children: [
+                      // Availability info
+                      if (tier.quantityCap != null && !tier.isSoldOut) ...[
+                        Icon(
+                          Icons.event_seat_rounded,
+                          color: (tier.available ?? 999) < 10
+                              ? Colors.orangeAccent
+                              : Colors.white24,
+                          size: 12.sp,
+                        ),
+                        SizedBox(width: 1.5.w),
+                        Text(
+                          '${tier.available} left',
+                          style: TextStyle(
+                            color: (tier.available ?? 999) < 10
+                                ? Colors.orangeAccent
+                                : Colors.white30,
+                            fontSize: 9.5.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ] else if (tier.isSoldOut) ...[
+                        Icon(Icons.block_rounded,
+                            color: Colors.red.withValues(alpha: 0.6),
+                            size: 12.sp),
+                        SizedBox(width: 1.5.w),
+                        Text(
+                          'No longer available',
+                          style: TextStyle(
+                            color: Colors.red.withValues(alpha: 0.6),
+                            fontSize: 9.5.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ] else ...[
+                        Icon(Icons.all_inclusive_rounded,
+                            color: Colors.white24, size: 12.sp),
+                        SizedBox(width: 1.5.w),
+                        Text(
+                          'Available',
+                          style: TextStyle(
+                            color: Colors.white30,
+                            fontSize: 9.5.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
 
-                // Counter
-                if (tier.isSoldOut)
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 3.w, vertical: 1.h),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(1.5.h),
-                      border: Border.all(
-                          color: Colors.red.withValues(alpha: 0.2)),
-                    ),
-                    child: Text('—',
-                        style:
-                            TextStyle(color: Colors.red, fontSize: 11.sp)),
-                  )
-                else
-                  _buildCounter(index),
-              ],
+                      const Spacer(),
+
+                      // Subtotal for this tier (when selected)
+                      if (isSelected) ...[
+                        Text(
+                          '\$${(tier.price * qty).toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: AppColors.blueColor,
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(width: 3.w),
+                      ],
+
+                      // Counter or sold-out indicator
+                      if (tier.isSoldOut)
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 3.w, vertical: 0.8.h),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(1.5.h),
+                            border: Border.all(
+                                color: Colors.red.withValues(alpha: 0.2)),
+                          ),
+                          child: Text('—',
+                              style: TextStyle(
+                                  color: Colors.red, fontSize: 11.sp)),
+                        )
+                      else
+                        _buildCounter(index),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -489,39 +679,47 @@ class _BookEventScreenState extends State<BookEventScreen>
   // ── Counter ────────────────────────────────────────────────────────────────
   Widget _buildCounter(int index) {
     final qty = _localTiers[index].selectedQuantity;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _counterBtn(
-          icon: Icons.remove_rounded,
-          active: qty > 0,
-          onTap: () => _adjustQty(index, -1),
-        ),
-        Container(
-          width: 9.w,
-          alignment: Alignment.center,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 150),
-            transitionBuilder: (child, anim) =>
-                ScaleTransition(scale: anim, child: child),
-            child: Text(
-              '$qty',
-              key: ValueKey(qty),
-              style: TextStyle(
-                color: qty > 0 ? Colors.white : Colors.white38,
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -1,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(1.5.h),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _counterBtn(
+            icon: Icons.remove_rounded,
+            active: qty > 0,
+            onTap: () => _adjustQty(index, -1),
+          ),
+          Container(
+            width: 10.w,
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(vertical: 0.8.h),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 150),
+              transitionBuilder: (child, anim) =>
+                  ScaleTransition(scale: anim, child: child),
+              child: Text(
+                '$qty',
+                key: ValueKey(qty),
+                style: TextStyle(
+                  color: qty > 0 ? Colors.white : Colors.white38,
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1,
+                ),
               ),
             ),
           ),
-        ),
-        _counterBtn(
-          icon: Icons.add_rounded,
-          active: true,
-          onTap: () => _adjustQty(index, 1),
-        ),
-      ],
+          _counterBtn(
+            icon: Icons.add_rounded,
+            active: true,
+            onTap: () => _adjustQty(index, 1),
+          ),
+        ],
+      ),
     );
   }
 
@@ -532,17 +730,12 @@ class _BookEventScreenState extends State<BookEventScreen>
     return GestureDetector(
       onTap: active ? onTap : null,
       child: Container(
-        padding: EdgeInsets.all(1.h),
+        padding: EdgeInsets.all(1.2.h),
         decoration: BoxDecoration(
           color: active
-              ? AppColors.blueColor.withValues(alpha: 0.12)
+              ? AppColors.blueColor.withValues(alpha: 0.15)
               : Colors.white.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(1.h),
-          border: Border.all(
-            color: active
-                ? AppColors.blueColor.withValues(alpha: 0.35)
-                : Colors.white.withValues(alpha: 0.06),
-          ),
+          borderRadius: BorderRadius.circular(1.2.h),
         ),
         child: Icon(
           icon,
@@ -569,101 +762,118 @@ class _BookEventScreenState extends State<BookEventScreen>
                   color: Colors.white.withValues(alpha: 0.08), width: 0.5),
             ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: Row(
             children: [
-              // Summary row
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _summaryText,
-                          style: TextStyle(
-                            color: hasSelection
-                                ? Colors.white70
-                                : Colors.white30,
-                            fontSize: 10.sp,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: Text(
+                        _summaryText,
+                        key: ValueKey(_summaryText),
+                        style: TextStyle(
+                          color: hasSelection
+                              ? Colors.white60
+                              : Colors.white30,
+                          fontSize: 9.5.sp,
+                          height: 1.3,
                         ),
-                        if (hasSelection) ...[
-                          SizedBox(height: 0.4.h),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    if (hasSelection) ...[
+                      SizedBox(height: 0.3.h),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
                           Text(
                             '\$${_total.toStringAsFixed(2)}',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 20.sp,
+                              fontSize: 22.sp,
                               fontWeight: FontWeight.w900,
-                              letterSpacing: -1,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-
-                  // CTA Button
-                  GestureDetector(
-                    onTap: hasSelection ? _onContinue : null,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 6.w, vertical: 1.8.h),
-                      decoration: BoxDecoration(
-                        gradient: hasSelection
-                            ? LinearGradient(
-                                colors: [
-                                  AppColors.blueColor,
-                                  AppColors.blueColor
-                                      .withValues(alpha: 0.8),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              )
-                            : null,
-                        color: hasSelection
-                            ? null
-                            : Colors.white.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(4.h),
-                        boxShadow: hasSelection
-                            ? [
-                                BoxShadow(
-                                  color: AppColors.blueColor
-                                      .withValues(alpha: 0.4),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Continue',
-                            style: TextStyle(
-                              color:
-                                  hasSelection ? Colors.white : Colors.white30,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.3,
+                              letterSpacing: -1.2,
                             ),
                           ),
                           SizedBox(width: 1.5.w),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            color:
-                                hasSelection ? Colors.white : Colors.white30,
-                            size: 14.sp,
+                          Text(
+                            'total',
+                            style: TextStyle(
+                              color: Colors.white38,
+                              fontSize: 10.sp,
+                            ),
                           ),
                         ],
                       ),
-                    ),
+                    ],
+                  ],
+                ),
+              ),
+
+              SizedBox(width: 3.w),
+
+              // CTA Button
+              GestureDetector(
+                onTap: hasSelection ? _onContinue : null,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOutCubic,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 7.w, vertical: 1.8.h),
+                  decoration: BoxDecoration(
+                    gradient: hasSelection
+                        ? const LinearGradient(
+                            colors: [
+                              AppColors.blueColor,
+                              AppColors.lightColor,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    color: hasSelection
+                        ? null
+                        : Colors.white.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(4.h),
+                    boxShadow: hasSelection
+                        ? [
+                            BoxShadow(
+                              color: AppColors.blueColor
+                                  .withValues(alpha: 0.4),
+                              blurRadius: 20,
+                              offset: const Offset(0, 6),
+                            ),
+                          ]
+                        : null,
                   ),
-                ],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Continue',
+                        style: TextStyle(
+                          color:
+                              hasSelection ? Colors.white : Colors.white30,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                      SizedBox(width: 1.5.w),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color:
+                            hasSelection ? Colors.white : Colors.white30,
+                        size: 15.sp,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
