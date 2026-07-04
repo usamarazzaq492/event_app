@@ -36,12 +36,14 @@ class DonationController extends Controller
                 throw new \Exception('Square access token not configured. Please set SQUARE_ACCESS_TOKEN or SQUARE_TOKEN in your .env file.');
             }
 
-            $this->squareClient = new SquareClient(options: [
-                'accessToken' => $accessToken,
-                'baseUrl' => $environment === 'production'
-                    ? Environments::Production->value
-                    : Environments::Sandbox->value,
-            ]);
+            $this->squareClient = new SquareClient(
+                token: $accessToken,
+                options: [
+                    'baseUrl' => $environment === 'production'
+                        ? Environments::Production->value
+                        : Environments::Sandbox->value,
+                ]
+            );
         }
 
         return $this->squareClient;

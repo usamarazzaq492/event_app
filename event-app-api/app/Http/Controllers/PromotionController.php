@@ -48,27 +48,14 @@ class PromotionController extends Controller
             }
 
             try {
-                // Temporarily set environment variable if not set (Square SDK checks this)
-                $originalToken = getenv('SQUARE_TOKEN');
-                if (empty($originalToken) && !empty($accessToken)) {
-                    putenv("SQUARE_TOKEN={$accessToken}");
-                }
-
-                $this->squareClient = new SquareClient(options: [
-                    'accessToken' => $accessToken,
-                    'baseUrl' => $environment === 'production'
-                        ? Environments::Production->value
-                        : Environments::Sandbox->value,
-                ]);
-
-                // Restore original value if we set it
-                if (empty($originalToken) && !empty($accessToken)) {
-                    if ($originalToken === false) {
-                        putenv('SQUARE_TOKEN');
-                    } else {
-                        putenv("SQUARE_TOKEN={$originalToken}");
-                    }
-                }
+                $this->squareClient = new SquareClient(
+                    token: $accessToken,
+                    options: [
+                        'baseUrl' => $environment === 'production'
+                            ? Environments::Production->value
+                            : Environments::Sandbox->value,
+                    ]
+                );
             } catch (\Exception $e) {
                 Log::error('Failed to initialize SquareClient', [
                     'error' => $e->getMessage(),
