@@ -47,6 +47,20 @@ class EventController extends Controller
             }
         }
 
+        // Enforce compulsory Square connection for organizers
+        $hasSquare = DB::table('organizer_square_accounts')
+            ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+            ->where('organizers.userId', $request->user()->userId)
+            ->where('organizer_square_accounts.status', 'connected')
+            ->exists();
+
+        if (!$hasSquare) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You must connect your Square account in settings before you can create an event.',
+            ], 400);
+        }
+
         $path = $request->file('eventImage')->store('events', 'public');
 
         $latitude = $request->input('latitude');

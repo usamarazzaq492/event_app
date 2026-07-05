@@ -383,52 +383,50 @@ class BookingController extends Controller
             ->select('organizer_square_accounts.*')
             ->first();
 
-        $useSplitPayment = false;
-        $squareClient = $this->getSquareClient();
-        $locationId = config('square.location_id', '') ?: env('SQUARE_LOCATION_ID', '');
+        if (!$organizerSquareAccount) {
+            throw new \RuntimeException('The organizer has not connected their Square account. Payments cannot be processed for this event.');
+        }
 
-        if ($organizerSquareAccount) {
-            try {
-                // Decrypt access token
-                $accessToken = Crypt::decryptString($organizerSquareAccount->accessToken);
+        try {
+            // Decrypt access token
+            $accessToken = Crypt::decryptString($organizerSquareAccount->accessToken);
 
-                // Get application ID for split payments (required when using applicationFeeMoney)
-                $applicationId = config('square.application_id', env('SQUARE_APPLICATION_ID', ''));
+            // Get application ID for split payments (required when using applicationFeeMoney)
+            $applicationId = config('square.application_id', env('SQUARE_APPLICATION_ID', ''));
 
-                if (empty($applicationId)) {
-                    throw new \RuntimeException('Square Application ID is required for split payments. Please set SQUARE_APPLICATION_ID in your .env file.');
-                }
-
-                // Create Square client with organizer's token and application ID
-                $squareClientOptions = [
-                    'baseUrl' => $organizerSquareAccount->environment === 'production'
-                        ? Environments::Production->value
-                        : Environments::Sandbox->value,
-                ];
-
-                // Add applicationId for split payments
-                $squareClientOptions['applicationId'] = $applicationId;
-
-                $squareClient = new SquareClient(
-                    token: $accessToken,
-                    options: $squareClientOptions
-                );
-
-                $locationId = $organizerSquareAccount->squareLocationId;
-                $useSplitPayment = true;
-
-                Log::info('Using split payment', [
-                    'organizer_id' => $event->userId,
-                    'merchant_id' => $organizerSquareAccount->squareMerchantId,
-                    'application_id' => $applicationId
-                ]);
-            } catch (\Exception $e) {
-                Log::warning('Failed to use organizer Square account, falling back to direct payment', [
-                    'error' => $e->getMessage(),
-                    'organizer_id' => $event->userId
-                ]);
-                // Fall back to direct payment
+            if (empty($applicationId)) {
+                throw new \RuntimeException('Square Application ID is required for split payments. Please set SQUARE_APPLICATION_ID in your .env file.');
             }
+
+            // Create Square client with organizer's token and application ID
+            $squareClientOptions = [
+                'baseUrl' => $organizerSquareAccount->environment === 'production'
+                    ? Environments::Production->value
+                    : Environments::Sandbox->value,
+            ];
+
+            // Add applicationId for split payments
+            $squareClientOptions['applicationId'] = $applicationId;
+
+            $squareClient = new SquareClient(
+                token: $accessToken,
+                options: $squareClientOptions
+            );
+
+            $locationId = $organizerSquareAccount->squareLocationId;
+            $useSplitPayment = true;
+
+            Log::info('Using split payment', [
+                'organizer_id' => $event->userId,
+                'merchant_id' => $organizerSquareAccount->squareMerchantId,
+                'application_id' => $applicationId
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Organizer Square account error', [
+                'error' => $e->getMessage(),
+                'organizer_id' => $event->userId
+            ]);
+            throw new \RuntimeException('There is a problem with the organizer\'s payment setup. Please contact support.');
         }
 
         if (empty($locationId)) {
