@@ -442,22 +442,24 @@ class BookingController extends Controller
             'amountMoney' => $amountMoney
         ];
 
+        // Create payment request
+        $paymentRequest = new CreatePaymentRequest($paymentRequestData);
+
         // If split payment, set application fee (app owner's commission)
         if ($useSplitPayment && $commission > 0) {
             $commissionCents = (int)round($commission * 100);
             $applicationFeeMoney = new Money();
             $applicationFeeMoney->setAmount($commissionCents);
             $applicationFeeMoney->setCurrency('USD');
-            $paymentRequestData['applicationFeeMoney'] = $applicationFeeMoney;
+            
+            // Fix: Use correct setter for app fee money
+            $paymentRequest->setAppFeeMoney($applicationFeeMoney);
 
             Log::debug('Split payment with application fee', [
                 'commission' => $commission,
                 'commission_cents' => $commissionCents
             ]);
         }
-
-        // Create payment request
-        $paymentRequest = new CreatePaymentRequest($paymentRequestData);
 
         // Set additional parameters
         $paymentRequest->setNote(substr($note, 0, 500));
