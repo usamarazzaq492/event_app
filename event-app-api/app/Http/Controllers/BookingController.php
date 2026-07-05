@@ -20,7 +20,7 @@ class BookingController extends Controller
     // Constants for fee structure
     const PROCESSING_FEE_PERCENT = 2.9;
     const FIXED_PROCESSING_FEE = 0.30;
-    const COMMISSION_RATE = 10.0; // App owner commission rate (percentage of subtotal)
+    const COMMISSION_RATE = 1.0; // App owner commission rate (percentage of subtotal)
 
     private $squareClient;
 
