@@ -344,11 +344,19 @@ class EventController extends Controller
         $hasLiveStreamAccess = $isOrganizer || $isBooked;
     }
 
+    // Check if the organizer has connected Square
+    $isOrganizerSquareConnected = DB::table('organizer_square_accounts')
+        ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+        ->where('organizers.userId', $event->userId)
+        ->where('organizer_square_accounts.status', 'connected')
+        ->exists();
+
     // Convert event object to array
     $eventArray = (array) $event;
     $eventArray['isBooked'] = $isBooked;
     $eventArray['isOrganizer'] = $isOrganizer;
     $eventArray['hasLiveStreamAccess'] = $hasLiveStreamAccess;
+    $eventArray['isOrganizerSquareConnected'] = $isOrganizerSquareConnected;
 
     // ── Append active ticket tiers ───────────────────────────────────────────
     $tiers = EventTicketTier::where('eventId', $id)
