@@ -26,6 +26,7 @@ class EventDetailModel {
   String? addDate;
   String? editDate;
   bool? isBooked; // changed to bool
+  bool? isOrganizerSquareConnected;
   bool? isPromoted;
   String? promotionStartDate;
   String? promotionEndDate;
@@ -58,6 +59,7 @@ class EventDetailModel {
     this.addDate,
     this.editDate,
     this.isBooked, // updated
+    this.isOrganizerSquareConnected,
     this.isPromoted,
     this.promotionStartDate,
     this.promotionEndDate,
@@ -80,17 +82,18 @@ class EventDetailModel {
     address = json['address'];
     city = json['city'];
     state = json['state'];
-    latitude = json['latitude'];
-    longitude = json['longitude'];
+    latitude = json['latitude']?.toString();
+    longitude = json['longitude']?.toString();
     eventImage = json['eventImage'];
     liveStreamUrl = json['live_stream_url'];
     liveStreamEmbedUrl = json['live_stream_embed_url'];
-    hasLiveStreamAccess = json['hasLiveStreamAccess'];
-    isOrganizer = json['isOrganizer'];
+    hasLiveStreamAccess = json['hasLiveStreamAccess'] == true || json['hasLiveStreamAccess'] == '1';
+    isOrganizer = json['isOrganizer'] == true || json['isOrganizer'] == '1';
     isActive = json['isActive'];
     addDate = json['addDate'];
     editDate = json['editDate'];
     isBooked = json['isBooked'] == true || json['isBooked'] == '1'; // updated
+    isOrganizerSquareConnected = json['isOrganizerSquareConnected'] == true || json['isOrganizerSquareConnected'] == '1';
     isPromoted = json['isPromoted'] == 1 || json['isPromoted'] == true;
     promotionStartDate = json['promotionStartDate'];
     promotionEndDate = json['promotionEndDate'];
@@ -104,7 +107,7 @@ class EventDetailModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = {};
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['eventId'] = eventId;
     data['userId'] = userId;
     data['eventTitle'] = eventTitle;
@@ -130,6 +133,7 @@ class EventDetailModel {
     data['addDate'] = addDate;
     data['editDate'] = editDate;
     data['isBooked'] = isBooked; // updated
+    data['isOrganizerSquareConnected'] = isOrganizerSquareConnected;
     if (ticketTiers != null) {
       data['ticket_tiers'] = ticketTiers!.map((v) => v.toJson()).toList();
     }

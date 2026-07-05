@@ -1288,7 +1288,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   ? 'ALREADY BOOKED'
                                   : isCreator
                                       ? 'YOUR EVENT'
-                                      : 'GET TICKETS',
+                                      : (event.isOrganizerSquareConnected == false)
+                                          ? 'UNAVAILABLE'
+                                          : 'GET TICKETS',
                       icon: hasEventEnded
                           ? Icons.event_busy_rounded
                           : hasEventStarted
@@ -1297,7 +1299,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   ? Icons.check_circle_rounded
                                   : isCreator
                                       ? Icons.person_rounded
-                                      : Icons.shopping_bag_rounded,
+                                      : (event.isOrganizerSquareConnected == false)
+                                          ? Icons.block_rounded
+                                          : Icons.shopping_bag_rounded,
                       color: hasEventEnded
                           ? Colors.grey
                           : hasEventStarted
@@ -1306,11 +1310,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   ? Colors.green
                                   : isCreator
                                       ? Colors.purple
-                                      : AppColors.blueColor,
+                                      : (event.isOrganizerSquareConnected == false)
+                                          ? Colors.red
+                                          : AppColors.blueColor,
                       isDisabled: hasEventStarted ||
                           isBooked ||
                           hasEventEnded ||
-                          isCreator,
+                          isCreator ||
+                          (event.isOrganizerSquareConnected == false),
                       onTap: () {
                         HapticUtils.buttonPress();
                         if (!authViewModel.isLoggedIn.value) {
