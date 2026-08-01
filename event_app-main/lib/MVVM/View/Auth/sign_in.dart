@@ -123,20 +123,24 @@ class _SigninScreenState extends State<SigninScreen> {
                           vertical: 1.h,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.blueColor.withValues(alpha: 0.3),
+                          color: AppColors.backgroundColor,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppColors.blueColor.withValues(alpha: 0.5),
-                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryColor.withValues(alpha: 0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               "Don't have an account? ",
-                              style: TextStyles.regularwhite.copyWith(
+                              style: TextStyles.regulartext.copyWith(
                                 fontSize: 11.sp,
-                                color: Colors.white70,
+                                color: AppColors.textColorPrimary,
                               ),
                             ),
                             Text(
@@ -144,7 +148,7 @@ class _SigninScreenState extends State<SigninScreen> {
                               style: TextStyles.regulartext.copyWith(
                                 fontSize: 11.sp,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.lightColor,
+                                color: AppColors.blueColor,
                               ),
                             ),
                           ],
@@ -191,7 +195,7 @@ class _SigninScreenState extends State<SigninScreen> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
+                      color: AppColors.primaryColor.withValues(alpha: 0.05),
                       blurRadius: 20,
                       offset: const Offset(0, -4),
                     ),
@@ -210,14 +214,15 @@ class _SigninScreenState extends State<SigninScreen> {
                           style: TextStyles.heading.copyWith(
                             fontSize: 24.sp,
                             fontWeight: FontWeight.w700,
+                            color: AppColors.textColorPrimary,
                           ),
                         ),
                         SizedBox(height: 0.5.h),
                         Text(
                           'Enter your details below',
-                          style: TextStyles.regularwhite.copyWith(
+                          style: TextStyles.regulartext.copyWith(
                             fontSize: 13.sp,
-                            color: Colors.white70,
+                            color: AppColors.textColorSecondary,
                           ),
                         ),
                         SizedBox(height: 4.h),
@@ -236,7 +241,7 @@ class _SigninScreenState extends State<SigninScreen> {
                             prefixIcon: Image.asset(
                               AppImages.emailIcon,
                               height: 2.h,
-                              color: Colors.white.withAlpha(179),
+                              color: AppColors.textColorSecondary,
                             ),
                             validator: (v) =>
                                 FormValidationUtils.validateEmail(v),
@@ -266,13 +271,13 @@ class _SigninScreenState extends State<SigninScreen> {
                             prefixIcon: Image.asset(
                               AppImages.passwordIcon,
                               height: 2.h,
-                              color: Colors.white.withAlpha(179),
+                              color: AppColors.textColorSecondary,
                             ),
                             suffixIcon: Icon(
                               _isObscure
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined,
-                              color: Colors.white.withAlpha(179),
+                              color: AppColors.textColorSecondary,
                               size: 20,
                             ),
                             onSuffixIconPress: () =>
@@ -315,8 +320,9 @@ class _SigninScreenState extends State<SigninScreen> {
                                   SizedBox(width: 1.w),
                                   Text(
                                     'Remember me',
-                                    style: TextStyles.regularwhite
-                                        .copyWith(fontSize: 11.sp),
+                                    style: TextStyles.regulartext.copyWith(
+                                        fontSize: 11.sp,
+                                        color: AppColors.textColorPrimary),
                                   ),
                                 ],
                               ),
@@ -380,10 +386,8 @@ class _SigninScreenState extends State<SigninScreen> {
                                       'Apple Sign In',
                                       'Could not get credentials from Apple.',
                                       snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor:
-                                          AppColors.signinoptioncolor,
-                                      colorText: Colors.white,
-                                    );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                                     return;
                                   }
                                   await authViewModel.signInWithApple(
@@ -404,20 +408,16 @@ class _SigninScreenState extends State<SigninScreen> {
                                           ? e.message
                                           : 'Could not sign in with Apple',
                                       snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor:
-                                          AppColors.signinoptioncolor,
-                                      colorText: Colors.white,
-                                    );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                                   }
                                 } catch (e) {
                                   Get.snackbar(
                                     'Apple Sign In',
                                     'Could not sign in with Apple. Please try again.',
                                     snackPosition: SnackPosition.BOTTOM,
-                                    backgroundColor:
-                                        AppColors.signinoptioncolor,
-                                    colorText: Colors.white,
-                                  );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                                 }
                               },
                               style: SignInWithAppleButtonStyle.black,
@@ -447,10 +447,10 @@ class _SigninScreenState extends State<SigninScreen> {
       children: [
         Text(
           label,
-          style: TextStyles.regularwhite.copyWith(
+          style: TextStyles.regulartext.copyWith(
             fontSize: 12.sp,
             fontWeight: FontWeight.w500,
-            color: Colors.white70,
+            color: AppColors.textColorPrimary,
           ),
         ),
         SizedBox(height: 1.h),

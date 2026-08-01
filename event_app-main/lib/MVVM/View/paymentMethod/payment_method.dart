@@ -73,7 +73,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                           'Select your preferred payment method',
                           style: TextStyle(
                             fontSize: 11.sp,
-                            color: Colors.white38,
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -138,7 +138,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                                 child: Text(
                                   'PAY NOW',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.textColorPrimary,
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 1,
@@ -170,7 +170,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                 width: 0.5,
               ),
             ),
@@ -185,15 +185,15 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     size: 16.sp,
                   ),
                 ),
@@ -203,7 +203,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                   child: Text(
                     'Payment Method',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
@@ -233,12 +233,12 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.blueColor.withValues(alpha: 0.1)
-              : Colors.white.withValues(alpha: 0.05),
+              : AppColors.textColorPrimary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(2.h),
           border: Border.all(
             color: isSelected
                 ? AppColors.blueColor.withValues(alpha: 0.4)
-                : Colors.white.withValues(alpha: 0.1),
+                : AppColors.textColorPrimary.withValues(alpha: 0.1),
             width: isSelected ? 1.5 : 1,
           ),
         ),
@@ -255,14 +255,14 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.blueColor.withValues(alpha: 0.2)
-                          : Colors.white.withValues(alpha: 0.05),
+                          : AppColors.textColorPrimary.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       index == 0
                           ? Icons.credit_card_rounded
                           : Icons.payments_rounded,
-                      color: isSelected ? AppColors.blueColor : Colors.white24,
+                      color: isSelected ? AppColors.blueColor : AppColors.textColorPrimary.withValues(alpha: 0.24),
                       size: 18.sp,
                     ),
                   ),
@@ -271,7 +271,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                     child: Text(
                       title,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textColorPrimary,
                         fontSize: 12.sp,
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.w500,
@@ -285,14 +285,14 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color:
-                            isSelected ? AppColors.blueColor : Colors.white24,
+                            isSelected ? AppColors.blueColor : AppColors.textColorPrimary.withValues(alpha: 0.24),
                         width: 2,
                       ),
                       color:
                           isSelected ? AppColors.blueColor : Colors.transparent,
                     ),
                     child: isSelected
-                        ? const Icon(Icons.check, size: 12, color: Colors.white)
+                        ? const Icon(Icons.check, size: 12, color: AppColors.textColorPrimary)
                         : null,
                   ),
                 ],

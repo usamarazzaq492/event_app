@@ -67,7 +67,7 @@ class InputTextField extends StatelessWidget {
               }
             : onChanged,
         cursorColor: AppColors.blueColor,
-        style: TextStyles.regularwhite,
+        style: TextStyles.regulartext.copyWith(color: AppColors.textColorPrimary),
         autofocus: autoFocus,
         autofillHints: autofillHints,
         textInputAction: textInputAction,
@@ -81,14 +81,14 @@ class InputTextField extends StatelessWidget {
           hintText: hint,
           contentPadding: const EdgeInsets.all(20),
           hintStyle: TextStyles.regularhint,
-          fillColor: AppColors.signinoptioncolor,
+          fillColor: AppColors.backgroundColor,
           filled: true,
           border: OutlineInputBorder(
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: AppColors.signinoptionbordercolor, width: 1),
             borderRadius: BorderRadius.circular(20),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: AppColors.blueColor, width: 1),
             borderRadius: BorderRadius.circular(20),
           ),
           errorBorder: OutlineInputBorder(
@@ -100,11 +100,11 @@ class InputTextField extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: AppColors.signinoptionbordercolor, width: 1),
             borderRadius: BorderRadius.circular(20),
           ),
           disabledBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(color: AppColors.signinoptionbordercolor, width: 1),
             borderRadius: BorderRadius.circular(20),
           ),
           prefixIcon: prefixIcon,

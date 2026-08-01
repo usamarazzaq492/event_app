@@ -65,7 +65,7 @@ class _InviteUserListState extends State<InviteUserList> {
                     } else if (authViewModel.error.isNotEmpty) {
                       return Center(
                           child: Text(authViewModel.error.value,
-                              style: const TextStyle(color: Colors.white70)));
+                              style: const TextStyle(color: AppColors.textColorSecondary)));
                     }
 
                     final currentUserId = authViewModel.currentUser['userId'];
@@ -78,7 +78,7 @@ class _InviteUserListState extends State<InviteUserList> {
                         child: Text(
                           'No users available',
                           style:
-                              TextStyle(color: Colors.white60, fontSize: 12.sp),
+                              TextStyle(color: AppColors.textColorSecondary, fontSize: 12.sp),
                         ),
                       );
                     }
@@ -93,10 +93,10 @@ class _InviteUserListState extends State<InviteUserList> {
                         return Container(
                           margin: EdgeInsets.only(bottom: 1.5.h),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.03),
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.03),
                             borderRadius: BorderRadius.circular(2.h),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.05),
+                              color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                             ),
                           ),
                           child: ClipRRect(
@@ -117,7 +117,7 @@ class _InviteUserListState extends State<InviteUserList> {
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: 4.w, vertical: 0.5.h),
                                 leading: Container(
-                                  padding: const EdgeInsets.all(2),
+                                  padding: EdgeInsets.all(2),
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
@@ -128,7 +128,7 @@ class _InviteUserListState extends State<InviteUserList> {
                                   ),
                                   child: CircleAvatar(
                                     radius: 24,
-                                    backgroundColor: Colors.white10,
+                                    backgroundColor: AppColors.textColorPrimary.withValues(alpha: 0.12),
                                     backgroundImage: CachedNetworkImageProvider(
                                       'https://eventgo-live.com${user.profileImageUrl}',
                                     ),
@@ -139,14 +139,14 @@ class _InviteUserListState extends State<InviteUserList> {
                                   style: TextStyle(
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: AppColors.textColorPrimary,
                                   ),
                                 ),
                                 subtitle: Text(
                                   user.email ?? '',
                                   style: TextStyle(
                                     fontSize: 9.sp,
-                                    color: Colors.white38,
+                                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -166,7 +166,7 @@ class _InviteUserListState extends State<InviteUserList> {
                                           horizontal: 4.w, vertical: 1.h),
                                       decoration: BoxDecoration(
                                         color: isInvited
-                                            ? Colors.white
+                                            ? AppColors.textColorPrimary
                                                 .withValues(alpha: 0.1)
                                             : AppColors.blueColor
                                                 .withValues(alpha: 0.2),
@@ -174,7 +174,7 @@ class _InviteUserListState extends State<InviteUserList> {
                                             BorderRadius.circular(2.h),
                                         border: Border.all(
                                           color: isInvited
-                                              ? Colors.white24
+                                              ? AppColors.textColorPrimary.withValues(alpha: 0.24)
                                               : AppColors.blueColor
                                                   .withValues(alpha: 0.5),
                                         ),
@@ -183,8 +183,8 @@ class _InviteUserListState extends State<InviteUserList> {
                                         isInvited ? 'Invited' : 'Invite',
                                         style: TextStyle(
                                           color: isInvited
-                                              ? Colors.white70
-                                              : Colors.white,
+                                              ? AppColors.textColorSecondary
+                                              : AppColors.textColorPrimary,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 9.sp,
                                         ),
@@ -267,7 +267,7 @@ class _InviteUserListState extends State<InviteUserList> {
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                 width: 0.5,
               ),
             ),
@@ -282,15 +282,15 @@ class _InviteUserListState extends State<InviteUserList> {
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     size: 16.sp,
                   ),
                 ),
@@ -300,7 +300,7 @@ class _InviteUserListState extends State<InviteUserList> {
                   child: Text(
                     'Invite Friends',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,

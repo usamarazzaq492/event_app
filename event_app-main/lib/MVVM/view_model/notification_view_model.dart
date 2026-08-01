@@ -1,6 +1,8 @@
+import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/Services/notification_service.dart';
 import 'package:event_app/Services/invite_service.dart';
-import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart' as book_event;
+import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart'
+    as book_event;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -43,16 +45,20 @@ class NotificationViewModel extends GetxController {
       Get.snackbar(
         "Success",
         "Invite ${response == 'accepted' ? 'accepted' : 'declined'} successfully",
-        backgroundColor: response == 'accepted' ? Colors.green : Colors.orange,
-        colorText: Colors.white,
+        
+        
         duration: const Duration(seconds: 2),
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
 
-      if (response == 'accepted' && res['is_paid'] == true && res['eventId'] != null) {
+      if (response == 'accepted' &&
+          res['is_paid'] == true &&
+          res['eventId'] != null) {
         // Redirect to BookEventScreen so they can buy the ticket
         // Using Future.delayed to let the snackbar show
         Future.delayed(const Duration(milliseconds: 500), () {
-          Get.to(() => book_event.BookEventScreen(id: int.parse(res['eventId'].toString())));
+          Get.to(() => book_event.BookEventScreen(
+              id: int.parse(res['eventId'].toString())));
         });
       }
     } catch (e) {
@@ -60,9 +66,8 @@ class NotificationViewModel extends GetxController {
       Get.snackbar(
         "Error",
         "Failed to respond to invite",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 

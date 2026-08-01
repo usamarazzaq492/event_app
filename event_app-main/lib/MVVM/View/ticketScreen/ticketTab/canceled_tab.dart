@@ -37,7 +37,7 @@ class CancelledTab extends StatelessWidget {
             child: Text(
               "No cancelled tickets",
               style: TextStyle(
-                color: Colors.white70,
+                color: AppColors.textColorSecondary,
                 fontSize: 14.sp,
               ),
             ),

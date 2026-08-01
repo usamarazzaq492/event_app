@@ -1,3 +1,4 @@
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/utils/haptic_utils.dart';
@@ -32,7 +33,7 @@ class _ContactScreenState extends State<ContactScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new,
-              color: Colors.white, size: 20),
+              color: AppColors.textColorPrimary, size: 20),
           onPressed: () {
             HapticUtils.navigation();
             Navigator.pop(context);
@@ -47,7 +48,7 @@ class _ContactScreenState extends State<ContactScreen> {
       body: SafeArea(
         child: SizedBox.expand(
           child: WebViewWidget(controller: _controller),
-        ),
+        ).animate().fade(duration: 400.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad),
       ),
     );
   }

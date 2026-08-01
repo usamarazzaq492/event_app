@@ -45,9 +45,9 @@ class _TicketScreenState extends State<TicketScreen> {
             Container(
               padding: EdgeInsets.all(4.h),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.03),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.03),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
               ),
               child: Icon(
                 Icons.confirmation_number_rounded,
@@ -59,7 +59,7 @@ class _TicketScreenState extends State<TicketScreen> {
             Text(
               "Join the EventGo Community",
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.5,
@@ -70,7 +70,7 @@ class _TicketScreenState extends State<TicketScreen> {
             Text(
               "Sign in to view your tickets and upcoming experiences.",
               style: TextStyle(
-                color: Colors.white38,
+                color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                 fontSize: 12.sp,
                 height: 1.4,
               ),
@@ -151,10 +151,10 @@ class _TicketScreenState extends State<TicketScreen> {
       final filtered = ticketVM.tickets;
 
       if (filtered.isEmpty) {
-        return const Center(
+        return Center(
           child: Text(
             "No tickets found",
-            style: TextStyle(color: Colors.white38),
+            style: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38)),
           ),
         );
       }
@@ -185,10 +185,10 @@ class _TicketScreenState extends State<TicketScreen> {
           return Container(
             margin: EdgeInsets.only(bottom: 2.5.h),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.03),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(2.5.h),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.08),
                 width: 1,
               ),
             ),
@@ -206,12 +206,12 @@ class _TicketScreenState extends State<TicketScreen> {
                           height: 8.h,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => Container(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                           ),
                           errorWidget: (context, url, error) => Container(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                             child: Icon(Icons.confirmation_number_rounded,
-                                color: Colors.white24, size: 20.sp),
+                                color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 20.sp),
                           ),
                         ),
                       ),
@@ -223,7 +223,7 @@ class _TicketScreenState extends State<TicketScreen> {
                             Text(
                               capitalizedTitle.trim(),
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.textColorPrimary,
                                 fontSize: 13.sp,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: -0.2,
@@ -235,7 +235,7 @@ class _TicketScreenState extends State<TicketScreen> {
                             Text(
                               "$formattedDate • $formattedStartTime",
                               style: TextStyle(
-                                  color: Colors.white38, fontSize: 9.sp),
+                                  color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 9.sp),
                             ),
                           ],
                         ),
@@ -265,22 +265,18 @@ class _TicketScreenState extends State<TicketScreen> {
                     padding:
                         EdgeInsets.symmetric(vertical: 3.h, horizontal: 4.w),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.02),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.02),
                       borderRadius: BorderRadius.circular(2.h),
                     ),
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.textColorPrimary,
                             borderRadius: BorderRadius.circular(1.5.h),
                             boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
+                              BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 10),),
                             ],
                           ),
                           child: QrImageView(
@@ -289,14 +285,14 @@ class _TicketScreenState extends State<TicketScreen> {
                                 : jsonEncode(qrCodeData),
                             version: QrVersions.auto,
                             size: 40.w,
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColors.textColorPrimary,
                           ),
                         ),
                         SizedBox(height: 2.h),
                         Text(
                           "SCAN TO ENTER",
                           style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
+                              color: AppColors.textColorPrimary.withValues(alpha: 0.5),
                               fontSize: 9.sp,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 2),
@@ -314,13 +310,13 @@ class _TicketScreenState extends State<TicketScreen> {
                         children: [
                           Text("ADMIT ONE",
                               style: TextStyle(
-                                  color: Colors.white24,
+                                  color: AppColors.textColorPrimary.withValues(alpha: 0.24),
                                   fontSize: 7.sp,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 1)),
                           Text(ticketNumber,
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.textColorPrimary,
                                   fontSize: 10.sp,
                                   fontWeight: FontWeight.w600)),
                         ],
@@ -332,7 +328,9 @@ class _TicketScreenState extends State<TicketScreen> {
                             await generateTicketPdf(t);
                             HapticUtils.success();
                             Get.snackbar(
-                                "Success", "Ticket saved to Downloads");
+                                "Success", "Ticket saved to Downloads",
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                           } catch (e) {
                             HapticUtils.error();
                           }
@@ -376,14 +374,14 @@ class _TicketScreenState extends State<TicketScreen> {
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
                 bottom:
-                    BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+                    BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05))),
           ),
           child: Row(
             children: [
               Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textColorPrimary,
                   fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: -0.5,

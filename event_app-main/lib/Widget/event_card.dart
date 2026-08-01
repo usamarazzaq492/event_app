@@ -42,7 +42,7 @@ class EventCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: const TextStyle(color: AppColors.whiteColor, fontSize: 13, fontWeight: FontWeight.bold)),
+                      Text(title, style: const TextStyle(color: AppColors.textColorPrimary, fontSize: 13, fontWeight: FontWeight.bold)),
                       SizedBox(height: 1.h),
                       Text(date, style: const TextStyle(color: AppColors.blueColor, fontSize: 13)),
                       SizedBox(height: 1.h),
@@ -51,7 +51,7 @@ class EventCard extends StatelessWidget {
                           const Icon(Icons.location_pin, color: AppColors.blueColor, size: 16),
                           SizedBox(width: 3.w),
                           Expanded( // To avoid overflow
-                            child: Text(location, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                            child: Text(location, style: const TextStyle(color: AppColors.textColorSecondary, fontSize: 10)),
                           ),
                         ],
                       ),

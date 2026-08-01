@@ -55,7 +55,7 @@ class CompletedTab extends StatelessWidget {
             child: Text(
               "No completed tickets",
               style: TextStyle(
-                color: Colors.white70,
+                color: AppColors.textColorSecondary,
                 fontSize: 14.sp,
               ),
             ),

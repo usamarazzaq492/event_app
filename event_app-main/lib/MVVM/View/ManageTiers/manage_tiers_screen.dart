@@ -75,10 +75,11 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
             Get.snackbar(
               'Tier Added',
               '"$name" tier created successfully.',
-              backgroundColor: AppColors.blueColor,
-              colorText: Colors.white,
+              
+              
               snackPosition: SnackPosition.BOTTOM,
-            );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
           }
           if (mounted) setState(() => _busy = false);
         },
@@ -111,10 +112,11 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
             Get.snackbar(
               'Tier Updated',
               '"$name" tier updated.',
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
+              
+              
               snackPosition: SnackPosition.BOTTOM,
-            );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
           }
           if (mounted) setState(() => _busy = false);
         },
@@ -159,11 +161,11 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
         onPressed: _openAddSheet,
         backgroundColor: AppColors.blueColor,
         elevation: 8,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        icon: const Icon(Icons.add_rounded, color: AppColors.textColorPrimary),
         label: Text(
           'Add Tier',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.textColorPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 11.sp,
           ),
@@ -183,7 +185,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
             color: AppColors.backgroundColor.withValues(alpha: 0.85),
             border: Border(
               bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.07), width: 0.5),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.07), width: 0.5),
             ),
           ),
           child: Row(
@@ -196,12 +198,12 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
                   ),
                   child: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white, size: 15.sp),
+                      color: AppColors.textColorPrimary, size: 15.sp),
                 ),
               ),
               SizedBox(width: 3.w),
@@ -212,7 +214,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
                     Text(
                       'Manage Ticket Tiers',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textColorPrimary,
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.4,
@@ -221,7 +223,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
                     Text(
                       widget.eventTitle,
                       style: TextStyle(
-                          color: Colors.white38, fontSize: 9.5.sp),
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 9.5.sp),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -262,7 +264,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
               SizedBox(height: 2.h),
               Text('Loading tiers…',
                   style:
-                      TextStyle(color: Colors.white38, fontSize: 11.sp)),
+                      TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 11.sp)),
             ],
           ),
         );
@@ -274,7 +276,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
 
       return RefreshIndicator(
         color: AppColors.blueColor,
-        backgroundColor: AppColors.signinoptioncolor,
+        backgroundColor: AppColors.textColorPrimary,
         onRefresh: _load,
         child: ListView(
           padding: EdgeInsets.fromLTRB(4.w, 2.h, 4.w, 12.h),
@@ -308,7 +310,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
             child: Text(
               '$count active tier${count == 1 ? '' : 's'} · Tap a card to edit, swipe left to delete.',
               style: TextStyle(
-                  color: Colors.white60, fontSize: 9.5.sp),
+                  color: AppColors.textColorSecondary, fontSize: 9.5.sp),
             ),
           ),
         ],
@@ -340,7 +342,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
             Text(
               'No ticket tiers yet',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.5,
@@ -350,7 +352,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
             Text(
               'Add tiers like Adult, Child, VIP,\nor Senior 55+ so attendees can pick\nwhat they need.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white38, fontSize: 11.sp, height: 1.5),
+              style: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 11.sp, height: 1.5),
             ),
             SizedBox(height: 4.h),
             GestureDetector(
@@ -375,12 +377,12 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.add_rounded, color: Colors.white),
+                    const Icon(Icons.add_rounded, color: AppColors.textColorPrimary),
                     SizedBox(width: 2.w),
                     Text(
                       'Add Your First Tier',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textColorPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 12.sp,
                       ),
@@ -418,10 +420,11 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
           Get.snackbar(
             'Removed',
             '"${tier.tierName}" tier removed.',
-            backgroundColor: Colors.red.shade700,
-            colorText: Colors.white,
+            
+            
             snackPosition: SnackPosition.BOTTOM,
-          );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
         }
         if (mounted) setState(() => _busy = false);
       },
@@ -450,10 +453,10 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
           duration: const Duration(milliseconds: 180),
           margin: EdgeInsets.only(bottom: 1.8.h),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.04),
+            color: AppColors.textColorPrimary.withValues(alpha: 0.04),
             borderRadius: BorderRadius.circular(2.2.h),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.09),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.09),
               width: 1,
             ),
           ),
@@ -490,7 +493,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
                           Text(
                             tier.tierName,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textColorPrimary,
                               fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
                               letterSpacing: -0.3,
@@ -503,7 +506,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
                               child: Text(
                                 tier.description!,
                                 style: TextStyle(
-                                    color: Colors.white38,
+                                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                                     fontSize: 9.sp),
                               ),
                             ),
@@ -515,7 +518,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
                                   tier.quantityCap != null
                                       ? '${tier.available}/${tier.quantityCap} left'
                                       : 'Unlimited',
-                                  Colors.white24,
+                                  AppColors.textColorPrimary.withValues(alpha: 0.24),
                                 ),
                                 if (tier.quantitySold > 0) ...[
                                   SizedBox(width: 1.5.w),
@@ -542,7 +545,7 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
                           style: TextStyle(
                             color: isFree
                                 ? Colors.greenAccent
-                                : Colors.white,
+                                : AppColors.textColorPrimary,
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.5,
@@ -707,7 +710,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
               borderRadius:
                   BorderRadius.vertical(top: Radius.circular(4.h)),
               border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.08)),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.08)),
             ),
             child: Form(
               key: _formKey,
@@ -722,7 +725,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                         width: 10.w,
                         height: 0.5.h,
                         decoration: BoxDecoration(
-                          color: Colors.white24,
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.24),
                           borderRadius: BorderRadius.circular(1.h),
                         ),
                       ),
@@ -733,7 +736,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                     Text(
                       _isEditing ? 'Edit Tier' : 'Add Ticket Tier',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textColorPrimary,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.5,
@@ -745,7 +748,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                           ? 'Update the details for this tier.'
                           : 'Define who can buy this tier and at what price.',
                       style: TextStyle(
-                          color: Colors.white38, fontSize: 10.sp),
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 10.sp),
                     ),
 
                     // Preset chips (only on add)
@@ -753,7 +756,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                       SizedBox(height: 2.h),
                       Text('QUICK PICK',
                           style: TextStyle(
-                              color: Colors.white38,
+                              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                               fontSize: 8.5.sp,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.2)),
@@ -822,7 +825,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                             _label('LIMIT QUANTITY'),
                             Text('Set max tickets for this tier',
                                 style: TextStyle(
-                                    color: Colors.white38,
+                                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                                     fontSize: 8.5.sp)),
                           ],
                         ),
@@ -892,7 +895,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                                   end: Alignment.bottomRight,
                                 ),
                           color: _isSaving
-                              ? Colors.white.withValues(alpha: 0.06)
+                              ? AppColors.textColorPrimary.withValues(alpha: 0.06)
                               : null,
                           borderRadius: BorderRadius.circular(4.h),
                           boxShadow: _isSaving
@@ -912,7 +915,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
-                                    color: Colors.white,
+                                    color: AppColors.textColorPrimary,
                                     strokeWidth: 2,
                                   ),
                                 )
@@ -921,7 +924,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                                       ? 'Save Changes'
                                       : 'Add Tier',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.textColorPrimary,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13.sp,
                                     letterSpacing: 0.3,
@@ -943,7 +946,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
   Widget _label(String text) => Text(
         text,
         style: TextStyle(
-          color: Colors.white38,
+          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
           fontSize: 8.5.sp,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.2,
@@ -965,31 +968,31 @@ class _TierFormSheetState extends State<_TierFormSheet> {
       inputFormatters: inputFormatters,
       validator: validator,
       maxLines: maxLines,
-      style: TextStyle(color: Colors.white, fontSize: 12.sp),
+      style: TextStyle(color: AppColors.textColorPrimary, fontSize: 12.sp),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle:
-            TextStyle(color: Colors.white24, fontSize: 11.sp),
+            TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.24), fontSize: 11.sp),
         prefixIcon:
             Icon(icon, color: AppColors.blueColor, size: 14.sp),
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.04),
+        fillColor: AppColors.textColorPrimary.withValues(alpha: 0.04),
         contentPadding:
             EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
           borderSide:
-              BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+              BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
           borderSide:
-              BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+              BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
           borderSide:
-              const BorderSide(color: AppColors.blueColor, width: 1.5),
+              BorderSide(color: AppColors.blueColor, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
@@ -1028,7 +1031,7 @@ class _PresetChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.textColorPrimary,
             fontSize: 10.sp,
             fontWeight: FontWeight.w500,
           ),
@@ -1057,7 +1060,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
               color: AppColors.signinoptioncolor.withValues(alpha: 0.97),
               borderRadius: BorderRadius.circular(3.h),
               border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.08)),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.08)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1076,7 +1079,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                 Text(
                   'Remove Tier?',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     fontSize: 14.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1086,7 +1089,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                   '"$tierName" will be deactivated.\nExisting bookings are not affected.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: Colors.white54, fontSize: 10.sp, height: 1.5),
+                      color: AppColors.textColorSecondary, fontSize: 10.sp, height: 1.5),
                 ),
                 SizedBox(height: 3.h),
                 Row(
@@ -1097,16 +1100,16 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 1.5.h),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(3.h),
                             border: Border.all(
                                 color:
-                                    Colors.white.withValues(alpha: 0.1)),
+                                    AppColors.textColorPrimary.withValues(alpha: 0.1)),
                           ),
                           child: Center(
                             child: Text('Cancel',
                                 style: TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.textColorPrimary,
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.w500)),
                           ),

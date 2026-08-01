@@ -158,7 +158,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     IconButton(
                       icon: const Icon(
                         Icons.arrow_back_ios_new,
-                        color: AppColors.whiteColor,
+                        color: AppColors.textColorPrimary,
                         size: 20,
                       ),
                       onPressed: () {
@@ -188,7 +188,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     alignment: Alignment.bottomRight,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(4),
+                        padding: EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
@@ -224,16 +224,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         decoration: BoxDecoration(
                           color: AppColors.blueColor,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: AppColors.textColorPrimary, width: 2),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.2),
+                              color: AppColors.textColorPrimary.withValues(alpha: 0.2),
                               blurRadius: 5,
                             ),
                           ],
                         ),
                         child: Icon(Icons.camera_alt_rounded,
-                            size: 14.sp, color: Colors.white),
+                            size: 14.sp, color: AppColors.textColorPrimary),
                       ),
                     ],
                   ),
@@ -250,7 +250,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
@@ -259,7 +259,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, -4),
                     ),
@@ -281,9 +281,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       SizedBox(height: 0.5.h),
                       Text(
                         'Update your personal details below',
-                        style: TextStyles.regularwhite.copyWith(
+                        style: TextStyles.regulartext.copyWith(
                           fontSize: 12.sp,
-                          color: Colors.white70,
+                          color: AppColors.textColorSecondary,
                         ),
                       ),
                       SizedBox(height: 4.h),
@@ -379,10 +379,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       children: [
         Text(
           label,
-          style: TextStyles.regularwhite.copyWith(
+          style: TextStyles.regulartext.copyWith(
             fontSize: 11.sp,
             fontWeight: FontWeight.w500,
-            color: Colors.white70,
+            color: AppColors.textColorSecondary,
           ),
         ),
         SizedBox(height: 1.h),

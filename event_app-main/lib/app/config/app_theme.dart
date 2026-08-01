@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTheme {
-  static ThemeData get darkTheme {
-    return ThemeData.dark().copyWith(
+  static ThemeData get lightTheme {
+    return ThemeData.light().copyWith(
       // Primary colors
       primaryColor: AppColors.blueColor,
       primaryColorDark: AppColors.blueColor,
       primaryColorLight: AppColors.lightColor,
 
       // Ensure text colors are always visible
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
 
       // Scaffold and background
       scaffoldBackgroundColor: AppColors.backgroundColor,
@@ -23,11 +23,11 @@ class AppTheme {
         titleTextStyle: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         iconTheme: IconThemeData(
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           size: 24,
         ),
       ),
@@ -36,19 +36,19 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.blueColor,
-          foregroundColor: AppColors.whiteColor,
+          foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          padding: const EdgeInsets.symmetric(
+          padding: EdgeInsets.symmetric(
             horizontal: 24,
             vertical: 12,
           ),
-          textStyle: const TextStyle(
+          textStyle: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: AppColors.whiteColor,
+            color: AppColors.textColorPrimary,
             fontFamily: 'Montserrat',
           ),
         ),
@@ -70,12 +70,12 @@ class AppTheme {
       // Outlined button theme
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.whiteColor,
+          foregroundColor: AppColors.textColorPrimary,
           side: const BorderSide(color: AppColors.blueColor),
           textStyle: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: AppColors.whiteColor,
+            color: AppColors.textColorPrimary,
             fontFamily: 'Montserrat',
           ),
         ),
@@ -84,7 +84,7 @@ class AppTheme {
       // Icon button theme
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
-          foregroundColor: AppColors.whiteColor,
+          foregroundColor: AppColors.textColorPrimary,
         ),
       ),
 
@@ -93,12 +93,12 @@ class AppTheme {
         filled: true,
         fillColor: AppColors.signinoptioncolor,
         hintStyle: const TextStyle(
-          color: Colors.white54,
+          color: AppColors.textColorSecondary,
           fontSize: 14,
           fontFamily: 'Montserrat',
         ),
         labelStyle: const TextStyle(
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontSize: 14,
           fontFamily: 'Montserrat',
         ),
@@ -148,7 +148,7 @@ class AppTheme {
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.bottombarcolor,
         selectedItemColor: AppColors.blueColor,
-        unselectedItemColor: Colors.white54,
+        unselectedItemColor: AppColors.textColorSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 8,
         selectedLabelStyle: TextStyle(
@@ -172,7 +172,7 @@ class AppTheme {
 
       // Icon theme
       iconTheme: const IconThemeData(
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         size: 24,
       ),
 
@@ -185,70 +185,70 @@ class AppTheme {
 
       // Text theme with fixed sizes (no Sizer dependency)
       textTheme: TextTheme(
-        displayLarge: const TextStyle(
+        displayLarge: TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.w900,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         displayMedium: const TextStyle(
           fontSize: 28,
           fontWeight: FontWeight.w800,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         displaySmall: const TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w700,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         headlineLarge: const TextStyle(
           fontSize: 22,
           fontWeight: FontWeight.w700,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         headlineMedium: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         headlineSmall: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         titleLarge: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         titleMedium: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         titleSmall: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         bodyLarge: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w400,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         bodyMedium: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         bodySmall: TextStyle(
@@ -260,7 +260,7 @@ class AppTheme {
         labelLarge: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: AppColors.whiteColor,
+          color: AppColors.textColorPrimary,
           fontFamily: 'Montserrat',
         ),
         labelMedium: TextStyle(
@@ -283,10 +283,10 @@ class AppTheme {
         secondary: AppColors.lightColor,
         surface: AppColors.signinoptioncolor,
         error: Colors.redAccent,
-        onPrimary: AppColors.whiteColor,
-        onSecondary: AppColors.whiteColor,
-        onSurface: AppColors.whiteColor,
-        onError: AppColors.whiteColor,
+        onPrimary: AppColors.textColorPrimary,
+        onSecondary: AppColors.textColorPrimary,
+        onSurface: AppColors.textColorPrimary,
+        onError: AppColors.textColorPrimary,
       ),
 
       // Progress indicator theme
@@ -299,21 +299,12 @@ class AppTheme {
       // Floating action button theme
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.blueColor,
-        foregroundColor: AppColors.whiteColor,
+        foregroundColor: Colors.white,
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
       ),
-    );
-  }
-
-  // Light theme (if needed in future)
-  static ThemeData get lightTheme {
-    return ThemeData.light().copyWith(
-      primaryColor: AppColors.blueColor,
-      scaffoldBackgroundColor: Colors.white,
-      // Add other light theme configurations as needed
     );
   }
 }

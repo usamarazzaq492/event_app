@@ -172,7 +172,7 @@ class _BookEventScreenState extends State<BookEventScreen>
             color: AppColors.backgroundColor.withValues(alpha: 0.85),
             border: Border(
               bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.08), width: 0.5),
             ),
           ),
           child: Row(
@@ -185,13 +185,13 @@ class _BookEventScreenState extends State<BookEventScreen>
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1)),
+                        color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
                   ),
                   child: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white, size: 16.sp),
+                      color: AppColors.textColorPrimary, size: 16.sp),
                 ),
               ),
               Expanded(
@@ -199,7 +199,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                   child: Text(
                     'Book Tickets',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
@@ -232,7 +232,7 @@ class _BookEventScreenState extends State<BookEventScreen>
             ),
             SizedBox(height: 2.h),
             Text('Loading ticket tiers…',
-                style: TextStyle(color: Colors.white38, fontSize: 11.sp)),
+                style: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 11.sp)),
           ],
         ),
       );
@@ -261,7 +261,7 @@ class _BookEventScreenState extends State<BookEventScreen>
               SizedBox(height: 3.h),
               Text('No Ticket Types Yet',
                   style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5)),
@@ -270,7 +270,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                   'The organizer has not set up ticket\ntiers yet. Please check back later.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: Colors.white38, fontSize: 11.sp, height: 1.5)),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 11.sp, height: 1.5)),
             ],
           ),
         ),
@@ -304,7 +304,7 @@ class _BookEventScreenState extends State<BookEventScreen>
               Text(
                 'SELECT YOUR TICKETS',
                 style: TextStyle(
-                  color: Colors.white38,
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                   fontSize: 9.sp,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.5,
@@ -347,15 +347,15 @@ class _BookEventScreenState extends State<BookEventScreen>
         Container(
           padding: EdgeInsets.symmetric(horizontal: 3.5.w, vertical: 1.5.h),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.02),
+            color: AppColors.textColorPrimary.withValues(alpha: 0.02),
             borderRadius: BorderRadius.circular(1.5.h),
             border:
-                Border.all(color: Colors.white.withValues(alpha: 0.06)),
+                Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.06)),
           ),
           child: Row(
             children: [
               Icon(Icons.info_outline_rounded,
-                  color: Colors.white24, size: 13.sp),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 13.sp),
               SizedBox(width: 2.5.w),
               Expanded(
                 child: Text(
@@ -396,14 +396,14 @@ class _BookEventScreenState extends State<BookEventScreen>
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.blueColor.withValues(alpha: 0.06)
-              : Colors.white.withValues(alpha: 0.03),
+              : AppColors.textColorPrimary.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(2.5.h),
           border: Border.all(
             color: tier.isSoldOut
                 ? Colors.red.withValues(alpha: 0.2)
                 : isSelected
                     ? AppColors.blueColor.withValues(alpha: 0.5)
-                    : Colors.white.withValues(alpha: 0.08),
+                    : AppColors.textColorPrimary.withValues(alpha: 0.08),
             width: isSelected ? 1.5 : 1,
           ),
           boxShadow: isSelected
@@ -479,8 +479,8 @@ class _BookEventScreenState extends State<BookEventScreen>
                                     tier.tierName,
                                     style: TextStyle(
                                       color: tier.isSoldOut
-                                          ? Colors.white38
-                                          : Colors.white,
+                                          ? AppColors.textColorPrimary.withValues(alpha: 0.38)
+                                          : AppColors.textColorPrimary,
                                       fontSize: 13.sp,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: -0.3,
@@ -521,7 +521,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                                 child: Text(
                                   tier.description!,
                                   style: TextStyle(
-                                      color: Colors.white38,
+                                      color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                                       fontSize: 9.5.sp,
                                       height: 1.3),
                                   maxLines: 2,
@@ -546,8 +546,8 @@ class _BookEventScreenState extends State<BookEventScreen>
                               color: isFree
                                   ? Colors.greenAccent
                                   : tier.isSoldOut
-                                      ? Colors.white24
-                                      : Colors.white,
+                                      ? AppColors.textColorPrimary.withValues(alpha: 0.24)
+                                      : AppColors.textColorPrimary,
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w900,
                               letterSpacing: -0.8,
@@ -557,7 +557,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                             Text(
                               'per ticket',
                               style: TextStyle(
-                                  color: Colors.white24, fontSize: 8.sp),
+                                  color: AppColors.textColorPrimary.withValues(alpha: 0.24), fontSize: 8.sp),
                             ),
                         ],
                       ),
@@ -573,8 +573,8 @@ class _BookEventScreenState extends State<BookEventScreen>
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            Colors.white.withValues(alpha: 0.06),
-                            Colors.white.withValues(alpha: 0.06),
+                            AppColors.textColorPrimary.withValues(alpha: 0.06),
+                            AppColors.textColorPrimary.withValues(alpha: 0.06),
                             Colors.transparent,
                           ],
                           stops: const [0.0, 0.2, 0.8, 1.0],
@@ -592,7 +592,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                           Icons.event_seat_rounded,
                           color: (tier.available ?? 999) < 10
                               ? Colors.orangeAccent
-                              : Colors.white24,
+                              : AppColors.textColorPrimary.withValues(alpha: 0.24),
                           size: 12.sp,
                         ),
                         SizedBox(width: 1.5.w),
@@ -621,7 +621,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                         ),
                       ] else ...[
                         Icon(Icons.all_inclusive_rounded,
-                            color: Colors.white24, size: 12.sp),
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 12.sp),
                         SizedBox(width: 1.5.w),
                         Text(
                           'Available',
@@ -681,9 +681,9 @@ class _BookEventScreenState extends State<BookEventScreen>
     final qty = _localTiers[index].selectedQuantity;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
+        color: AppColors.textColorPrimary.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(1.5.h),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.08)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -705,7 +705,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                 '$qty',
                 key: ValueKey(qty),
                 style: TextStyle(
-                  color: qty > 0 ? Colors.white : Colors.white38,
+                  color: qty > 0 ? AppColors.textColorPrimary : AppColors.textColorPrimary.withValues(alpha: 0.38),
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -1,
@@ -734,12 +734,12 @@ class _BookEventScreenState extends State<BookEventScreen>
         decoration: BoxDecoration(
           color: active
               ? AppColors.blueColor.withValues(alpha: 0.15)
-              : Colors.white.withValues(alpha: 0.03),
+              : AppColors.textColorPrimary.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(1.2.h),
         ),
         child: Icon(
           icon,
-          color: active ? AppColors.blueColor : Colors.white24,
+          color: active ? AppColors.blueColor : AppColors.textColorPrimary.withValues(alpha: 0.24),
           size: 14.sp,
         ),
       ),
@@ -759,7 +759,7 @@ class _BookEventScreenState extends State<BookEventScreen>
             color: AppColors.backgroundColor.withValues(alpha: 0.9),
             border: Border(
               top: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.08), width: 0.5),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.08), width: 0.5),
             ),
           ),
           child: Row(
@@ -776,7 +776,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                         key: ValueKey(_summaryText),
                         style: TextStyle(
                           color: hasSelection
-                              ? Colors.white60
+                              ? AppColors.textColorSecondary
                               : Colors.white30,
                           fontSize: 9.5.sp,
                           height: 1.3,
@@ -794,7 +794,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                           Text(
                             '\$${_total.toStringAsFixed(2)}',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textColorPrimary,
                               fontSize: 22.sp,
                               fontWeight: FontWeight.w900,
                               letterSpacing: -1.2,
@@ -804,7 +804,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                           Text(
                             'total',
                             style: TextStyle(
-                              color: Colors.white38,
+                              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                               fontSize: 10.sp,
                             ),
                           ),
@@ -838,7 +838,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                         : null,
                     color: hasSelection
                         ? null
-                        : Colors.white.withValues(alpha: 0.06),
+                        : AppColors.textColorPrimary.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(4.h),
                     boxShadow: hasSelection
                         ? [
@@ -858,7 +858,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                         'Continue',
                         style: TextStyle(
                           color:
-                              hasSelection ? Colors.white : Colors.white30,
+                              hasSelection ? AppColors.textColorPrimary : Colors.white30,
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.3,
@@ -868,7 +868,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                       Icon(
                         Icons.arrow_forward_rounded,
                         color:
-                            hasSelection ? Colors.white : Colors.white30,
+                            hasSelection ? AppColors.textColorPrimary : Colors.white30,
                         size: 15.sp,
                       ),
                     ],

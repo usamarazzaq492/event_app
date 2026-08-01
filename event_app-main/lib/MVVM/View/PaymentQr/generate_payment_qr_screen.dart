@@ -98,7 +98,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                           'Generate a QR code for your event. Users can scan it to quickly purchase tickets.',
                           style: TextStyle(
                             fontSize: 11.sp,
-                            color: Colors.white60,
+                            color: AppColors.textColorSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -120,10 +120,10 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                             child: Container(
                               padding: EdgeInsets.all(5.w),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.05),
+                                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(2.5.h),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.1),
+                                  color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                                 ),
                               ),
                               child: Column(
@@ -223,7 +223,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
       label,
       style: TextStyle(
         fontSize: 12.sp,
-        color: Colors.white,
+        color: AppColors.textColorPrimary,
         fontWeight: FontWeight.bold,
         letterSpacing: -0.5,
       ),
@@ -237,7 +237,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
           title,
           style: TextStyle(
             fontSize: 14.sp,
-            color: Colors.white,
+            color: AppColors.textColorPrimary,
             fontWeight: FontWeight.bold,
             letterSpacing: -0.5,
           ),
@@ -246,9 +246,9 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
         Expanded(
           child: Container(
             height: 1,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.white24, Colors.transparent],
+                colors: [AppColors.textColorPrimary.withValues(alpha: 0.24), Colors.transparent],
               ),
             ),
           ),
@@ -267,9 +267,9 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: AppColors.textColorPrimary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(1.5.h),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
       ),
       child: DropdownButtonFormField<String>(
         value: _selectedTicketType,
@@ -279,7 +279,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
               EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
           border: InputBorder.none,
         ),
-        style: TextStyle(color: Colors.white, fontSize: 11.sp),
+        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 11.sp),
         items: _ticketTiers.map((tier) {
           return DropdownMenuItem<String>(
             value: tier['tierId'].toString(),
@@ -287,7 +287,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
           );
         }).toList(),
         onChanged: (value) => setState(() => _selectedTicketType = value),
-        hint: const Text('Select a ticket tier', style: TextStyle(color: Colors.white38)),
+        hint: Text('Select a ticket tier', style: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38))),
       ),
     );
   }
@@ -298,9 +298,9 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: AppColors.textColorPrimary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(1.5.h),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [
@@ -315,8 +315,8 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                     : 'Set expiration date',
                 style: TextStyle(
                   color: _selectedExpiresAt != null
-                      ? Colors.white
-                      : Colors.white38,
+                      ? AppColors.textColorPrimary
+                      : AppColors.textColorPrimary.withValues(alpha: 0.38),
                   fontSize: 11.sp,
                 ),
               ),
@@ -331,16 +331,16 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     return TextField(
       controller: _maxUsesController,
       keyboardType: TextInputType.number,
-      style: TextStyle(color: Colors.white, fontSize: 11.sp),
+      style: TextStyle(color: AppColors.textColorPrimary, fontSize: 11.sp),
       decoration: InputDecoration(
         hintText: 'Unlimited uses',
-        hintStyle: TextStyle(color: Colors.white24, fontSize: 11.sp),
+        hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.24), fontSize: 11.sp),
         filled: true,
-        fillColor: Colors.white.withValues(alpha: 0.05),
+        fillColor: AppColors.textColorPrimary.withValues(alpha: 0.05),
         contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.h),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          borderSide: BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(1.5.h),
@@ -383,18 +383,18 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2, color: AppColors.textColorPrimary),
                   )
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.qr_code_rounded,
-                          color: Colors.white, size: 18.sp),
+                          color: AppColors.textColorPrimary, size: 18.sp),
                       SizedBox(width: 3.w),
                       Text(
                         'Generate QR',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -506,7 +506,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                 width: 0.5,
               ),
             ),
@@ -521,15 +521,15 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     size: 16.sp,
                   ),
                 ),
@@ -539,7 +539,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                   child: Text(
                     'Event QR Codes',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
@@ -576,14 +576,10 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
           child: Container(
             padding: EdgeInsets.all(6.w),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.textColorPrimary,
               borderRadius: BorderRadius.circular(2.5.h),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
+                BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 10),),
               ],
             ),
             child: Column(
@@ -592,7 +588,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                   data: qrString,
                   version: QrVersions.auto,
                   size: 65.w,
-                  backgroundColor: Colors.white,
+                  backgroundColor: AppColors.textColorPrimary,
                   padding: EdgeInsets.zero,
                 ),
                 SizedBox(height: 3.h),
@@ -602,7 +598,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                   'USD ${double.parse(qrData['price'].toString()).toStringAsFixed(2)}',
                   style: TextStyle(
                     fontSize: 16.sp,
-                    color: Colors.black,
+                    color: AppColors.textColorPrimary,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -619,7 +615,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
       decoration: BoxDecoration(
-        color: isVip ? AppColors.blueColor : Colors.black12,
+        color: isVip ? AppColors.blueColor : AppColors.textColorSecondary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(1.2.h),
       ),
       child: Text(
@@ -627,7 +623,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
         style: TextStyle(
           fontSize: 10.sp,
           fontWeight: FontWeight.bold,
-          color: isVip ? Colors.white : Colors.black54,
+          color: isVip ? AppColors.textColorPrimary : AppColors.textColorSecondary,
           letterSpacing: 1,
         ),
       ),
@@ -656,19 +652,19 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
       child: Container(
         height: 6.h,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
+          color: AppColors.textColorPrimary.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(1.5.h),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 16.sp),
+            Icon(icon, color: AppColors.textColorPrimary, size: 16.sp),
             SizedBox(width: 2.w),
             Text(
               label,
               style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textColorPrimary,
                   fontWeight: FontWeight.bold,
                   fontSize: 11.sp),
             ),
@@ -715,9 +711,9 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
     return Container(
       margin: EdgeInsets.only(bottom: 2.5.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
+        color: AppColors.textColorPrimary.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(2.5.h),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(2.h),
@@ -730,13 +726,13 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2.h),
                   child: Container(
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     padding: EdgeInsets.all(4.w),
                     child: QrImageView(
                       data: qrString,
                       version: QrVersions.auto,
                       size: 45.w,
-                      backgroundColor: Colors.white,
+                      backgroundColor: AppColors.textColorPrimary,
                       padding: EdgeInsets.zero,
                     ),
                   ),
@@ -773,7 +769,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                   SizedBox(height: 1.h),
                   Text(
                     'Expires: ${DateFormat('MMM d, y HH:mm').format(DateTime.parse(expiresAt))}',
-                    style: TextStyle(fontSize: 9.sp, color: Colors.white38),
+                    style: TextStyle(fontSize: 9.sp, color: AppColors.textColorPrimary.withValues(alpha: 0.38)),
                   ),
                 ],
                 SizedBox(height: 2.h),
@@ -877,21 +873,21 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
         ),
         content: Text(
           'Are you sure you want to deactivate this QR code?',
-          style: TextStyles.regularwhite,
+          style: TextStyles.regulartext,
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
             child: Text(
               'Cancel',
-              style: TextStyles.regularwhite,
+              style: TextStyles.regulartext,
             ),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
             child: Text(
               'Deactivate',
-              style: TextStyles.regularwhite.copyWith(color: Colors.red),
+              style: TextStyles.regulartext.copyWith(color: Colors.red),
             ),
           ),
         ],
@@ -910,9 +906,8 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
           'Success',
           'QR code deactivated successfully',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.blueColor,
-          colorText: Colors.white,
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
         // Reload QR codes
         _loadExistingQrCodes();
       } else {
@@ -920,18 +915,16 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
           'Error',
           responseData['message'] ?? 'Failed to deactivate QR code',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     } catch (e) {
       Get.snackbar(
         'Error',
         'Failed to deactivate QR code: $e',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 
@@ -955,17 +948,15 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
         'Success',
         'QR code saved to Documents',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.blueColor,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } catch (e) {
       Get.snackbar(
         'Error',
         'Failed to save QR code: $e',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 
@@ -994,9 +985,8 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
         'Error',
         'Failed to share QR code: $e',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 

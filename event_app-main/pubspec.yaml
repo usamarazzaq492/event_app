@@ -44,6 +44,7 @@ dependencies:
 
   path: any
   http_parser: any
+  flutter_animate: ^4.5.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

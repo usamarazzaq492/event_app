@@ -94,15 +94,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
                   color: AppColors.bottombarcolor.withValues(alpha: 0.85),
                   borderRadius: BorderRadius.circular(3.h),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.12),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.12),
                     width: 0.5,
                   ),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
+                    BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10),),
                   ],
                 ),
                 child: Row(
@@ -144,7 +140,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                                   height: 2.6.h,
                                   color: isSelected
                                       ? AppColors.blueColor
-                                      : Colors.white54,
+                                      : AppColors.textColorSecondary,
                                 ),
                                 SizedBox(height: 0.4.h),
                                 Text(
@@ -156,7 +152,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
                                         : FontWeight.w500,
                                     color: isSelected
                                         ? AppColors.blueColor
-                                        : Colors.white54,
+                                        : AppColors.textColorSecondary,
                                     fontFamily: 'Montserrat',
                                   ),
                                   textAlign: TextAlign.center,

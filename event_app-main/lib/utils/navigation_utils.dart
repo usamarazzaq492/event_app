@@ -1,3 +1,4 @@
+import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -319,15 +320,16 @@ class NavigationUtils {
     Get.snackbar(
       title ?? 'Notification',
       message,
-      backgroundColor: backgroundColor,
-      colorText: textColor,
+      
+      
       duration: duration,
       snackPosition: snackPosition,
       margin: margin,
       borderRadius: borderRadius,
       isDismissible: isDismissible,
       dismissDirection: dismissDirection,
-    );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
   }
 
   /// Show loading dialog
@@ -349,7 +351,7 @@ class NavigationUtils {
                 const SizedBox(height: 16),
                 Text(
                   message,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textColorPrimary),
                   textAlign: TextAlign.center,
                 ),
               ],

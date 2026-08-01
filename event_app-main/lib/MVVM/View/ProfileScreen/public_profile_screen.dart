@@ -123,7 +123,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                 await loadProfile();
               },
               color: AppColors.blueColor,
-              backgroundColor: AppColors.signinoptioncolor,
+              backgroundColor: AppColors.textColorPrimary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.fromLTRB(
@@ -173,9 +173,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                 SizedBox(height: 3.h),
                 Text(
                   'Loading profile...',
-                  style: TextStyles.regularwhite.copyWith(
+                  style: TextStyles.regulartext.copyWith(
                     fontSize: 12.sp,
-                    color: Colors.white70,
+                    color: AppColors.textColorSecondary,
                   ),
                 ),
               ],
@@ -212,9 +212,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                 SizedBox(height: 1.h),
                 Text(
                   controller.error.value,
-                  style: TextStyles.regularwhite.copyWith(
+                  style: TextStyles.regulartext.copyWith(
                     fontSize: 11.sp,
-                    color: Colors.white70,
+                    color: AppColors.textColorSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -225,7 +225,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                   label: Text('Retry', style: TextStyle(fontSize: 12.sp)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.blueColor,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.backgroundColor,
                     padding:
                         EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                     shape: RoundedRectangleBorder(
@@ -254,7 +254,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                 Icon(
                   Icons.person_off,
                   size: 48.sp,
-                  color: Colors.grey.shade400,
+                  color: AppColors.textColorSecondary,
                 ),
                 SizedBox(height: 3.h),
                 Text(
@@ -267,9 +267,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                 SizedBox(height: 1.h),
                 Text(
                   'This profile doesn\'t exist or has been removed.',
-                  style: TextStyles.regularwhite.copyWith(
+                  style: TextStyles.regulartext.copyWith(
                     fontSize: 11.sp,
-                    color: Colors.white70,
+                    color: AppColors.textColorSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -280,7 +280,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                   label: Text('Go Back', style: TextStyle(fontSize: 12.sp)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.blueColor,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.backgroundColor,
                     padding:
                         EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                     shape: RoundedRectangleBorder(
@@ -302,7 +302,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
       child: Align(
         alignment: Alignment.centerLeft,
         child: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textColorPrimary),
           onPressed: () {
             HapticUtils.navigation();
             Navigator.of(context).pop();
@@ -323,16 +323,16 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(1.5.h),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
               child: IconButton(
                 icon: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 16.sp),
+                    color: AppColors.textColorPrimary, size: 16.sp),
                 onPressed: () {
                   HapticUtils.navigation();
                   Navigator.of(context).pop();
@@ -345,7 +345,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
           'USER PROFILE',
           style: TextStyle(
             fontSize: 8.sp,
-            color: Colors.white38,
+            color: AppColors.textColorPrimary.withValues(alpha: 0.38),
             fontWeight: FontWeight.w800,
             letterSpacing: 2.0,
           ),
@@ -356,10 +356,10 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(1.5.h),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
@@ -372,7 +372,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15)),
                   icon: Icon(Icons.more_horiz_rounded,
-                      color: Colors.white, size: 18.sp),
+                      color: AppColors.textColorPrimary, size: 18.sp),
                   onSelected: (String value) async {
                     HapticUtils.light();
                     if (!authViewModel.isLoggedIn.value &&
@@ -380,8 +380,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                       Get.snackbar(
                         'Sign in required',
                         'Please sign in to report or block users.',
-                        backgroundColor: AppColors.blueColor,
-                        colorText: Colors.white,
+                        
+                        
                         mainButton: TextButton(
                           onPressed: () {
                             Get.closeCurrentSnackbar();
@@ -389,10 +389,11 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                           },
                           child: const Text('Sign in',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.textColorPrimary,
                                   fontWeight: FontWeight.bold)),
                         ),
-                      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                       return;
                     }
                     final profile = controller.profile.value;
@@ -415,7 +416,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                           Icon(Icons.share_rounded, color: AppColors.blueColor),
                           SizedBox(width: 12),
                           Text('Share Profile',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: AppColors.textColorPrimary)),
                         ],
                       ),
                     ),
@@ -426,7 +427,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                           Icon(Icons.flag_rounded, color: Colors.orange),
                           SizedBox(width: 12),
                           Text('Report User',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: AppColors.textColorPrimary)),
                         ],
                       ),
                     ),
@@ -437,7 +438,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                           Icon(Icons.block_rounded, color: Colors.red),
                           SizedBox(width: 12),
                           Text('Block User',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(color: AppColors.textColorPrimary)),
                         ],
                       ),
                     ),
@@ -478,7 +479,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
           tag: 'profile_image',
           child: CircleAvatar(
             radius: 65,
-            backgroundColor: Colors.white.withValues(alpha: 0.05),
+            backgroundColor: AppColors.textColorPrimary.withValues(alpha: 0.05),
             backgroundImage: (profile.profileImageUrl != null &&
                     profile.profileImageUrl!.isNotEmpty)
                 ? CachedNetworkImageProvider(
@@ -502,7 +503,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
           style: TextStyle(
             fontSize: 22.sp,
             fontWeight: FontWeight.w900,
-            color: Colors.white,
+            color: AppColors.textColorPrimary,
             letterSpacing: -0.5,
           ),
           maxLines: 1,
@@ -514,7 +515,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
             profile.email!.toLowerCase(),
             style: TextStyle(
               fontSize: 10.sp,
-              color: Colors.white38,
+              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -531,10 +532,10 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 4.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
+            color: AppColors.textColorPrimary.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(2.5.h),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.08),
               width: 1.5,
             ),
           ),
@@ -556,7 +557,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.white.withValues(alpha: 0.1),
+                      AppColors.textColorPrimary.withValues(alpha: 0.1),
                       Colors.transparent,
                     ],
                   ),
@@ -586,8 +587,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
               gradient: LinearGradient(
                 colors: isFollowing
                     ? [
-                        Colors.white.withValues(alpha: 0.1),
-                        Colors.white.withValues(alpha: 0.05)
+                        AppColors.textColorPrimary.withValues(alpha: 0.1),
+                        AppColors.textColorPrimary.withValues(alpha: 0.05)
                       ]
                     : [
                         AppColors.blueColor,
@@ -599,7 +600,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
               borderRadius: BorderRadius.circular(2.h),
               border: isFollowing
                   ? Border.all(
-                      color: Colors.white.withValues(alpha: 0.1), width: 1)
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1), width: 1)
                   : null,
               boxShadow: isFollowing
                   ? null
@@ -620,8 +621,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                     Get.snackbar(
                       'Sign in required',
                       'Please sign in or sign up first to follow users',
-                      backgroundColor: AppColors.blueColor,
-                      colorText: Colors.white,
+                      
+                      
                       duration: const Duration(seconds: 3),
                       mainButton: TextButton(
                         onPressed: () {
@@ -631,12 +632,13 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                         child: const Text(
                           'Sign in',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textColorPrimary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                     return;
                   }
                   final userId = profile.userId;
@@ -654,14 +656,14 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                         isFollowing
                             ? Icons.person_remove_rounded
                             : Icons.person_add_rounded,
-                        color: isFollowing ? Colors.white70 : Colors.white,
+                        color: isFollowing ? AppColors.textColorSecondary : Colors.white,
                         size: 16.sp,
                       ),
                       SizedBox(width: 2.w),
                       Text(
                         isFollowing ? 'Unfollow' : 'Follow',
                         style: TextStyle(
-                          color: isFollowing ? Colors.white70 : Colors.white,
+                          color: isFollowing ? AppColors.textColorSecondary : Colors.white,
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -691,17 +693,17 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
               width: double.infinity,
               padding: EdgeInsets.all(4.w),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.03),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(2.h),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.08),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.08),
                   width: 1.5,
                 ),
               ),
               child: Text(
                 profile.shortBio ?? 'No bio added yet.',
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: AppColors.textColorSecondary,
                   fontSize: 11.sp,
                   height: 1.5,
                 ),
@@ -723,7 +725,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
             ? Padding(
                 padding: EdgeInsets.only(left: 2.w),
                 child: Text('No interests added',
-                    style: TextStyle(color: Colors.grey, fontSize: 12.sp)),
+                    style: TextStyle(color: AppColors.textColorSecondary, fontSize: 12.sp)),
               )
             : Wrap(
                 alignment: WrapAlignment.start,
@@ -771,7 +773,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
           style: TextStyle(
             fontSize: 14.sp,
             fontWeight: FontWeight.w900,
-            color: Colors.white,
+            color: AppColors.textColorPrimary,
             letterSpacing: -0.5,
           ),
         ),
@@ -780,7 +782,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
           label.toUpperCase(),
           style: TextStyle(
             fontSize: 7.sp,
-            color: Colors.white38,
+            color: AppColors.textColorPrimary.withValues(alpha: 0.38),
             fontWeight: FontWeight.w800,
             letterSpacing: 1.0,
           ),
@@ -801,7 +803,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
             title.toUpperCase(),
             style: TextStyle(
               fontSize: 9.sp,
-              color: Colors.white,
+              color: AppColors.textColorPrimary,
               fontWeight: FontWeight.w900,
               letterSpacing: 1.5,
             ),
@@ -824,7 +826,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
         height: 7.h,
         width: 40.w,
         decoration: BoxDecoration(
-          color: filled ? AppColors.blueColor : AppColors.backgroundColor,
+          color: filled ? AppColors.blueColor : Colors.white,
           borderRadius: BorderRadius.circular(2.h),
           border: Border.all(color: AppColors.blueColor),
         ),
@@ -873,35 +875,35 @@ Download EventGo app to connect with them and discover amazing events!
       if (res['statusCode'] == 201 || res['statusCode'] == 200) {
         Get.snackbar('Reported', res['message'] ?? 'Report submitted.',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: AppColors.signinoptioncolor,
-            colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       } else {
         Get.snackbar('Error', res['message'] ?? 'Could not submit report.',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     } catch (e) {
       Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 
   Future<void> _showBlockUserSheet(int userId) async {
     final confirm = await Get.dialog<bool>(
       AlertDialog(
-        backgroundColor: AppColors.signinoptioncolor,
-        title: const Text('Block User?', style: TextStyle(color: Colors.white)),
+        backgroundColor: AppColors.textColorPrimary,
+        title: const Text('Block User?', style: TextStyle(color: AppColors.textColorPrimary)),
         content: const Text(
             'This user will be removed from your feed. You can unblock them later from settings.',
-            style: TextStyle(color: Colors.white70)),
+            style: TextStyle(color: AppColors.textColorSecondary)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child: const Text('Cancel',
-                  style: TextStyle(color: Colors.white70))),
+                  style: TextStyle(color: AppColors.textColorSecondary))),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: const Text('Block', style: TextStyle(color: Colors.red))),
@@ -914,20 +916,20 @@ Download EventGo app to connect with them and discover amazing events!
       if (res['statusCode'] == 200) {
         Get.snackbar('Blocked', res['message'] ?? 'User blocked.',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: AppColors.signinoptioncolor,
-            colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
         if (mounted) Navigator.of(context).pop();
       } else {
         Get.snackbar('Error', res['message'] ?? 'Could not block.',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     } catch (e) {
       Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 }
@@ -949,27 +951,27 @@ class _ReportReasonDialogState extends State<_ReportReasonDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.signinoptioncolor,
-      title: const Text('Report User', style: TextStyle(color: Colors.white)),
+      backgroundColor: AppColors.textColorPrimary,
+      title: Text('Report User', style: TextStyle(color: AppColors.textColorPrimary)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text('Optionally describe the issue:',
-              style: TextStyle(color: Colors.white70, fontSize: 12)),
+              style: TextStyle(color: AppColors.textColorSecondary, fontSize: 12)),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Reason (optional)',
-              hintStyle: const TextStyle(color: Colors.white38),
+              hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38)),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
-              fillColor: Colors.white.withValues(alpha: 0.1),
+              fillColor: AppColors.textColorPrimary.withValues(alpha: 0.1),
             ),
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: AppColors.textColorPrimary),
           ),
         ],
       ),
@@ -977,7 +979,7 @@ class _ReportReasonDialogState extends State<_ReportReasonDialog> {
         TextButton(
             onPressed: () => Navigator.pop(context),
             child:
-                const Text('Cancel', style: TextStyle(color: Colors.white70))),
+                const Text('Cancel', style: TextStyle(color: AppColors.textColorSecondary))),
         TextButton(
             onPressed: () => Navigator.pop(context, _controller.text.trim()),
             child: const Text('Submit',

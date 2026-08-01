@@ -1,3 +1,4 @@
+import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -30,7 +31,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
         ),
         Text('Description',
             style: TextStyle(
-                color: Colors.black,
+                color: AppColors.textColorPrimary,
                 fontWeight: FontWeight.w500,
                 fontSize: 13.sp)),
         SizedBox(
@@ -65,23 +66,23 @@ class _CreatEventTabState extends State<CreatEventTab> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
-                  color: Colors.black,
+                  color: AppColors.textColorPrimary,
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
-                  color: Colors.black,
+                  color: AppColors.textColorPrimary,
                 ),
                 borderRadius: BorderRadius.circular(15),
               ),
-              focusColor: Colors.black,
+              focusColor: AppColors.textColorPrimary,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
             ),
-            cursorColor: Colors.black,
+            cursorColor: AppColors.textColorPrimary,
             style: const TextStyle(
-              color: Colors.black,
+              color: AppColors.textColorPrimary,
               fontSize: 14,
             ),
           ),
@@ -91,7 +92,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
         ),
         Text('Date',
             style: TextStyle(
-                color: Colors.black,
+                color: AppColors.textColorPrimary,
                 fontWeight: FontWeight.w500,
                 fontSize: 13.sp)),
         SizedBox(
@@ -139,22 +140,22 @@ class _CreatEventTabState extends State<CreatEventTab> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
-                  color: Colors.black,
+                  color: AppColors.textColorPrimary,
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
-                  color: Colors.black,
+                  color: AppColors.textColorPrimary,
                 ),
                 borderRadius: BorderRadius.circular(15),
               ),
-              focusColor: Colors.black,
+              focusColor: AppColors.textColorPrimary,
               contentPadding: const EdgeInsets.symmetric(horizontal: 20),
             ),
-            cursorColor: Colors.black,
+            cursorColor: AppColors.textColorPrimary,
             style: const TextStyle(
-              color: Colors.black,
+              color: AppColors.textColorPrimary,
               fontSize: 14,
             ),
           ),
@@ -230,7 +231,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
         ),
         Text('Choose file',
             style: TextStyle(
-                color: Colors.black,
+                color: AppColors.textColorPrimary,
                 fontWeight: FontWeight.w500,
                 fontSize: 13.sp)),
         SizedBox(
@@ -246,7 +247,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
             padding: EdgeInsets.symmetric(vertical: 1.h),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(1.h),
-              color: Colors.white,
+              color: AppColors.textColorPrimary,
               boxShadow: [
                 BoxShadow(
                   color: const Color(0xff000000).withValues(alpha: 0.10),
@@ -267,7 +268,7 @@ class _CreatEventTabState extends State<CreatEventTab> {
                         Text(
                           'Choose File',
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textColorPrimary,
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w600,
                           ),
@@ -342,13 +343,13 @@ class _CreatEventTabState extends State<CreatEventTab> {
                   children: [
                     const Icon(
                       Icons.check,
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                     ),
                     Text(
                       "Create Event",
                       style: TextStyle(
                           fontWeight: FontWeight.w400,
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                           fontSize: 13.sp),
                     ),
                   ],

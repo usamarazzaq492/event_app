@@ -250,14 +250,14 @@ class _HomeScreenState extends State<HomeScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(greeting,
-                    style: TextStyle(color: Colors.white60, fontSize: 10.sp)),
+                    style: TextStyle(color: AppColors.textColorSecondary, fontSize: 10.sp)),
                 Obx(() {
                   final name = authViewModel.isLoggedIn.value
                       ? (authViewModel.currentUser['name'] ?? 'Friend')
                       : 'Guest';
                   return Text(name,
                       style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                           fontSize: 18.sp,
                           fontWeight: FontWeight.bold));
                 }),
@@ -282,10 +282,10 @@ class _HomeScreenState extends State<HomeScreen>
       child: Container(
         padding: EdgeInsets.all(1.2.h),
         decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
             shape: BoxShape.circle),
         child: Icon(Icons.notifications_none_rounded,
-            color: Colors.white, size: 20.sp),
+            color: AppColors.textColorPrimary, size: 20.sp),
       ),
     );
   }
@@ -332,19 +332,19 @@ class _HomeScreenState extends State<HomeScreen>
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
                 decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(2.h),
                     border:
-                        Border.all(color: Colors.white.withValues(alpha: 0.1))),
+                        Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.1))),
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
                   onChanged: _onSearchChanged,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textColorPrimary),
                   decoration: InputDecoration(
                     hintText: "Search events, organizers...",
                     hintStyle:
-                        TextStyle(color: Colors.white38, fontSize: 11.sp),
+                        TextStyle(color: AppColors.textColorSecondary, fontSize: 11.sp),
                     prefixIcon: Icon(Icons.search_rounded,
                         color: AppColors.blueColor, size: 20.sp),
                     border: InputBorder.none,
@@ -367,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen>
       decoration: BoxDecoration(
           color: AppColors.signinoptioncolor,
           borderRadius: BorderRadius.circular(2.h),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1))),
+          border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.1))),
       child: ListView(
         shrinkWrap: true,
         padding: EdgeInsets.symmetric(vertical: 1.h),
@@ -377,12 +377,12 @@ class _HomeScreenState extends State<HomeScreen>
                 padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
                 child: Text('Events',
                     style: TextStyle(
-                        color: Colors.white38,
+                        color: AppColors.textColorSecondary,
                         fontSize: 9.sp,
                         fontWeight: FontWeight.bold))),
             ..._searchEventResults.map((e) => ListTile(
                   title: Text(e.eventTitle ?? '',
-                      style: TextStyle(color: Colors.white, fontSize: 11.sp)),
+                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: 11.sp)),
                   onTap: () {
                     _dismissSearchResults();
                     NavigationUtils.push(
@@ -396,12 +396,12 @@ class _HomeScreenState extends State<HomeScreen>
                 padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
                 child: Text('Users',
                     style: TextStyle(
-                        color: Colors.white38,
+                        color: AppColors.textColorSecondary,
                         fontSize: 9.sp,
                         fontWeight: FontWeight.bold))),
             ..._searchUserResults.map((u) => ListTile(
                   title: Text(u.name ?? '',
-                      style: TextStyle(color: Colors.white, fontSize: 11.sp)),
+                      style: TextStyle(color: AppColors.textColorPrimary, fontSize: 11.sp)),
                   onTap: () {
                     _dismissSearchResults();
                     NavigationUtils.push(
@@ -438,12 +438,12 @@ class _HomeScreenState extends State<HomeScreen>
                 decoration: BoxDecoration(
                   color: isSelected
                       ? AppColors.blueColor
-                      : Colors.white.withValues(alpha: 0.05),
+                      : AppColors.textColorSecondary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(2.h),
                   border: Border.all(
                       color: isSelected
                           ? AppColors.blueColor
-                          : Colors.white.withValues(alpha: 0.1)),
+                          : AppColors.textColorSecondary.withValues(alpha: 0.1)),
                 ),
                 alignment: Alignment.center,
                 child: Text(cat,
@@ -451,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen>
                         fontSize: 9.sp,
                         fontWeight:
                             isSelected ? FontWeight.bold : FontWeight.w500,
-                        color: isSelected ? Colors.white : Colors.white70)),
+                        color: isSelected ? AppColors.whiteColor : AppColors.textColorSecondary)),
               ),
             ),
           );
@@ -476,7 +476,7 @@ class _HomeScreenState extends State<HomeScreen>
               children: [
                 Text("Promoted Events",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textColorPrimary,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.5)),
@@ -500,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen>
                       width: 78.w,
                       margin: EdgeInsets.only(right: 4.w),
                       decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(2.5.h)));
                 }
                 return Padding(
@@ -548,7 +548,7 @@ class _HomeScreenState extends State<HomeScreen>
                   imageUrl: imageUrl,
                   fit: BoxFit.cover,
                   placeholder: (context, url) => Container(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                   ),
                 ),
                 // Promoted Badge
@@ -570,12 +570,12 @@ class _HomeScreenState extends State<HomeScreen>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.campaign_rounded,
-                                color: Colors.white, size: 10.sp),
+                                color: AppColors.whiteColor, size: 10.sp),
                             SizedBox(width: 1.w),
                             Text(
                               "PROMOTED",
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.whiteColor,
                                   fontSize: 7.sp,
                                   fontWeight: FontWeight.w900,
                                   letterSpacing: 0.5),
@@ -627,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen>
         child: Container(
           padding: EdgeInsets.all(2.h),
           decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(2.h),
               border: Border.all(
                   color: AppColors.blueColor.withValues(alpha: 0.3))),
@@ -639,7 +639,7 @@ class _HomeScreenState extends State<HomeScreen>
               Expanded(
                   child: Text("Host an event? Create one in a few taps.",
                       style:
-                          TextStyle(fontSize: 10.sp, color: Colors.white70))),
+                          TextStyle(fontSize: 10.sp, color: AppColors.textColorSecondary))),
               Icon(Icons.arrow_forward_ios,
                   size: 10.sp, color: AppColors.blueColor),
             ],
@@ -659,7 +659,7 @@ class _HomeScreenState extends State<HomeScreen>
               padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.h),
               child: Text("Discover",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold))),
           ...discoverEvents.map((e) => _buildDiscoverEventCard(context, e)),
@@ -685,7 +685,7 @@ class _HomeScreenState extends State<HomeScreen>
                 imageUrl: imageUrl, width: 60, height: 60, fit: BoxFit.cover)),
         title: Text(event.eventTitle ?? '',
             style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 11.sp),
             maxLines: 2),
@@ -693,7 +693,7 @@ class _HomeScreenState extends State<HomeScreen>
             event.state != null && event.state!.isNotEmpty
                 ? '${event.city ?? ''}, ${event.state}'
                 : (event.city ?? ''),
-            style: TextStyle(color: Colors.white60, fontSize: 9.sp)),
+            style: TextStyle(color: AppColors.textColorSecondary, fontSize: 9.sp)),
         onTap: () => NavigationUtils.push(
             context, EventDetailScreen(eventId: '${event.eventId}'),
             routeName: '/event-detail'),

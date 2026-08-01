@@ -178,10 +178,14 @@ class EventController extends GetxController {
         return true;
       }
       final msg = data['error'] ?? data['message'] ?? 'Failed to create tier';
-      Get.snackbar('Error', msg, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', msg,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return false;
     } catch (e) {
-      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', e.toString(),
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return false;
     }
   }
@@ -210,10 +214,14 @@ class EventController extends GetxController {
         return true;
       }
       final msg = data['error'] ?? data['message'] ?? 'Failed to update tier';
-      Get.snackbar('Error', msg, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', msg,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return false;
     } catch (e) {
-      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', e.toString(),
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return false;
     }
   }
@@ -228,10 +236,14 @@ class EventController extends GetxController {
         return true;
       }
       final msg = data['error'] ?? data['message'] ?? 'Failed to remove tier';
-      Get.snackbar('Error', msg, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', msg,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return false;
     } catch (e) {
-      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', e.toString(),
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return false;
     }
   }
@@ -257,7 +269,9 @@ class EventController extends GetxController {
       // 🔷 Call onLoaded callback to populate UI
       onLoaded?.call(detail);
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      Get.snackbar('Error', e.toString(),
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       isLoading.value = false;
     }
@@ -324,7 +338,8 @@ class EventController extends GetxController {
 
         final message = data['message'] ?? 'Event Created Successfully!';
         Get.snackbar('Success', message,
-            backgroundColor: AppColors.blueColor, colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
 
         // Refresh lists so new event appears
         await fetchAllEvents();
@@ -333,12 +348,14 @@ class EventController extends GetxController {
         return eventId;
       } else {
         Get.snackbar("Error", data['message'] ?? "Failed to create event",
-            backgroundColor: Colors.red, colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
         return null;
       }
     } catch (e) {
       Get.snackbar("Error", e.toString(),
-          backgroundColor: Colors.red, colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return null;
     } finally {
       isLoading.value = false;
@@ -404,10 +421,11 @@ class EventController extends GetxController {
       Get.snackbar(
         'Partial Success',
         '$successCount of ${tiersList.length} tiers added. You can add the rest from Manage Tiers.',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
+        
+        
         snackPosition: SnackPosition.BOTTOM,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
 
     // Navigate to My Events tab
@@ -471,7 +489,8 @@ class EventController extends GetxController {
 
       if (response.statusCode == 200) {
         Get.snackbar("Success", data["message"] ?? "Event updated.",
-            backgroundColor: Colors.green, colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
         // Refresh the event list after successful update
         await fetchAllEvents();
       } else {
@@ -479,13 +498,15 @@ class EventController extends GetxController {
             data["message"] ??
             "Update failed. Status: ${response.statusCode}";
         Get.snackbar("Error", errorMessage,
-            backgroundColor: Colors.red, colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
         debugPrint(
             "Update Event Error: ${response.statusCode} - ${response.body}");
       }
     } catch (e) {
       Get.snackbar("Error", "Failed to update event: ${e.toString()}",
-          backgroundColor: Colors.red, colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       debugPrint("Update Event Exception: $e");
     } finally {
       isLoading.value = false;
@@ -499,7 +520,9 @@ class EventController extends GetxController {
       final fetchedEvent = await _eventService.fetchEventDetail(eventId);
       return fetchedEvent;
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch event: $e');
+      Get.snackbar('Error', 'Failed to fetch event: $e',
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return null;
     } finally {
       isLoading.value = false;
@@ -516,27 +539,24 @@ class EventController extends GetxController {
         Get.snackbar(
           "Success",
           "Event deleted successfully",
-          backgroundColor: AppColors.blueColor,
-          colorText: AppColors.whiteColor,
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
         await getMyEvents();
       } else {
         Get.back(); // Close loader
         Get.snackbar(
           "Error",
           "Failed to delete event: ${response.body}",
-          backgroundColor: Colors.red,
-          colorText: AppColors.whiteColor,
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     } catch (e) {
       Get.back(); // Close loader
       Get.snackbar(
         "Exception",
         e.toString(),
-        backgroundColor: Colors.red,
-        colorText: AppColors.whiteColor,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 }

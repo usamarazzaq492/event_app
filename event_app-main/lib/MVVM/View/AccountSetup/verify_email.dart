@@ -70,7 +70,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
           "Error",
           "Email not found. Please register again.",
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.textColorPrimary,
           colorText: Colors.white,
         );
         return;
@@ -81,9 +81,9 @@ class _VerifyEmailState extends State<VerifyEmail> {
         "Sending",
         "Resending verification code...",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.blueColor,
-        colorText: Colors.white,
         duration: const Duration(seconds: 1),
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
       );
 
       await authViewModel.resendVerificationCode(email);
@@ -95,16 +95,16 @@ class _VerifyEmailState extends State<VerifyEmail> {
         "Success",
         "Verification code has been resent to your email",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
         duration: const Duration(seconds: 3),
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
       );
     } catch (e) {
       Get.snackbar(
         "Error",
         "Failed to resend code: ${e.toString()}",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.textColorPrimary,
         colorText: Colors.white,
       );
     }
@@ -143,7 +143,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                     IconButton(
                       icon: const Icon(
                         Icons.arrow_back_ios_new,
-                        color: AppColors.whiteColor,
+                        color: AppColors.textColorPrimary,
                         size: 20,
                       ),
                       onPressed: () {
@@ -182,7 +182,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
@@ -191,7 +191,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, -4),
                     ),
@@ -212,9 +212,9 @@ class _VerifyEmailState extends State<VerifyEmail> {
                       Text(
                         'Code has been sent to your email',
                         textAlign: TextAlign.center,
-                        style: TextStyles.regularwhite.copyWith(
+                        style: TextStyles.regulartext.copyWith(
                           fontSize: 12.sp,
-                          color: Colors.white70,
+                          color: AppColors.textColorSecondary,
                         ),
                       ),
                       SizedBox(height: 5.h),
@@ -236,7 +236,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                           inactiveColor: AppColors.signinoptionbordercolor,
                           inactiveFillColor: AppColors.signinoptionbordercolor,
                         ),
-                        textStyle: TextStyles.regularwhite,
+                        textStyle: TextStyles.regulartext,
                         animationDuration: const Duration(milliseconds: 300),
                         backgroundColor: Colors.transparent,
                         enableActiveFill: true,
@@ -260,7 +260,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                                   SizedBox(width: 1.w),
                                   Text(
                                     'Resend Code',
-                                    style: TextStyles.regularwhite.copyWith(
+                                    style: TextStyles.regulartext.copyWith(
                                       color: AppColors.blueColor,
                                       fontWeight: FontWeight.w600,
                                       decoration: TextDecoration.underline,
@@ -274,11 +274,11 @@ class _VerifyEmailState extends State<VerifyEmail> {
                               children: [
                                 Text(
                                   'Resend code in ',
-                                  style: TextStyles.regularwhite,
+                                  style: TextStyles.regulartext,
                                 ),
                                 Text(
                                   '$_countdown',
-                                  style: TextStyles.regularwhite.copyWith(
+                                  style: TextStyles.regulartext.copyWith(
                                     color: AppColors.blueColor,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16.sp,
@@ -286,7 +286,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                                 ),
                                 Text(
                                   's',
-                                  style: TextStyles.regularwhite,
+                                  style: TextStyles.regulartext,
                                 ),
                               ],
                             ),
@@ -303,7 +303,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                               "Error",
                               "Please enter the complete 4-digit code",
                               snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.red,
+                              backgroundColor: AppColors.textColorPrimary,
                               colorText: Colors.white,
                             );
                           }

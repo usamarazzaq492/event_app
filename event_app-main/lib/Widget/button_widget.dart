@@ -54,7 +54,9 @@ class ButtonWidget extends StatelessWidget {
               )
             : Text(
                 text,
-                style: TextStyles.buttontext,
+                style: TextStyles.buttontext.copyWith(
+                  color: textColor ?? Colors.white,
+                ),
               ),
       ),
     );

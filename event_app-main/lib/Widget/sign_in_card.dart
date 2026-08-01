@@ -39,7 +39,7 @@ class SignInCard extends StatelessWidget {
           //   width: 20,
           //   height: 20,
           //   child: CircularProgressIndicator(
-          //     color: Colors.white,
+          //     color: AppColors.textColorPrimary,
           //     strokeWidth: 2,
           //   ),
           // ):
@@ -56,7 +56,7 @@ class SignInCard extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              color: textColor ?? Colors.white,
+              color: textColor ?? AppColors.textColorPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),

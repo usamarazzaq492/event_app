@@ -1,6 +1,8 @@
+import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/MVVM/View/bottombar/bottom_navigation_bar.dart';
 import 'package:event_app/Services/invite_service.dart';
-import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart' as book_event;
+import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart'
+    as book_event;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,7 +22,9 @@ class InviteViewModel extends GetxController {
 
   void toggleInvite(int userId) {
     if (selectedUserIds.contains(userId)) {
-      Get.snackbar("Already Invited", "You already invited this user.");
+      Get.snackbar("Already Invited", "You already invited this user.",
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } else {
       selectedUserIds.add(userId);
       debugPrint("✅ Selected User IDs: $selectedUserIds");
@@ -29,7 +33,9 @@ class InviteViewModel extends GetxController {
 
   Future<void> sendInvites() async {
     if (selectedUserIds.isEmpty) {
-      Get.snackbar("No Users", "Please select at least one user to invite.");
+      Get.snackbar("No Users", "Please select at least one user to invite.",
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       return;
     }
 
@@ -47,12 +53,16 @@ class InviteViewModel extends GetxController {
           result['message'] ?? "Invitations sent successfully.";
       debugPrint("✅ Invite API response: $result");
 
-      Get.snackbar("Success", responseMessage.value);
+      Get.snackbar("Success", responseMessage.value,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       Get.offAll(() => const BottomNavBar());
     } catch (e) {
       responseMessage.value = "Failed to send invitations.";
       debugPrint("❌ Error sending invites: $e");
-      Get.snackbar("Error", responseMessage.value);
+      Get.snackbar("Error", responseMessage.value,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       isLoading.value = false;
     }
@@ -95,18 +105,22 @@ class InviteViewModel extends GetxController {
       Get.snackbar(
         "Success",
         "Invite ${response == 'accepted' ? 'accepted' : 'declined'} successfully",
-        backgroundColor: response == 'accepted' ? Colors.green : Colors.orange,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
 
-      if (response == 'accepted' && res['is_paid'] == true && res['eventId'] != null) {
+      if (response == 'accepted' &&
+          res['is_paid'] == true &&
+          res['eventId'] != null) {
         Future.delayed(const Duration(milliseconds: 500), () {
-          Get.to(() => book_event.BookEventScreen(id: int.parse(res['eventId'].toString())));
+          Get.to(() => book_event.BookEventScreen(
+              id: int.parse(res['eventId'].toString())));
         });
       }
     } catch (e) {
       debugPrint("❌ Error responding to invite: $e");
-      Get.snackbar("Error", "Failed to respond to invite");
+      Get.snackbar("Error", "Failed to respond to invite",
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       isLoading.value = false;
     }

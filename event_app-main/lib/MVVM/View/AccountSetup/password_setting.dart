@@ -40,7 +40,7 @@ class _PasswordSettingState extends State<PasswordSetting> {
         Get.snackbar(
           "Success",
           message,
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.textColorPrimary,
           colorText: Colors.white,
         );
       });
@@ -105,7 +105,7 @@ class _PasswordSettingState extends State<PasswordSetting> {
                     IconButton(
                       icon: const Icon(
                         Icons.arrow_back_ios_new,
-                        color: AppColors.whiteColor,
+                        color: AppColors.textColorPrimary,
                         size: 20,
                       ),
                       onPressed: () {
@@ -144,7 +144,7 @@ class _PasswordSettingState extends State<PasswordSetting> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
@@ -153,7 +153,7 @@ class _PasswordSettingState extends State<PasswordSetting> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.3),
                       blurRadius: 20,
                       offset: const Offset(0, -4),
                     ),
@@ -182,9 +182,9 @@ class _PasswordSettingState extends State<PasswordSetting> {
                           Center(
                             child: Text(
                               'Set your new secure password',
-                              style: TextStyles.regularwhite.copyWith(
+                              style: TextStyles.regulartext.copyWith(
                                 fontSize: 12.sp,
-                                color: Colors.white70,
+                                color: AppColors.textColorSecondary,
                               ),
                             ),
                           ),
@@ -202,14 +202,16 @@ class _PasswordSettingState extends State<PasswordSetting> {
                             prefixIcon: Image.asset(
                               'assets/icons/password_icon.png',
                               height: 2.h,
-                              color: Colors.white.withValues(alpha: 0.7),
+                              color: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.7),
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _isObscure
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
-                                color: Colors.white.withValues(alpha: 0.7),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.7),
                               ),
                               onPressed: () {
                                 setState(() => _isObscure = !_isObscure);
@@ -241,14 +243,16 @@ class _PasswordSettingState extends State<PasswordSetting> {
                             prefixIcon: Image.asset(
                               'assets/icons/password_icon.png',
                               height: 2.h,
-                              color: Colors.white.withValues(alpha: 0.7),
+                              color: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.7),
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _isObscureConfirm
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
-                                color: Colors.white.withValues(alpha: 0.7),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.7),
                               ),
                               onPressed: () {
                                 setState(() =>

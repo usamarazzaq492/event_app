@@ -120,7 +120,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
           Get.snackbar(
             'Success! 🎉',
             'Your event is now boosted for 10 days!',
-            backgroundColor: AppColors.blueColor,
+            backgroundColor: AppColors.textColorPrimary,
             colorText: Colors.white,
           );
         }
@@ -130,7 +130,12 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
         _error = e.toString();
         _isLoading = false;
       });
-      Get.snackbar('Error', e.toString(), backgroundColor: Colors.red);
+      Get.snackbar(
+        'Error',
+        e.toString(),
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -189,7 +194,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                 width: 0.5,
               ),
             ),
@@ -204,15 +209,15 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     size: 16.sp,
                   ),
                 ),
@@ -222,7 +227,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                   child: Text(
                     'Promote Event',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
@@ -252,10 +257,10 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
               child: Container(
                 padding: EdgeInsets.all(4.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(2.h),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Row(
@@ -274,7 +279,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                       child: Text(
                         widget.eventTitle,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                           fontSize: 13.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -293,7 +298,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
           Text(
             'Boost Benefits',
             style: TextStyle(
-              color: Colors.white,
+              color: AppColors.textColorPrimary,
               fontSize: 15.sp,
               fontWeight: FontWeight.bold,
               letterSpacing: -0.5,
@@ -327,7 +332,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
             Text(
               'Available Package',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.5,
@@ -422,7 +427,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                         'Your event will be boosted for ${_boostPackage?['durationDays'] ?? boostDurationDays} days. You can boost again after it expires.',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: Colors.white60,
+                          color: AppColors.textColorSecondary,
                           height: 1.4,
                         ),
                       ),
@@ -464,10 +469,10 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
           child: Container(
             padding: EdgeInsets.all(2.h),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.03),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(1.8.h),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.08),
               ),
             ),
             child: Row(
@@ -489,7 +494,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                       Text(
                         title,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                           fontSize: 12.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -498,7 +503,7 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
                       Text(
                         description,
                         style: TextStyle(
-                          color: Colors.white54,
+                          color: AppColors.textColorSecondary,
                           fontSize: 10.sp,
                           height: 1.3,
                         ),

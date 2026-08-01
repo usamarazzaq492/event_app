@@ -94,7 +94,7 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
                 'Enable these to discover events near you and never miss an update.',
                 style: TextStyles.regularhometext.copyWith(
                   fontSize: 12.sp,
-                  color: Colors.white70,
+                  color: AppColors.textColorSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -136,9 +136,9 @@ class _PermissionsScreenState extends State<PermissionsScreen> {
               Text(
                 'You can change these settings anytime in your device settings.',
                 textAlign: TextAlign.center,
-                style: TextStyles.regularwhite.copyWith(
+                style: TextStyles.regulartext.copyWith(
                   fontSize: 8.sp,
-                  color: Colors.white38,
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                 ),
               ),
             ],
@@ -176,7 +176,7 @@ class _PermissionCard extends StatelessWidget {
         border: Border.all(
           color: isGranted
               ? Colors.green.withValues(alpha: 0.5)
-              : Colors.white.withValues(alpha: 0.08),
+              : AppColors.textColorPrimary.withValues(alpha: 0.08),
           width: 1,
         ),
       ),
@@ -199,7 +199,7 @@ class _PermissionCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyles.regularwhite.copyWith(
+                      style: TextStyles.regulartext.copyWith(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -214,17 +214,17 @@ class _PermissionCard extends StatelessWidget {
                 SizedBox(height: 0.3.h),
                 Text(
                   subtitle,
-                  style: TextStyles.regularwhite.copyWith(
+                  style: TextStyles.regulartext.copyWith(
                     fontSize: 11.sp,
-                    color: Colors.white70,
+                    color: AppColors.textColorSecondary,
                   ),
                 ),
                 SizedBox(height: 0.5.h),
                 Text(
                   description,
-                  style: TextStyles.regularwhite.copyWith(
+                  style: TextStyles.regulartext.copyWith(
                     fontSize: 10.sp,
-                    color: Colors.white54,
+                    color: AppColors.textColorSecondary,
                   ),
                 ),
               ],

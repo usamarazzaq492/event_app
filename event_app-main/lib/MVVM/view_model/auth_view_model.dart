@@ -64,17 +64,21 @@ class AuthViewModel extends GetxController {
   void _handleApiError(dynamic e) {
     error.value = e.toString();
     Get.snackbar('Error', error.value,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP);
+        
+        
+        snackPosition: SnackPosition.TOP,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     debugPrint("API Error: $e"); // Added debugPrint for API errors
   }
 
   void _showSuccess(String message) {
     Get.snackbar('Success', message,
-        backgroundColor: AppColors.blueColor,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP);
+        
+        
+        snackPosition: SnackPosition.TOP,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
   }
 
   /// 🔐 Login with email and password
@@ -447,26 +451,25 @@ class AuthViewModel extends GetxController {
           "Logged out",
           "You have been logged out successfully",
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.blueColor,
-          colorText: Colors.white,
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       } else {
         Get.snackbar(
           "Error",
           response['message'] ?? "Logout failed",
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red, // ✅ Red for error
-          colorText: Colors.white,
-        );
+           // ✅ Red for error,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     } catch (e) {
       Get.snackbar(
         "Error",
         "An error occurred",
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red, // ✅ Red for exception errors
-        colorText: Colors.white,
-      );
+         // ✅ Red for exception errors,
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       isLoading.value = false;
     }
@@ -483,10 +486,11 @@ class AuthViewModel extends GetxController {
           "Account Deleted",
           response['message'] ?? "Your account has been permanently deleted",
           snackPosition: SnackPosition.TOP,
-          backgroundColor: AppColors.blueColor,
-          colorText: Colors.white,
+          
+          
           duration: const Duration(seconds: 2),
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
 
         // Wait a moment for snackbar to show, then navigate
         await Future.delayed(const Duration(milliseconds: 500));
@@ -506,18 +510,16 @@ class AuthViewModel extends GetxController {
           "Error",
           response['message'] ?? "Failed to delete account",
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     } catch (e) {
       Get.snackbar(
         "Error",
         "An error occurred while deleting your account: ${e.toString()}",
         snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       isLoading.value = false;
     }

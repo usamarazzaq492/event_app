@@ -21,7 +21,7 @@ class SkeletonLoading {
               width: 20.w,
               height: 10.h,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
                 borderRadius: BorderRadius.circular(1.h),
               ),
             ),
@@ -38,7 +38,7 @@ class SkeletonLoading {
                     height: 2.h,
                     width: 80.w,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       borderRadius: BorderRadius.circular(0.5.h),
                     ),
                   ),
@@ -51,7 +51,7 @@ class SkeletonLoading {
                     height: 1.5.h,
                     width: 60.w,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       borderRadius: BorderRadius.circular(0.5.h),
                     ),
                   ),
@@ -64,7 +64,7 @@ class SkeletonLoading {
                     height: 1.5.h,
                     width: 70.w,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       borderRadius: BorderRadius.circular(0.5.h),
                     ),
                   ),
@@ -91,7 +91,7 @@ class SkeletonLoading {
             highlightColor: Colors.grey[100]!,
             child: CircleAvatar(
               radius: 8.h,
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.textColorPrimary,
             ),
           ),
           SizedBox(height: 2.h),
@@ -102,7 +102,7 @@ class SkeletonLoading {
               height: 2.h,
               width: 40.w,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
                 borderRadius: BorderRadius.circular(0.5.h),
               ),
             ),
@@ -115,7 +115,7 @@ class SkeletonLoading {
               height: 1.5.h,
               width: 60.w,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
                 borderRadius: BorderRadius.circular(0.5.h),
               ),
             ),
@@ -144,7 +144,7 @@ class SkeletonLoading {
             height: 2.h,
             width: 3.w,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.textColorPrimary,
               borderRadius: BorderRadius.circular(0.5.h),
             ),
           ),
@@ -157,7 +157,7 @@ class SkeletonLoading {
             height: 1.5.h,
             width: 8.w,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.textColorPrimary,
               borderRadius: BorderRadius.circular(0.5.h),
             ),
           ),
@@ -202,7 +202,7 @@ class SkeletonLoading {
               child: Container(
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.textColorPrimary,
                   borderRadius: BorderRadius.circular(2.h),
                 ),
               ),
@@ -216,7 +216,7 @@ class SkeletonLoading {
               child: Container(
                 height: 4.h,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.textColorPrimary,
                   borderRadius: BorderRadius.circular(2.h),
                 ),
               ),
@@ -249,7 +249,7 @@ class SkeletonLoading {
                   height: 2.h,
                   width: 70.w,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     borderRadius: BorderRadius.circular(0.5.h),
                   ),
                 ),
@@ -262,7 +262,7 @@ class SkeletonLoading {
                   height: 1.5.h,
                   width: 50.w,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     borderRadius: BorderRadius.circular(0.5.h),
                   ),
                 ),

@@ -1,8 +1,8 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:event_app/MVVM/view_model/event_view_model.dart';
 import 'package:event_app/app/config/app_colors.dart';
-import 'package:event_app/app/config/app_text_style.dart';
 import 'package:event_app/Widget/button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,7 +47,6 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
   void initState() {
     super.initState();
 
-    // Initialize controllers
     titlecontroller = TextEditingController();
     desccontroller = TextEditingController();
     cityccontroller = TextEditingController();
@@ -79,248 +78,365 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: Obx(() {
-        if (eventController.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        body: Obx(() {
+          if (eventController.isLoading.value) {
+            return const Center(child: CircularProgressIndicator(color: AppColors.blueColor));
+          }
 
-        return SingleChildScrollView(
-          child: Padding(
-            padding:
-                EdgeInsets.only(top: 4.h, left: 5.w, right: 5.w, bottom: 3.h),
-            child: Form(
-              key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeaderModern(),
-                      SizedBox(height: 2.5.h),
+          return Stack(
+            children: [
+              // Background Glow
+              Positioned(
+                top: -15.h,
+                left: -20.w,
+                child: Container(
+                  width: 60.w,
+                  height: 60.w,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.blueColor.withValues(alpha: 0.08),
+                  ),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
+              ),
 
-                  // Details Section
-                  _buildSection(
-                    title: 'Event Details',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        buildValidatedInput(titlecontroller, 'Name of Event'),
-                        buildValidatedMultiLineField(
-                            desccontroller, 'Description'),
-                        buildValidatedOptionalPriceInput(priceController, 'Base Price (Optional)'),
-                        buildValidatedInput(categoryccontroller, 'Category'),
-                        buildValidatedInput(
-                            liveStreamController, 'Live Stream URL (Optional)'),
-                      ],
+              SafeArea(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeader(),
+                          SizedBox(height: 2.h),
+
+                          // Details Section
+                          _buildSection(
+                            title: 'EVENT DETAILS',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildInputField('Title', titlecontroller, 'Name of Event'),
+                                _buildInputField('Description', desccontroller, 'Event Description', maxLines: 4),
+                                _buildInputField('Base Price (Optional)', priceController, 'e.g. 50.00', keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+                                _buildInputField('Category', categoryccontroller, 'Category'),
+                                _buildInputField('Live Stream URL (Optional)', liveStreamController, 'https://youtube.com/... or https://facebook.com/...'),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 1.w, bottom: 1.h),
+                                  child: Text(
+                                      'Only YouTube and Facebook URLs are supported',
+                                      style: TextStyle(
+                                          color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+                                          fontSize: 9.sp,
+                                          fontWeight: FontWeight.w600)),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Location Section
+                          _buildSection(
+                            title: 'LOCATION',
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildInputField('City', cityccontroller, 'e.g. Memphis'),
+                                _buildInputField('State', stateccontroller, 'e.g. Tennessee'),
+                                _buildInputField('Address', addessccontroller, 'Street address or venue'),
+                              ],
+                            ),
+                          ),
+
+                          // Schedule Section
+                          _buildSection(
+                            title: 'SCHEDULE',
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(child: _buildDateField('Start Date', sdateController, () => _selectDate(sdateController))),
+                                    SizedBox(width: 3.w),
+                                    Expanded(child: _buildDateField('End Date', edateController, () => _selectDate(edateController))),
+                                  ],
+                                ),
+                                SizedBox(height: 2.h),
+                                Row(
+                                  children: [
+                                    Expanded(child: _buildTimeField('Start Time', _startTime, () => _selectTime(isStart: true), _startTimeError)),
+                                    SizedBox(width: 3.w),
+                                    Expanded(child: _buildTimeField('End Time', _endTime, () => _selectTime(isStart: false), _endTimeError)),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Media Section
+                          _buildSection(
+                            title: 'COVER IMAGE',
+                            child: _buildImagePicker(),
+                          ),
+
+                          SizedBox(height: 3.h),
+                          _buildUpdateButton(),
+                          SizedBox(height: 4.h),
+                        ],
+                      ),
                     ),
                   ),
+                ),
+              ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
 
-                  // Location Section (City + State disambiguate same-named cities)
-                  _buildSection(
-                    title: 'Location',
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        buildValidatedInput(cityccontroller, 'City (e.g. Memphis)'),
-                        buildValidatedInput(stateccontroller, 'State (e.g. Tennessee)'),
-                        buildValidatedInput(addessccontroller, 'Address'),
-                      ],
-                    ),
+  Widget _buildSection({required String title, required Widget child}) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 2.h),
+      padding: EdgeInsets.all(2.5.h),
+      decoration: BoxDecoration(
+        color: AppColors.textColorPrimary.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(2.5.h),
+        border: Border.all(
+          color: AppColors.textColorPrimary.withValues(alpha: 0.08),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 16,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.blueColor,
+                      AppColors.blueColor.withValues(alpha: 0.5)
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              SizedBox(width: 3.w),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 8.sp,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2.5.h),
+          child,
+        ],
+      ),
+    );
+  }
 
-                  // Schedule Section
-                  _buildSection(
-                    title: 'Schedule',
-                    child: Column(
-                      children: [
-                        buildDateRow(),
-                        SizedBox(height: 1.5.h),
-                        buildTimeRow(),
-                      ],
-                    ),
+  Widget _buildHeader() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 2.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(1.5.h),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(1.5.h),
+                  border: Border.all(
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.1),
+                    width: 1,
                   ),
-
-                  // Media Section
-                  _buildSection(
-                    title: 'Media',
-                    child: buildImagePicker(),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.textColorPrimary, size: 16.sp),
+                  onPressed: () => Get.back(),
+                  style: IconButton.styleFrom(
+                    minimumSize: Size.zero,
+                    padding: EdgeInsets.all(2.w),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-
-                  SizedBox(height: 3.h),
-                  buildUpdateButton(),
-                ],
+                ),
               ),
             ),
           ),
-        );
-      }),
-    );
-  }
-
-  Widget buildLabel(String label) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 1.h, top: 2.h),
-      child: Text(label, style: TextStyles.regularwhite),
-    );
-  }
-
-  Widget buildValidatedInput(TextEditingController controller, String hint) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 2.h),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: TextInputType.text,
-        style: const TextStyle(color: Colors.white),
-        decoration: inputDecoration(hint),
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            if (hint.contains('Live Stream URL')) {
-              return null; // Optional field, no error for empty value
-            }
-            return 'This field is required';
-          }
-          if (hint.contains('Live Stream URL') && value.isNotEmpty) {
-            if (!_isValidLiveStreamUrl(value)) {
-              return 'Please enter a valid YouTube or Facebook URL';
-            }
-          }
-          return null;
-        },
+          Expanded(
+            child: Text(
+              'EDIT EVENT',
+              style: TextStyle(
+                fontSize: 10.sp,
+                color: AppColors.textColorPrimary,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          SizedBox(width: 10.w), // Spacer to balance back button
+        ],
       ),
     );
   }
 
-  Widget buildValidatedOptionalPriceInput(TextEditingController controller, String hint) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 2.h),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        style: const TextStyle(color: Colors.white),
-        decoration: inputDecoration(hint),
-        validator: (value) {
-          if (value != null && value.trim().isNotEmpty) {
-            final v = double.tryParse(value);
-            if (v == null || v < 0) return 'Invalid price';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  Widget buildValidatedMultiLineField(
-      TextEditingController controller, String hint) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 2.h),
-      child: TextFormField(
-        controller: controller,
-        maxLines: 6,
-        style: const TextStyle(color: Colors.white),
-        decoration: inputDecoration(hint),
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            return 'This field is required';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  InputDecoration inputDecoration(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: Colors.grey),
-      filled: true,
-      fillColor: AppColors.signinoptioncolor,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: AppColors.blueColor, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.red, width: 1.5),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.red, width: 1.5),
-      ),
-      errorStyle: TextStyle(
-        color: Colors.redAccent,
-        fontSize: 11.sp,
-      ),
-    );
-  }
-
-  Widget buildDateRow() {
-    return Row(
+  Widget _buildInputField(
+      String label, TextEditingController controller, String hint,
+      {int maxLines = 1, TextInputType keyboardType = TextInputType.text}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-            child: _buildDateField('Start Date', sdateController,
-                () => _selectDate(sdateController))),
-        SizedBox(width: 3.w),
-        Expanded(
-            child: _buildDateField('End Date', edateController,
-                () => _selectDate(edateController))),
+        Padding(
+          padding: EdgeInsets.only(left: 1.w, bottom: 1.h),
+          child: Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 7.sp,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+              letterSpacing: 1.0,
+            ),
+          ),
+        ),
+        TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          keyboardType: keyboardType,
+          cursorColor: AppColors.blueColor,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          style: TextStyle(
+            color: AppColors.textColorPrimary,
+            fontSize: 11.sp,
+            fontWeight: FontWeight.w500,
+          ),
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: AppColors.textColorPrimary.withValues(alpha: 0.03),
+            hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.12), fontSize: 10.sp),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(1.5.h),
+              borderSide:
+                  BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(1.5.h),
+              borderSide:
+                  BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(1.5.h),
+              borderSide:
+                  const BorderSide(color: AppColors.blueColor, width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(1.5.h),
+              borderSide: const BorderSide(color: Colors.redAccent, width: 1),
+            ),
+            errorStyle: TextStyle(fontSize: 8.sp, color: Colors.redAccent),
+          ),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              if (label.contains('Optional')) return null;
+              return '$label is required';
+            }
+            if (label.contains('Live Stream URL') && value.isNotEmpty) {
+              if (!_isValidLiveStreamUrl(value)) return 'Use YT or FB URLs';
+            }
+            if (label.contains('Price') && value.isNotEmpty) {
+               final v = double.tryParse(value);
+               if (v == null || v < 0) return 'Invalid price';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: 2.5.h),
       ],
     );
   }
 
   Widget _buildDateField(
       String hint, TextEditingController controller, VoidCallback onTap) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      enableInteractiveSelection: false,
-      contextMenuBuilder: (context, editableTextState) =>
-          const SizedBox.shrink(),
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: AppColors.signinoptioncolor,
-        suffixIcon: IconButton(
-            icon: const Icon(Icons.calendar_today, color: Colors.grey),
-            onPressed: onTap),
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: const BorderSide(color: AppColors.blueColor)),
-        errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: const BorderSide(color: Colors.red)),
-        focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: const BorderSide(color: Colors.red)),
-        hintStyle: const TextStyle(color: Colors.grey),
-        contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
-      ),
-      style: const TextStyle(color: Colors.white),
-      validator: (value) =>
-          (value == null || value.isEmpty) ? '$hint is required' : null,
-    );
-  }
-
-  Widget buildTimeRow() {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-            child: _buildTimeField('Start Time', _startTime,
-                () => _selectTime(isStart: true), _startTimeError)),
-        SizedBox(width: 3.w),
-        Expanded(
-            child: _buildTimeField('End Time', _endTime,
-                () => _selectTime(isStart: false), _endTimeError)),
+        Padding(
+          padding: EdgeInsets.only(left: 1.w, bottom: 1.h),
+          child: Text(
+            hint.toUpperCase(),
+            style: TextStyle(
+              fontSize: 7.sp,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+              letterSpacing: 1.0,
+            ),
+          ),
+        ),
+        TextFormField(
+          controller: controller,
+          readOnly: true,
+          onTap: onTap,
+          enableInteractiveSelection: false,
+          style: TextStyle(
+            color: AppColors.textColorPrimary,
+            fontSize: 10.sp,
+            fontWeight: FontWeight.w600,
+          ),
+          decoration: InputDecoration(
+            hintText: 'Select Date',
+            filled: true,
+            fillColor: AppColors.textColorPrimary.withValues(alpha: 0.03),
+            suffixIcon: Icon(Icons.calendar_month_rounded,
+                color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 16.sp),
+            hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.12), fontSize: 10.sp),
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(1.5.h),
+              borderSide:
+                  BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(1.5.h),
+              borderSide:
+                  BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(1.5.h),
+              borderSide:
+                  const BorderSide(color: AppColors.blueColor, width: 1.5),
+            ),
+          ),
+          validator: (value) =>
+              (value == null || value.isEmpty) ? 'Required' : null,
+        ),
       ],
     );
   }
@@ -330,45 +446,72 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Padding(
+          padding: EdgeInsets.only(left: 1.w, bottom: 1.h),
+          child: Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 7.sp,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+              letterSpacing: 1.0,
+            ),
+          ),
+        ),
         InkWell(
           onTap: onTap,
+          borderRadius: BorderRadius.circular(1.5.h),
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+            padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
             decoration: BoxDecoration(
-              color: AppColors.signinoptioncolor,
-              borderRadius: BorderRadius.circular(20),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(1.5.h),
               border: Border.all(
-                  color: errorText != null ? Colors.red : Colors.transparent),
+                color: errorText != null
+                    ? Colors.redAccent
+                    : AppColors.textColorPrimary.withValues(alpha: 0.05),
+                width: errorText != null ? 1 : 1,
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(value, style: const TextStyle(color: Colors.white)),
-                const Icon(Icons.access_time, color: Colors.grey),
+                Expanded(
+                  child: Text(
+                    value == label ? 'Select $label' : value,
+                    style: TextStyle(
+                      color: value == label ? AppColors.textColorPrimary.withValues(alpha: 0.12) : AppColors.textColorPrimary,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: 2.w),
+                Icon(Icons.access_time_rounded,
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 16.sp),
               ],
             ),
           ),
         ),
         if (errorText != null)
           Padding(
-            padding: EdgeInsets.only(top: 0.5.h, left: 1.w),
+            padding: EdgeInsets.only(top: 0.8.h, left: 1.w),
             child: Text(errorText,
-                style: TextStyle(color: Colors.red, fontSize: 10.sp)),
+                style: TextStyle(color: Colors.redAccent, fontSize: 8.sp)),
           ),
       ],
     );
   }
 
-  Widget buildImagePicker() {
+  Widget _buildImagePicker() {
     final imageUrl = eventController.eventDetail.value?.eventImage;
-
-    // 🔧 Adjust your domain here
     String fullImageUrl = '';
     if (imageUrl != null && imageUrl.isNotEmpty) {
       if (imageUrl.startsWith('http')) {
         fullImageUrl = imageUrl;
       } else {
-        fullImageUrl = 'https://eventgo-live.com$imageUrl'; // 👈 prepend domain
+        fullImageUrl = 'https://eventgo-live.com$imageUrl';
       }
     }
 
@@ -376,111 +519,92 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         InkWell(
-          onTap: selectFile,
+          onTap: _selectFile,
+          borderRadius: BorderRadius.circular(2.h),
           child: Container(
-            height: 20.h,
+            height: 22.h,
             width: double.infinity,
             decoration: BoxDecoration(
-              color: AppColors.signinoptioncolor,
-              borderRadius: BorderRadius.circular(10),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(2.h),
               border: Border.all(
-                color: _imageError != null ? Colors.red : Colors.transparent,
-                width: 1.5,
+                color: _imageError != null ? Colors.redAccent : AppColors.textColorPrimary.withValues(alpha: 0.05),
+                width: 1,
               ),
             ),
-            child: imageFile != null
-                ? Image.file(imageFile!, fit: BoxFit.cover)
-                : (fullImageUrl.isNotEmpty
-                    ? Image.network(
-                        fullImageUrl,
-                        fit: BoxFit.cover,
-                      )
-                    : const Center(
-                        child: Text('Choose File',
-                            style: TextStyle(color: Colors.white)),
-                      )),
+            child: imageFile == null && fullImageUrl.isEmpty
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(3.w),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.03),
+                        ),
+                        child: Icon(Icons.add_photo_alternate_rounded,
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 30.sp),
+                      ),
+                      SizedBox(height: 1.5.h),
+                      Text(
+                        'Tap to upload cover image',
+                        style: TextStyle(
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.12),
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  )
+                : Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(2.h),
+                        child: imageFile != null
+                            ? Image.file(
+                                imageFile!,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.network(
+                                fullImageUrl,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                      Positioned(
+                        top: 1.5.h,
+                        right: 1.5.h,
+                        child: GestureDetector(
+                          onTap: _selectFile,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: AppColors.textColorSecondary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.edit_rounded,
+                                color: AppColors.textColorPrimary, size: 18),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ),
         if (_imageError != null)
           Padding(
-            padding: EdgeInsets.only(top: 0.5.h, left: 1.w),
+            padding: EdgeInsets.only(top: 0.8.h, left: 1.w),
             child: Text(_imageError!,
-                style: TextStyle(color: Colors.redAccent, fontSize: 11.sp)),
+                style: TextStyle(color: Colors.redAccent, fontSize: 8.sp)),
           ),
       ],
     );
   }
 
-  Widget buildUpdateButton() {
-    return Obx(() {
-      final isBusy = eventController.isLoading.value;
-      return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        switchInCurve: Curves.easeOut,
-        switchOutCurve: Curves.easeIn,
-        child: ButtonWidget(
-          key: ValueKey<bool>(isBusy),
-          text: isBusy ? 'Updating…' : 'Update Event',
-          onPressed: isBusy
-              ? null
-              : () async {
-                  HapticFeedback.lightImpact();
-                  bool isValid = _formKey.currentState!.validate();
-
-                  setState(() {
-                    _startTimeError = (_startTime == 'Start Time')
-                        ? 'Select start time'
-                        : null;
-                    _endTimeError =
-                        (_endTime == 'End Time') ? 'Select end time' : null;
-
-                    // For updates, image is optional if existing image exists
-                    // final existingImageUrl =
-                    //     eventController.eventDetail.value?.eventImage;
-                    _imageError =
-                        null; // Image is optional when updating (can keep existing)
-                  });
-
-                  if (isValid &&
-                      _startTimeError == null &&
-                      _endTimeError == null &&
-                      _imageError == null) {
-                    // Backend will geocode address + city + state to get latitude/longitude
-                    await eventController.updateEvent(
-                      id: widget.eventId,
-                      eventTitle: titlecontroller.text,
-                      startDate: sdateController.text,
-                      endDate: edateController.text,
-                      startTime: _startTime,
-                      endTime: _endTime,
-                      description: desccontroller.text,
-                      category: categoryccontroller.text,
-                      address: addessccontroller.text,
-                      city: cityccontroller.text.trim(),
-                      state: stateccontroller.text.trim(),
-                      latitude: null,
-                      longitude: null,
-                      image: imageFile,
-                      liveStreamUrl: liveStreamController.text.isNotEmpty
-                          ? liveStreamController.text
-                          : null,
-                      eventPrice: priceController.text.isNotEmpty ? priceController.text : null,
-                    );
-                  } else {
-                    Get.snackbar(
-                        'Validation', 'Please fill all required fields',
-                        backgroundColor: Colors.red, colorText: Colors.white);
-                  }
-                },
-          borderRadius: 4.h,
-          textColor: AppColors.whiteColor,
-          backgroundColor: AppColors.blueColor,
-        ),
-      );
-    });
-  }
-
-  void selectFile() async {
+  void _selectFile() async {
     XFile? file = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (file != null) {
       setState(() {
@@ -527,79 +651,64 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
     return youtubePattern.hasMatch(url) || facebookPattern.hasMatch(url);
   }
 
-  Widget _buildSection({required String title, required Widget child}) {
+  Widget _buildUpdateButton() {
     return Container(
-      margin: EdgeInsets.only(bottom: 2.h),
-      padding: EdgeInsets.all(2.h),
       decoration: BoxDecoration(
-        color: AppColors.signinoptioncolor,
-        borderRadius: BorderRadius.circular(18),
-        border:
-            Border.all(color: Colors.white.withValues(alpha: 0.08), width: 1),
+        borderRadius: BorderRadius.circular(2.h),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: AppColors.blueColor.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 6,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: AppColors.blueColor,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              SizedBox(width: 2.w),
-              Text(title, style: TextStyles.homeheadingtext),
-            ],
-          ),
-          SizedBox(height: 1.5.h),
-          child,
-        ],
-      ),
-    );
-  }
+      child: Obx(() {
+        final isBusy = eventController.isLoading.value;
+        return ButtonWidget(
+          text: isBusy ? 'UPDATING...' : 'UPDATE EVENT',
+          onPressed: isBusy
+              ? null
+              : () async {
+                  HapticFeedback.lightImpact();
+                  bool isValid = _formKey.currentState!.validate();
 
-  Widget _buildHeaderModern() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            Expanded(
-              child: Center(
-                child: Text('Edit Event', style: TextStyles.heading),
-              ),
-            ),
-            const SizedBox(width: 48),
-          ],
-        ),
-        SizedBox(height: 1.h),
-        Container(
-          height: 1,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withValues(alpha: 0.06),
-                Colors.white.withValues(alpha: 0.02),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-          ),
-        ),
-      ],
+                  setState(() {
+                    _startTimeError = (_startTime == 'Start Time') ? 'Select start time' : null;
+                    _endTimeError = (_endTime == 'End Time') ? 'Select end time' : null;
+                    _imageError = null; // optional on update
+                  });
+
+                  if (isValid && _startTimeError == null && _endTimeError == null) {
+                    await eventController.updateEvent(
+                      id: widget.eventId,
+                      eventTitle: titlecontroller.text,
+                      startDate: sdateController.text,
+                      endDate: edateController.text,
+                      startTime: _startTime,
+                      endTime: _endTime,
+                      description: desccontroller.text,
+                      category: categoryccontroller.text,
+                      address: addessccontroller.text,
+                      city: cityccontroller.text.trim(),
+                      state: stateccontroller.text.trim(),
+                      latitude: null,
+                      longitude: null,
+                      image: imageFile,
+                      liveStreamUrl: liveStreamController.text.isNotEmpty ? liveStreamController.text : null,
+                      eventPrice: priceController.text.isNotEmpty ? priceController.text : null,
+                    );
+                  } else {
+                    Get.snackbar('Validation', 'Please fill all required fields',
+                        backgroundColor: AppColors.textColorPrimary,
+                        colorText: Colors.white);
+                  }
+                },
+          borderRadius: 2.h,
+          textColor: Colors.white,
+          backgroundColor: AppColors.blueColor,
+        );
+      }),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:event_app/app/config/app_colors.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:event_app/MVVM/View/bookEvent/book_event_screen.dart';
@@ -73,9 +74,8 @@ class DeepLinkHandler {
             'Success',
             'Square account connected successfully!',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
           return;
         }
       }
@@ -91,9 +91,8 @@ class DeepLinkHandler {
             'Error',
             'Invalid QR code format',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-          );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
           return;
         }
 
@@ -126,9 +125,8 @@ class DeepLinkHandler {
             'Error',
             data['message'] ?? 'Invalid QR code',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-          );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
         }
       }
     } catch (e) {
@@ -137,9 +135,8 @@ class DeepLinkHandler {
         'Error',
         'Failed to process QR code: $e',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 }

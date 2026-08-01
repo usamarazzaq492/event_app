@@ -130,7 +130,7 @@ class PublicProfileController extends GetxController {
         Get.snackbar(
           "Success",
           response["message"] ?? "Profile updated successfully.",
-          backgroundColor: AppColors.blueColor,
+          backgroundColor: AppColors.textColorPrimary,
           colorText: Colors.white,
         );
         // Refresh after update
@@ -139,7 +139,7 @@ class PublicProfileController extends GetxController {
         Get.snackbar(
           "Error",
           "Failed to update profile",
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.textColorPrimary,
           colorText: Colors.white,
         );
       }
@@ -147,7 +147,7 @@ class PublicProfileController extends GetxController {
       Get.snackbar(
         "Error",
         "Failed to update profile",
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.textColorPrimary,
         colorText: Colors.white,
       );
     } finally {

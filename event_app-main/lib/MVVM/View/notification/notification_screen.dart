@@ -59,7 +59,7 @@ class _NotificationScreenState extends State<NotificationScreen>
       case 'follow':
         return Colors.purple;
       default:
-        return Colors.grey;
+        return AppColors.textColorSecondary;
     }
   }
 
@@ -131,7 +131,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                                   style: TextStyle(
                                     fontSize: 9.sp,
                                     fontWeight: FontWeight.w900,
-                                    color: Colors.white38,
+                                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                                     letterSpacing: 1.5,
                                   ),
                                 ),
@@ -168,16 +168,16 @@ class _NotificationScreenState extends State<NotificationScreen>
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(1.5.h),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
                 child: IconButton(
                   icon: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white, size: 16.sp),
+                      color: AppColors.textColorPrimary, size: 16.sp),
                   onPressed: () {
                     HapticUtils.navigation();
                     NavigationUtils.pop(context);
@@ -190,7 +190,7 @@ class _NotificationScreenState extends State<NotificationScreen>
             'NOTIFICATIONS',
             style: TextStyle(
               fontSize: 8.sp,
-              color: Colors.white38,
+              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
               fontWeight: FontWeight.w800,
               letterSpacing: 2.0,
             ),
@@ -201,16 +201,16 @@ class _NotificationScreenState extends State<NotificationScreen>
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(1.5.h),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
                 child: IconButton(
                   icon: Icon(Icons.refresh_rounded,
-                      color: Colors.white, size: 18.sp),
+                      color: AppColors.textColorPrimary, size: 18.sp),
                   onPressed: () {
                     HapticUtils.light();
                     viewModel.fetchNotifications();
@@ -238,10 +238,10 @@ class _NotificationScreenState extends State<NotificationScreen>
     return Container(
       margin: EdgeInsets.only(bottom: 1.2.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
+        color: AppColors.textColorPrimary.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(2.h),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: AppColors.textColorPrimary.withValues(alpha: 0.08),
           width: 1,
         ),
       ),
@@ -294,11 +294,11 @@ class _NotificationScreenState extends State<NotificationScreen>
                                 width: 2,
                               ),
                             ),
-                            padding: const EdgeInsets.all(2),
+                            padding: EdgeInsets.all(2),
                             child: CircleAvatar(
                               radius: 20.sp,
                               backgroundColor:
-                                  Colors.white.withValues(alpha: 0.05),
+                                  AppColors.textColorPrimary.withValues(alpha: 0.05),
                               backgroundImage: actorImage != null &&
                                       actorImage.toString().isNotEmpty
                                   ? CachedNetworkImageProvider(
@@ -324,16 +324,16 @@ class _NotificationScreenState extends State<NotificationScreen>
                           RichText(
                             text: TextSpan(
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.textColorPrimary,
                                 fontSize: 11.sp,
                                 height: 1.3,
                               ),
                               children: [
                                 TextSpan(
                                   text: '$actorName ',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontWeight: FontWeight.w900,
-                                      color: Colors.white),
+                                      color: AppColors.textColorPrimary),
                                 ),
                                 TextSpan(
                                   text: isInvite
@@ -342,7 +342,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       color:
-                                          Colors.white.withValues(alpha: 0.7)),
+                                          AppColors.textColorPrimary.withValues(alpha: 0.7)),
                                 ),
                               ],
                             ),
@@ -351,7 +351,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                           Text(
                             timeAgo.toUpperCase(),
                             style: TextStyle(
-                              color: Colors.white24,
+                              color: AppColors.textColorPrimary.withValues(alpha: 0.24),
                               fontSize: 7.sp,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.5,
@@ -370,7 +370,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                           height: 12.w,
                           fit: BoxFit.cover,
                           placeholder: (_, __) =>
-                              Container(color: Colors.white10),
+                              Container(color: AppColors.textColorPrimary.withValues(alpha: 0.12)),
                         ),
                       ),
                   ],
@@ -401,7 +401,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                               child: Text(
                                 'Accept',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.textColorPrimary,
                                   fontWeight: FontWeight.w900,
                                   fontSize: 10.sp,
                                 ),
@@ -421,10 +421,10 @@ class _NotificationScreenState extends State<NotificationScreen>
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 1.2.h),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.05),
+                              color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(1.2.h),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.1),
+                                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                                 width: 1,
                               ),
                             ),
@@ -432,7 +432,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                               child: Text(
                                 'Decline',
                                 style: TextStyle(
-                                  color: Colors.white70,
+                                  color: AppColors.textColorSecondary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 10.sp,
                                 ),
@@ -467,7 +467,7 @@ class _NotificationScreenState extends State<NotificationScreen>
             'Syncing your alerts...',
             style: TextStyle(
               fontSize: 11.sp,
-              color: Colors.white38,
+              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -501,7 +501,7 @@ class _NotificationScreenState extends State<NotificationScreen>
               style: TextStyle(
                 fontSize: 15.sp,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
               ),
             ),
             SizedBox(height: 1.h),
@@ -509,7 +509,7 @@ class _NotificationScreenState extends State<NotificationScreen>
               viewModel.error.value,
               style: TextStyle(
                 fontSize: 10.sp,
-                color: Colors.white38,
+                color: AppColors.textColorPrimary.withValues(alpha: 0.38),
               ),
               textAlign: TextAlign.center,
             ),
@@ -538,7 +538,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                 child: Text(
                   'Retry',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     fontWeight: FontWeight.bold,
                     fontSize: 11.sp,
                   ),
@@ -560,12 +560,12 @@ class _NotificationScreenState extends State<NotificationScreen>
             padding: EdgeInsets.all(5.w),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withValues(alpha: 0.03),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.03),
             ),
             child: Icon(
               Icons.notifications_paused_rounded,
               size: 45.sp,
-              color: Colors.white.withValues(alpha: 0.1),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.1),
             ),
           ),
           SizedBox(height: 3.h),
@@ -574,7 +574,7 @@ class _NotificationScreenState extends State<NotificationScreen>
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.w800,
-              color: Colors.white.withValues(alpha: 0.8),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.8),
               letterSpacing: -0.5,
             ),
           ),
@@ -583,7 +583,7 @@ class _NotificationScreenState extends State<NotificationScreen>
             'We\'ll notify you when something important happens.',
             style: TextStyle(
               fontSize: 10.sp,
-              color: Colors.white24,
+              color: AppColors.textColorPrimary.withValues(alpha: 0.24),
             ),
             textAlign: TextAlign.center,
           ),

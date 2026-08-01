@@ -1,3 +1,5 @@
+import 'package:event_app/app/config/app_colors.dart';
+import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:event_app/MVVM/View/bottombar/bottom_navigation_bar.dart';
 import 'package:event_app/MVVM/body_model/ads_model.dart';
@@ -44,7 +46,12 @@ class AdViewModel extends GetxController {
   }) async {
     // Validate image
     if (selectedImage.value == null) {
-      Get.snackbar("Image Missing", "Please select an image.");
+      Get.snackbar(
+        "Image Missing",
+        "Please select an image.",
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
       return;
     }
 
@@ -59,7 +66,12 @@ class AdViewModel extends GetxController {
       );
 
       if (result['success']) {
-        Get.snackbar("Success", "Ad uploaded successfully");
+        Get.snackbar(
+          "Success",
+          "Ad uploaded successfully",
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
 
         // Navigate to bottom nav bar (adjust initial index as needed)
         Get.offAll(() => const BottomNavBar(initialIndex: 2));
@@ -71,7 +83,12 @@ class AdViewModel extends GetxController {
         selectedImage.value = null;
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     } finally {
       isLoading.value = false;
     }

@@ -5,7 +5,6 @@ import 'package:event_app/MVVM/View/Promotion/select_event_to_promote_screen.dar
 import 'package:event_app/MVVM/body_model/ads_model.dart';
 import 'package:event_app/MVVM/view_model/ad_view_model.dart';
 import 'package:event_app/MVVM/view_model/auth_view_model.dart';
-import 'package:event_app/app/config/app_asset.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_pages.dart';
 import 'package:event_app/app/config/app_text_style.dart';
@@ -84,7 +83,7 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
             color: AppColors.backgroundColor.withValues(alpha: 0.7),
             border: Border(
               top: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                 width: 0.5,
               ),
             ),
@@ -102,8 +101,6 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                       'Sign in to promote',
                       'Create an account to promote your events.',
                       snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: AppColors.signinoptioncolor,
-                      colorText: Colors.white,
                       mainButton: TextButton(
                         onPressed: () => Get.toNamed(RouteName.loginScreen),
                         child: const Text(
@@ -114,6 +111,8 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                           ),
                         ),
                       ),
+                      backgroundColor: AppColors.textColorPrimary,
+                      colorText: Colors.white,
                     );
                     return;
                   }
@@ -182,7 +181,7 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                 width: 0.5,
               ),
             ),
@@ -217,7 +216,7 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                           Text(
                             "Promoted",
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textColorPrimary,
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,
                               letterSpacing: -0.5,
@@ -229,7 +228,8 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                                 "${adVM.ads.length} active promotion${adVM.ads.length != 1 ? 's' : ''}",
                                 style: TextStyle(
                                   fontSize: 9.sp,
-                                  color: Colors.white38,
+                                  color: AppColors.textColorPrimary
+                                      .withValues(alpha: 0.38),
                                   fontWeight: FontWeight.w500,
                                 ),
                                 maxLines: 1,
@@ -250,15 +250,15 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Icon(
                     Icons.refresh_rounded,
-                    color: Colors.white70,
+                    color: AppColors.textColorSecondary,
                     size: 16.sp,
                   ),
                 ),
@@ -274,11 +274,11 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
     return RefreshIndicator(
       onRefresh: adVM.fetchAds,
       color: AppColors.blueColor,
-      backgroundColor: AppColors.signinoptioncolor,
+      backgroundColor: AppColors.textColorPrimary,
       child: Obx(() {
         if (adVM.isLoading.value && adVM.ads.isEmpty) {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.white),
+            child: CircularProgressIndicator(color: AppColors.textColorPrimary),
           );
         } else if (adVM.error.isNotEmpty) {
           // Show friendly message for auth/network errors instead of raw exception
@@ -299,15 +299,15 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                       Icon(
                         isAuthError ? Icons.info_outline : Icons.cloud_off,
                         size: 48.sp,
-                        color: Colors.white54,
+                        color: AppColors.textColorSecondary,
                       ),
                       SizedBox(height: 2.h),
                       Text(
                         isAuthError
                             ? 'Pull to refresh promoted events'
                             : 'Something went wrong. Pull to refresh.',
-                        style: TextStyles.regularwhite.copyWith(
-                          color: Colors.white70,
+                        style: TextStyles.regulartext.copyWith(
+                          color: AppColors.textColorSecondary,
                           fontSize: 14.sp,
                         ),
                         textAlign: TextAlign.center,
@@ -316,10 +316,10 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                       TextButton.icon(
                         onPressed: () => adVM.fetchAds(),
                         icon: const Icon(Icons.refresh,
-                            color: Colors.white70, size: 20),
+                            color: AppColors.textColorSecondary, size: 20),
                         label: Text(
                           'Retry',
-                          style: TextStyles.regularwhite.copyWith(
+                          style: TextStyles.regulartext.copyWith(
                             color: AppColors.blueColor,
                             fontWeight: FontWeight.w600,
                           ),
@@ -348,26 +348,28 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
   }
 
   Widget _buildEmptyState() {
-    return ListView(
+    return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        SizedBox(height: 10.h),
-        Center(
-          child: Column(
-            children: [
-              Image.asset(AppImages.emptyImg, height: 25.h),
-              SizedBox(height: 2.h),
-              Text(
-                "No Promoted Events",
-                style: TextStyles.homeheadingtext,
-              ),
-              SizedBox(height: 1.h),
-              Text(
-                "Be the first to promote your event!",
-                textAlign: TextAlign.center,
-                style: TextStyles.regularwhite.copyWith(color: Colors.grey),
-              ),
-            ],
+      slivers: [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "No Promoted Events",
+                  style: TextStyles.homeheadingtext,
+                ),
+                SizedBox(height: 1.h),
+                Text(
+                  "Be the first to promote your event!",
+                  textAlign: TextAlign.center,
+                  style: TextStyles.regulartext
+                      .copyWith(color: AppColors.textColorSecondary),
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -403,10 +405,10 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(2.2.h),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
@@ -427,15 +429,18 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                           width: 32.w,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => Container(
-                            color: Colors.white.withValues(alpha: 0.05),
-                            child: const Center(
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.05),
+                            child: Center(
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           ),
                           errorWidget: (context, url, error) => Container(
-                            color: Colors.white.withValues(alpha: 0.05),
-                            child: const Icon(Icons.broken_image_rounded,
-                                color: Colors.white24),
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.05),
+                            child: Icon(Icons.broken_image_rounded,
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.24)),
                           ),
                         ),
                       ),
@@ -456,7 +461,7 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                                         ? '${title[0].toUpperCase()}${title.substring(1)}'
                                         : 'Untitled',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: AppColors.textColorPrimary,
                                       fontSize: 12.sp,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: -0.2,
@@ -504,7 +509,7 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                                     ? description
                                     : 'No description provided',
                                 style: TextStyle(
-                                  color: Colors.white60,
+                                  color: AppColors.textColorSecondary,
                                   fontSize: 10.sp,
                                   height: 1.3,
                                 ),
@@ -523,20 +528,21 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                                     '\$${ad.amount}',
                                     style: TextStyle(
                                       fontSize: 14.sp,
-                                      color: Colors.white,
+                                      color: AppColors.textColorPrimary,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 Container(
                                   padding: EdgeInsets.all(0.6.h),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.1),
+                                    color: AppColors.textColorPrimary
+                                        .withValues(alpha: 0.1),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
                                     Icons.arrow_forward_ios_rounded,
                                     size: 10.sp,
-                                    color: Colors.white,
+                                    color: AppColors.textColorPrimary,
                                   ),
                                 ),
                               ],

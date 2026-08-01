@@ -89,7 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   count: onboardData.length,
                   effect: const ExpandingDotsEffect(
                     activeDotColor: AppColors.blueColor,
-                    dotColor: Colors.grey,
+                    dotColor: AppColors.textColorSecondary,
                     dotHeight: 8,
                     dotWidth: 8,
                   ),
@@ -154,8 +154,8 @@ class OnboardingContent extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha: 0.5),
-                        Colors.black,
+                        AppColors.textColorPrimary.withValues(alpha: 0.5),
+                        AppColors.textColorPrimary,
                       ],
                     ),
                   ),
@@ -171,7 +171,7 @@ class OnboardingContent extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: AppColors.textColorPrimary,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(4.h),
               topRight: Radius.circular(4.h),

@@ -141,10 +141,10 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.signinoptioncolor,
         title: Text(title,
-            style: const TextStyle(color: Colors.white, fontSize: 16)),
+            style: const TextStyle(color: AppColors.textColorPrimary, fontSize: 16)),
         content: SingleChildScrollView(
           child: Text(details,
-              style: const TextStyle(color: Colors.white70, fontSize: 12)),
+              style: const TextStyle(color: AppColors.textColorSecondary, fontSize: 12)),
         ),
         actions: [
           TextButton(
@@ -176,13 +176,13 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
                   color: AppColors.blueColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check, size: 40, color: Colors.white),
+                child: const Icon(Icons.check, size: 40, color: AppColors.textColorPrimary),
               ),
               const SizedBox(height: 20),
               const Text(
                 "Congratulations!",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textColorPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -194,7 +194,7 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
                     : "You have successfully placed an order for the event. Enjoy!",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: AppColors.textColorSecondary,
                   fontSize: 14,
                 ),
               ),
@@ -218,7 +218,7 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
                     );
                   },
                   child: const Text("View E-Ticket",
-                      style: TextStyle(color: AppColors.whiteColor)),
+                      style: TextStyle(color: AppColors.textColorPrimary)),
                 ),
               if (!widget.isPromotion) const SizedBox(height: 10),
               TextButton(
@@ -230,7 +230,7 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
                 },
                 child: Text(
                   widget.isPromotion ? "Done" : "Cancel",
-                  style: const TextStyle(color: Colors.white60),
+                  style: const TextStyle(color: AppColors.textColorSecondary),
                 ),
               )
             ],
@@ -246,11 +246,11 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textColorPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(widget.isPromotion ? 'Promote Event' : 'Complete Payment',
-            style: const TextStyle(color: Colors.white)),
+            style: const TextStyle(color: AppColors.textColorPrimary)),
         backgroundColor: AppColors.backgroundColor,
         elevation: 0,
       ),

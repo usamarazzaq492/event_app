@@ -60,7 +60,7 @@ class CustomLoadingIndicator extends StatelessWidget {
             Text(
               message!,
               style: TextStyle(
-                color: Colors.white70,
+                color: AppColors.textColorSecondary,
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w400,
               ),

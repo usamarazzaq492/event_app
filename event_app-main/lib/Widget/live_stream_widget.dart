@@ -1,3 +1,4 @@
+import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -80,11 +81,11 @@ class _LiveStreamWidgetState extends State<LiveStreamWidget> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(color: Colors.white),
+                      CircularProgressIndicator(color: AppColors.textColorPrimary),
                       SizedBox(height: 16),
                       Text(
                         'Loading Live Stream...',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.textColorPrimary),
                       ),
                     ],
                   ),
@@ -101,7 +102,7 @@ class _LiveStreamWidgetState extends State<LiveStreamWidget> {
                       const SizedBox(height: 16),
                       const Text(
                         'Failed to load live stream',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: AppColors.textColorPrimary),
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton(
@@ -124,12 +125,12 @@ class _LiveStreamWidgetState extends State<LiveStreamWidget> {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.circle, color: Colors.white, size: 8),
+                    Icon(Icons.circle, color: AppColors.textColorPrimary, size: 8),
                     SizedBox(width: 4),
                     Text(
                       'LIVE',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textColorPrimary,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),

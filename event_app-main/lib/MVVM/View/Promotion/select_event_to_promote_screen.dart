@@ -90,7 +90,7 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
                           'Choose an event to boost its visibility',
                           style: TextStyle(
                             fontSize: 11.sp,
-                            color: Colors.white38,
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -118,7 +118,7 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
               bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                 width: 0.5,
               ),
             ),
@@ -133,15 +133,15 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     size: 16.sp,
                   ),
                 ),
@@ -151,7 +151,7 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
                   child: Text(
                     'Promote Event',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
@@ -176,7 +176,7 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
         if (eventController.isLoading.value &&
             eventController.myEvents.isEmpty) {
           return const Center(
-            child: CircularProgressIndicator(color: Colors.white),
+            child: CircularProgressIndicator(color: AppColors.textColorPrimary),
           );
         } else if (eventController.myEvents.isEmpty) {
           return _buildEmptyState();
@@ -212,7 +212,7 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
               Text(
                 "Create an event first to promote it!",
                 textAlign: TextAlign.center,
-                style: TextStyles.regularwhite.copyWith(color: Colors.grey),
+                style: TextStyles.regulartext.copyWith(color: AppColors.textColorSecondary),
               ),
             ],
           ),
@@ -237,151 +237,118 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
     // Event can be promoted if it's upcoming AND not currently promoted
     final bool canPromote = isUpcoming && !isCurrentlyPromoted;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(2.2.h),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: GestureDetector(
-          onTap: canPromote
-              ? () {
-                  HapticUtils.selection();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => PromoteEventScreen(
-                        eventId: event.eventId!,
-                        eventTitle: event.eventTitle ?? 'Event',
-                      ),
-                    ),
-                  );
-                }
-              : null,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(2.2.h),
-              border: Border.all(
-                color: isCurrentlyPromoted
-                    ? Colors.orange.withValues(alpha: 0.3)
-                    : Colors.white.withValues(alpha: 0.1),
-                width: isCurrentlyPromoted ? 1.5 : 1,
+    return Container(
+      margin: EdgeInsets.fromLTRB(4.w, 0, 4.w, 2.h),
+      decoration: BoxDecoration(
+        color: AppColors.signinoptioncolor,
+        borderRadius: BorderRadius.circular(2.h),
+        border: isCurrentlyPromoted
+            ? Border.all(color: Colors.orange.withValues(alpha: 0.5), width: 1.5)
+            : Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textColorPrimary.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.all(1.5.h),
+        leading: Hero(
+          tag: 'event_image_${event.eventId}',
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(1.h),
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              width: 65,
+              height: 65,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                width: 65,
+                height: 65,
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                child: Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
               ),
-            ),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Image
-                  Hero(
-                    tag: 'event_image_${event.eventId}',
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(2.2.h),
-                        bottomLeft: Radius.circular(2.2.h),
-                      ),
-                      child: Stack(
-                        children: [
-                          CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            width: 30.w,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Container(
-                              color: Colors.white.withValues(alpha: 0.05),
-                              child: const Center(
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              color: Colors.white.withValues(alpha: 0.05),
-                              child: const Icon(Icons.broken_image_rounded,
-                                  color: Colors.white24),
-                            ),
-                          ),
-                          if (!isUpcoming)
-                            Container(
-                              color: Colors.black.withValues(alpha: 0.6),
-                              child: Center(
-                                child: Text(
-                                  'PAST',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9.sp,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Content
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(1.5.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            event.eventTitle ?? 'Untitled Event',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: 0.6.h),
-                          if (event.startDate != null)
-                            Row(
-                              children: [
-                                Icon(Icons.calendar_today_rounded,
-                                    size: 10.sp, color: Colors.white38),
-                                SizedBox(width: 1.5.w),
-                                Text(
-                                  _formatDate(event.startDate!),
-                                  style: TextStyle(
-                                    color: Colors.white38,
-                                    fontSize: 9.sp,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          SizedBox(height: 1.5.h),
-                          if (isCurrentlyPromoted)
-                            _buildStatusBadge(
-                              icon: Icons.verified_rounded,
-                              label: timeRemaining != null
-                                  ? 'Boosted • $timeRemaining'
-                                  : 'Boosted',
-                              color: Colors.orange,
-                            )
-                          else if (isUpcoming)
-                            _buildStatusBadge(
-                              icon: Icons.rocket_launch_rounded,
-                              label: 'Tap to Boost',
-                              color: AppColors.blueColor,
-                            )
-                          else
-                            _buildStatusBadge(
-                              icon: Icons.history_rounded,
-                              label: 'Past Event',
-                              color: Colors.white24,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+              errorWidget: (context, url, error) => Container(
+                width: 65,
+                height: 65,
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                child: Icon(Icons.broken_image_rounded,
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.24)),
               ),
             ),
           ),
         ),
+        title: Text(
+          event.eventTitle ?? 'Untitled Event',
+          style: TextStyle(
+            color: AppColors.textColorPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 11.sp,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (event.startDate != null) ...[
+              SizedBox(height: 0.5.h),
+              Row(
+                children: [
+                  Icon(Icons.calendar_today_rounded,
+                      size: 9.sp, color: AppColors.textColorSecondary),
+                  SizedBox(width: 1.w),
+                  Text(
+                    _formatDate(event.startDate!),
+                    style: TextStyle(
+                      color: AppColors.textColorSecondary,
+                      fontSize: 9.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            SizedBox(height: 1.h),
+            if (isCurrentlyPromoted)
+              _buildStatusBadge(
+                icon: Icons.verified_rounded,
+                label: timeRemaining != null
+                    ? 'Boosted • $timeRemaining'
+                    : 'Boosted',
+                color: Colors.orange,
+              )
+            else if (isUpcoming)
+              _buildStatusBadge(
+                icon: Icons.rocket_launch_rounded,
+                label: 'Tap to Boost',
+                color: AppColors.blueColor,
+              )
+            else
+              _buildStatusBadge(
+                icon: Icons.history_rounded,
+                label: 'Past Event',
+                color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+              ),
+          ],
+        ),
+        onTap: canPromote
+            ? () {
+                HapticUtils.selection();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PromoteEventScreen(
+                      eventId: event.eventId!,
+                      eventTitle: event.eventTitle ?? 'Event',
+                    ),
+                  ),
+                );
+              }
+            : null,
       ),
     );
   }

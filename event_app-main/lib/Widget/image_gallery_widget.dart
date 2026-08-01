@@ -175,7 +175,7 @@ class _ImageGalleryWidgetState extends State<ImageGalleryWidget> {
                         decoration: BoxDecoration(
                           color: _currentIndex == index
                               ? AppColors.blueColor
-                              : Colors.white.withValues(alpha: 0.5),
+                              : AppColors.textColorPrimary.withValues(alpha: 0.5),
                           borderRadius: BorderRadius.circular(1.h),
                         ),
                       ),
@@ -211,7 +211,7 @@ class _ImageGalleryWidgetState extends State<ImageGalleryWidget> {
                     ),
                     child: Icon(
                       Icons.fullscreen,
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       size: 4.w,
                     ),
                   ),
@@ -265,7 +265,7 @@ class _FullScreenGalleryState extends State<FullScreenGallery> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close, color: AppColors.textColorPrimary),
           onPressed: () {
             HapticUtils.light();
             Navigator.of(context).pop();
@@ -356,7 +356,7 @@ class _FullScreenGalleryState extends State<FullScreenGallery> {
                     decoration: BoxDecoration(
                       color: _currentIndex == index
                           ? AppColors.blueColor
-                          : Colors.white.withValues(alpha: 0.5),
+                          : AppColors.textColorPrimary.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(1.h),
                     ),
                   ),

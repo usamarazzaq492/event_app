@@ -47,11 +47,11 @@ class EventTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.signinoptioncolor,
         borderRadius: BorderRadius.circular(2.h),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black26,
+            color: AppColors.textColorPrimary.withOpacity(0.26),
             blurRadius: 6,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           )
         ],
       ),
@@ -107,8 +107,8 @@ class EventTab extends StatelessWidget {
                     SizedBox(width: 2.w),
                     Text(
                       event.category ?? '',
-                      style: TextStyles.regularwhite.copyWith(
-                        color: Colors.grey[300],
+                      style: TextStyles.regulartext.copyWith(
+                        color: AppColors.textColorSecondary.withOpacity(0.5),
                       ),
                     ),
                     const Spacer(),
@@ -137,7 +137,7 @@ class EventTab extends StatelessWidget {
                             Icon(Icons.edit, color: Colors.white, size: 14.sp),
                         label: Text(
                           "Edit",
-                          style: TextStyles.buttontext,
+                          style: TextStyles.buttontext.copyWith(color: Colors.white),
                         ),
                       ),
                     ),
@@ -157,7 +157,7 @@ class EventTab extends StatelessWidget {
                             color: Colors.white, size: 14.sp),
                         label: Text(
                           "Delete",
-                          style: TextStyles.buttontext,
+                          style: TextStyles.buttontext.copyWith(color: Colors.white),
                         ),
                       ),
                     ),
@@ -196,7 +196,7 @@ class EventTab extends StatelessWidget {
           children: [
             Text(
               "Are you sure you want to delete this event?",
-              style: TextStyles.regularwhite,
+              style: TextStyles.regulartext,
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 3.h), // ✅ space between text and buttons
@@ -218,7 +218,7 @@ class EventTab extends StatelessWidget {
                     icon: const Icon(Icons.delete, color: Colors.white),
                     label: Text(
                       "Delete",
-                      style: TextStyles.buttontext,
+                      style: TextStyles.buttontext.copyWith(color: Colors.white),
                     ),
                   ),
                 ),

@@ -355,8 +355,8 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                   'Sign in to create events',
                   'Create an account to host your own events.',
                   snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: AppColors.signinoptioncolor,
-                  colorText: Colors.white,
+                  
+                  
                   mainButton: TextButton(
                     onPressed: () {
                       Get.toNamed(RouteName.loginScreen);
@@ -369,7 +369,8 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                       ),
                     ),
                   ),
-                );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
               }
             },
           ),
@@ -390,7 +391,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
           decoration: BoxDecoration(
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
-                bottom: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+                bottom: BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1))),
           ),
           child: Row(
             children: [
@@ -406,7 +407,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                 child: Text(
                   "Discover Events",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColorPrimary,
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5),
@@ -460,12 +461,12 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
         decoration: BoxDecoration(
           color: isActive
               ? AppColors.blueColor.withValues(alpha: 0.15)
-              : Colors.white.withValues(alpha: 0.05),
+              : AppColors.textColorPrimary.withValues(alpha: 0.05),
           shape: BoxShape.circle,
           border: Border.all(
             color: isActive
                 ? AppColors.blueColor.withValues(alpha: 0.5)
-                : Colors.white.withValues(alpha: 0.1),
+                : AppColors.textColorPrimary.withValues(alpha: 0.1),
           ),
         ),
         child: isRotating
@@ -473,11 +474,11 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                 turns: isActive ? 0.5 : 0,
                 duration: const Duration(milliseconds: 300),
                 child: Icon(icon,
-                    color: isActive ? AppColors.blueColor : Colors.white,
+                    color: isActive ? AppColors.blueColor : AppColors.textColorPrimary,
                     size: 16.sp),
               )
             : Icon(icon,
-                color: isActive ? AppColors.blueColor : Colors.white,
+                color: isActive ? AppColors.blueColor : AppColors.textColorPrimary,
                 size: 16.sp),
       ),
     );
@@ -497,20 +498,20 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(2.h),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
                     child: TextField(
                       controller: _searchController,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.textColorPrimary),
                       decoration: InputDecoration(
                         hintText: 'Search events, categories, locations...',
                         hintStyle:
-                            TextStyle(color: Colors.white38, fontSize: 11.sp),
+                            TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 11.sp),
                         prefixIcon: Icon(
                           Icons.search_rounded,
                           color: AppColors.blueColor,
@@ -525,7 +526,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                                 },
                                 icon: Icon(
                                   Icons.clear_rounded,
-                                  color: Colors.white70,
+                                  color: AppColors.textColorSecondary,
                                   size: 16.sp,
                                 ),
                               )
@@ -553,7 +554,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                               .withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(1.5.h),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.1),
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.1),
                             width: 1,
                           ),
                         ),
@@ -565,7 +566,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                                   title: Text(
                                     suggestion,
                                     style: TextStyle(
-                                        color: Colors.white, fontSize: 11.sp),
+                                        color: AppColors.textColorPrimary, fontSize: 11.sp),
                                   ),
                                   leading: Icon(
                                     Icons.history_rounded,
@@ -632,7 +633,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
         Text(
           'Quick Filters',
           style: TextStyle(
-              color: Colors.white,
+              color: AppColors.textColorPrimary,
               fontSize: 13.sp,
               fontWeight: FontWeight.bold),
         ),
@@ -663,12 +664,12 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                     decoration: BoxDecoration(
                       color: isSelected
                           ? AppColors.blueColor
-                          : Colors.white.withValues(alpha: 0.05),
+                          : AppColors.textColorPrimary.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(1.2.h),
                       border: Border.all(
                         color: isSelected
                             ? AppColors.blueColor
-                            : Colors.white.withValues(alpha: 0.1),
+                            : AppColors.textColorPrimary.withValues(alpha: 0.1),
                         width: 1,
                       ),
                       boxShadow: isSelected
@@ -686,7 +687,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                       child: Text(
                         category,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.white60,
+                          color: isSelected ? Colors.white : AppColors.textColorSecondary,
                           fontSize: 10.sp,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.w500,
@@ -711,10 +712,10 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
         child: Container(
           padding: EdgeInsets.all(4.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(2.h),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.1),
               width: 1,
             ),
           ),
@@ -724,7 +725,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
               Text(
                 'Advanced Filters',
                 style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     fontSize: 13.sp,
                     fontWeight: FontWeight.bold),
               ),
@@ -737,7 +738,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                   children: [
                     Text('Search Radius',
                         style:
-                            TextStyle(color: Colors.white70, fontSize: 10.sp)),
+                            TextStyle(color: AppColors.textColorSecondary, fontSize: 10.sp)),
                     Text('${_radiusKm.round()} km',
                         style: TextStyle(
                             color: AppColors.blueColor,
@@ -749,8 +750,8 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 4,
                     activeTrackColor: AppColors.blueColor,
-                    inactiveTrackColor: Colors.white.withValues(alpha: 0.1),
-                    thumbColor: Colors.white,
+                    inactiveTrackColor: AppColors.textColorPrimary.withValues(alpha: 0.1),
+                    thumbColor: AppColors.textColorPrimary,
                     overlayColor: AppColors.blueColor.withValues(alpha: 0.2),
                   ),
                   child: Slider(
@@ -800,7 +801,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.white60, fontSize: 9.sp)),
+        Text(label, style: TextStyle(color: AppColors.textColorSecondary, fontSize: 9.sp)),
         SizedBox(height: 1.h),
         GestureDetector(
           onTap: () {
@@ -810,10 +811,10 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.2.h),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(1.h),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
               ),
             ),
             child: Row(
@@ -827,7 +828,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                         ? DateFormat('MMM d, yyyy').format(date)
                         : 'Anytime',
                     style: TextStyle(
-                        color: date != null ? Colors.white : Colors.white38,
+                        color: date != null ? AppColors.textColorPrimary : AppColors.textColorPrimary.withValues(alpha: 0.38),
                         fontSize: 10.sp),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -886,10 +887,10 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
     return Container(
       margin: EdgeInsets.only(bottom: 2.h),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.03),
+        color: AppColors.textColorPrimary.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(2.2.h),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: AppColors.textColorPrimary.withValues(alpha: 0.08),
           width: 1,
         ),
       ),
@@ -922,8 +923,8 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                           height: 12.h,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => Container(
-                            color: Colors.white.withValues(alpha: 0.05),
-                            child: const Center(
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                            child: Center(
                               child: SizedBox(
                                 width: 20,
                                 height: 20,
@@ -933,9 +934,9 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                             ),
                           ),
                           errorWidget: (context, url, error) => Container(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                             child: Icon(Icons.image_not_supported_rounded,
-                                color: Colors.white24, size: 20.sp),
+                                color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 20.sp),
                           ),
                         ),
                       ),
@@ -969,7 +970,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                       Text(
                         _capitalizeFirstLetter(event.eventTitle ?? '').trim(),
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textColorPrimary,
                             fontSize: 12.sp,
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.2),
@@ -986,7 +987,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                             child: Text(
                               '${_formatDate(event.startDate)} • ${_formatTime(event.startTime)}',
                               style: TextStyle(
-                                  color: Colors.white54, fontSize: 9.sp),
+                                  color: AppColors.textColorSecondary, fontSize: 9.sp),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -1022,7 +1023,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                   ),
                 ),
                 Icon(Icons.arrow_forward_ios_rounded,
-                    color: Colors.white24, size: 12.sp),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 12.sp),
               ],
             ),
           ),
@@ -1070,9 +1071,9 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.dark(
               primary: AppColors.blueColor,
-              onPrimary: Colors.white,
+              onPrimary: AppColors.textColorPrimary,
               surface: AppColors.signinoptioncolor,
-              onSurface: Colors.white,
+              onSurface: AppColors.textColorPrimary,
             ),
           ),
           child: child!,
@@ -1101,9 +1102,9 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.dark(
               primary: AppColors.blueColor,
-              onPrimary: Colors.white,
+              onPrimary: AppColors.textColorPrimary,
               surface: AppColors.signinoptioncolor,
-              onSurface: Colors.white,
+              onSurface: AppColors.textColorPrimary,
             ),
           ),
           child: child!,
@@ -1140,10 +1141,11 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
         'Location unavailable',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-        backgroundColor: Colors.black87,
+        
+        
         duration: const Duration(seconds: 3),
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 
@@ -1175,7 +1177,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
     return RefreshIndicator(
       onRefresh: _loadEvents,
       color: AppColors.blueColor,
-      backgroundColor: AppColors.signinoptioncolor,
+      backgroundColor: AppColors.textColorPrimary,
       child: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: _buildHeader()),
@@ -1197,12 +1199,12 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.search_off_rounded,
-                          size: 60.sp, color: Colors.white10),
+                          size: 60.sp, color: AppColors.textColorPrimary.withValues(alpha: 0.12)),
                       SizedBox(height: 2.h),
                       Text(
                         "No Events Found",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textColorPrimary,
                             fontSize: 16.sp,
                             fontWeight: FontWeight.bold),
                       ),
@@ -1210,7 +1212,7 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                       Text(
                         "Try adjusting your filters to find more events.",
                         style:
-                            TextStyle(color: Colors.white38, fontSize: 10.sp),
+                            TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 10.sp),
                       ),
                       SizedBox(height: 3.h),
                       OutlinedButton(

@@ -54,7 +54,7 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                     IconButton(
                       icon: const Icon(
                         Icons.arrow_back_ios_new,
-                        color: AppColors.whiteColor,
+                        color: AppColors.textColorPrimary,
                         size: 20,
                       ),
                       onPressed: () {
@@ -69,14 +69,14 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(width: 48), // Spacer for balance
+                    SizedBox(width: 48), // Spacer for balance
                   ],
                 ),
                 SizedBox(height: 3.h),
 
                 /// Visual Card Illustration with a subtle glow
                 Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
@@ -105,7 +105,7 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
@@ -113,11 +113,7 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                     color: AppColors.signinoptionbordercolor,
                   ),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, -4),
-                    ),
+                    BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, -4),),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -136,9 +132,9 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                       SizedBox(height: 0.5.h),
                       Text(
                         'Securely add your payment method',
-                        style: TextStyles.regularwhite.copyWith(
+                        style: TextStyles.regulartext.copyWith(
                           fontSize: 12.sp,
-                          color: Colors.white70,
+                          color: AppColors.textColorSecondary,
                         ),
                       ),
                       SizedBox(height: 4.h),
@@ -217,7 +213,7 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                           }
                         },
                         backgroundColor: AppColors.blueColor,
-                        textColor: AppColors.whiteColor,
+                        textColor: AppColors.textColorPrimary,
                         borderRadius: 14,
                       ),
                     ],
@@ -240,10 +236,10 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
       children: [
         Text(
           label,
-          style: TextStyles.regularwhite.copyWith(
+          style: TextStyles.regulartext.copyWith(
             fontSize: 11.sp,
             fontWeight: FontWeight.w500,
-            color: Colors.white70,
+            color: AppColors.textColorSecondary,
           ),
         ),
         SizedBox(height: 1.h),

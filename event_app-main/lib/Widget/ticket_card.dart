@@ -46,7 +46,7 @@ Widget ticketCard({
                         height: 13.h,
                         color: Colors.grey[800],
                         child: const Icon(Icons.broken_image,
-                            color: Colors.white70),
+                            color: AppColors.textColorSecondary),
                       ),
                     )
                   : imagePath != null
@@ -56,7 +56,7 @@ Widget ticketCard({
                           width: 13.h,
                           height: 13.h,
                           color: Colors.grey[800],
-                          child: const Icon(Icons.event, color: Colors.white70),
+                          child: const Icon(Icons.event, color: AppColors.textColorSecondary),
                         ),
             ),
             SizedBox(width: 3.w),
@@ -68,7 +68,7 @@ Widget ticketCard({
                   children: [
                     Text(title,
                         style: const TextStyle(
-                            color: AppColors.whiteColor,
+                            color: AppColors.textColorPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.bold)),
                     SizedBox(height: 1.h),
@@ -83,7 +83,7 @@ Widget ticketCard({
                         SizedBox(width: 3.w),
                         Text(location,
                             style: const TextStyle(
-                                color: Colors.white70, fontSize: 12)),
+                                color: AppColors.textColorSecondary, fontSize: 12)),
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -95,7 +95,7 @@ Widget ticketCard({
                               )),
                           child: Text(status,
                               style: const TextStyle(
-                                  color: Colors.white, fontSize: 10)),
+                                  color: AppColors.textColorPrimary, fontSize: 10)),
                         ),
                       ],
                     ),

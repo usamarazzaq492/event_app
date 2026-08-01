@@ -42,7 +42,7 @@ void showSuccessDialog(BuildContext context) {
                 'Your account is ready to use. You will be redirected to the Home page in a few seconds..',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: AppColors.textColorSecondary,
                   fontSize: 16,
                 ),
               ),

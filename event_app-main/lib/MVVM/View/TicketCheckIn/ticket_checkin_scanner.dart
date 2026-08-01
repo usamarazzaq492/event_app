@@ -59,9 +59,8 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
               'Camera Permission Required',
               'Please grant camera permission to scan ticket QR codes',
               snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-            );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
           }
         }
       }
@@ -76,9 +75,8 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           'Error',
           'Failed to initialize camera. Please try again.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     }
   }
@@ -97,9 +95,8 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           'Camera Permission Required',
           'Please grant camera permission to scan ticket QR codes',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     } catch (e) {
       debugPrint('Error requesting camera permission: $e');
@@ -107,9 +104,8 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
         'Error',
         'Failed to request camera permission. Please try again.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 
@@ -215,11 +211,12 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           '✅ Ticket Checked In',
           'Ticket #${data['ticket_number']} checked in successfully',
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
+          
+          
           duration: const Duration(seconds: 3),
-          icon: const Icon(Icons.check_circle, color: Colors.white),
-        );
+          icon: const Icon(Icons.check_circle, color: AppColors.textColorPrimary),
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
 
         // Show success dialog with details
         _showCheckInSuccess(data);
@@ -240,10 +237,11 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
         'Error',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        
+        
         duration: const Duration(seconds: 3),
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       setState(() {
         _isProcessing = false;
@@ -255,7 +253,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.signinoptioncolor,
+        backgroundColor: AppColors.textColorPrimary,
         title: Row(
           children: [
             const Icon(Icons.check_circle, color: Colors.green, size: 28),
@@ -301,10 +299,10 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.signinoptioncolor,
+        backgroundColor: AppColors.textColorPrimary,
         title: Row(
           children: [
-            const Icon(Icons.warning, color: Colors.orange, size: 28),
+            Icon(Icons.warning, color: Colors.orange, size: 28),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -320,7 +318,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           children: [
             Text(
               message,
-              style: TextStyles.regularwhite,
+              style: TextStyles.regulartext,
             ),
             if (checkedInAt != null) ...[
               const SizedBox(height: 15),
@@ -329,7 +327,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
             if (warning != null) ...[
               const SizedBox(height: 15),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
@@ -343,7 +341,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
                     Expanded(
                       child: Text(
                         warning,
-                        style: TextStyles.regularwhite.copyWith(
+                        style: TextStyles.regulartext.copyWith(
                           color: Colors.orangeAccent,
                           fontSize: 12.sp,
                         ),
@@ -378,8 +376,8 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           width: 100,
           child: Text(
             '$label:',
-            style: TextStyles.regularwhite.copyWith(
-              color: Colors.grey,
+            style: TextStyles.regulartext.copyWith(
+              color: AppColors.textColorSecondary,
               fontSize: 12.sp,
             ),
           ),
@@ -387,7 +385,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
         Expanded(
           child: Text(
             value,
-            style: TextStyles.regularwhite.copyWith(
+            style: TextStyles.regulartext.copyWith(
               fontSize: 12.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -400,12 +398,12 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.textColorPrimary,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.textColorPrimary,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textColorPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -440,10 +438,10 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.camera_alt_outlined,
                     size: 80,
-                    color: Colors.white54,
+                    color: AppColors.textColorSecondary,
                   ),
                   SizedBox(height: 3.h),
                   Text(
@@ -488,7 +486,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
           // Processing indicator
           if (_isProcessing)
             Container(
-              color: Colors.black54,
+              color: AppColors.textColorSecondary,
               child: const Center(
                 child: CircularProgressIndicator(
                   valueColor:
@@ -507,7 +505,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
                 padding: EdgeInsets.all(4.w),
                 margin: EdgeInsets.symmetric(horizontal: 5.w),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(2.h),
                 ),
                 child: Column(
@@ -515,7 +513,7 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
                   children: [
                     Text(
                       'Point camera at ticket QR code',
-                      style: TextStyles.regularwhite.copyWith(
+                      style: TextStyles.regulartext.copyWith(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                       ),
@@ -524,9 +522,9 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
                     SizedBox(height: 1.h),
                     Text(
                       'The ticket will be marked as checked in automatically',
-                      style: TextStyles.regularwhite.copyWith(
+                      style: TextStyles.regulartext.copyWith(
                         fontSize: 11.sp,
-                        color: Colors.grey,
+                        color: AppColors.textColorSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),

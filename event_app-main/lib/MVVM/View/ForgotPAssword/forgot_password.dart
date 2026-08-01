@@ -70,7 +70,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       IconButton(
                         icon: const Icon(
                           Icons.arrow_back_ios_new,
-                          color: AppColors.whiteColor,
+                          color: AppColors.textColorPrimary,
                           size: 20,
                         ),
                         onPressed: () {
@@ -109,7 +109,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
@@ -117,11 +117,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     color: AppColors.signinoptionbordercolor,
                   ),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, -4),
-                    ),
+                    BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, -4),),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -142,9 +138,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         SizedBox(height: 0.5.h),
                         Text(
                           'Enter your email to receive a recovery link',
-                          style: TextStyles.regularwhite.copyWith(
+                          style: TextStyles.regulartext.copyWith(
                             fontSize: 13.sp,
-                            color: Colors.white70,
+                            color: AppColors.textColorSecondary,
                           ),
                         ),
                         SizedBox(height: 4.h),
@@ -161,10 +157,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         /// Email Input Field
                         Text(
                           'Email Address',
-                          style: TextStyles.regularwhite.copyWith(
+                          style: TextStyles.regulartext.copyWith(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white70,
+                            color: AppColors.textColorSecondary,
                           ),
                         ),
                         SizedBox(height: 1.h),
@@ -178,7 +174,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           prefixIcon: Image.asset(
                             AppImages.emailIcon,
                             height: 2.h,
-                            color: Colors.white.withAlpha(179),
+                            color: AppColors.textColorPrimary.withAlpha(179),
                           ),
                           autofillHints: const [AutofillHints.email],
                           textInputAction: TextInputAction.done,

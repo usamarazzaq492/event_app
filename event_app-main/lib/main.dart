@@ -13,17 +13,17 @@ void main() async {
 
   // Configure edge-to-edge system UI icon brightness
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness: Brightness.dark,
   ));
 
   // Preload fonts to ensure they're available immediately
   await _preloadFonts();
 
   // Debug: Print theme info
-  debugPrint('App starting with dark theme mode');
-  debugPrint('Theme brightness: ${AppTheme.darkTheme.brightness}');
-  debugPrint('Primary color: ${AppTheme.darkTheme.primaryColor}');
+  debugPrint('App starting with light theme mode');
+  debugPrint('Theme brightness: ${AppTheme.lightTheme.brightness}');
+  debugPrint('Primary color: ${AppTheme.lightTheme.primaryColor}');
 
   runApp(const MyApp());
 }
@@ -59,9 +59,9 @@ class MyApp extends StatelessWidget {
       return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'EventGo',
-        themeMode: ThemeMode.dark,
-        theme: AppTheme.darkTheme,
-        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.light,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.lightTheme, // Force light theme for now
         builder: (context, child) {
           return GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),

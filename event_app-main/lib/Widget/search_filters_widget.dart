@@ -135,7 +135,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
                     child: Text(
                       'Clear',
                       style: TextStyles.regulartext.copyWith(
-                        color: AppColors.whiteColor,
+                        color: AppColors.textColorPrimary,
                       ),
                     ),
                   ),
@@ -253,7 +253,7 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
                 child: Text(
                   category,
                   style: TextStyles.regulartext.copyWith(
-                    color: isSelected ? Colors.white : AppColors.whiteColor,
+                    color: isSelected ? AppColors.textColorPrimary : AppColors.textColorPrimary,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                     fontSize: 12.sp,
                   ),
@@ -423,14 +423,14 @@ class _SearchFiltersWidgetState extends State<SearchFiltersWidget> {
             fillColor: AppColors.backgroundColor,
           ),
           dropdownColor: AppColors.signinoptioncolor,
-          style: TextStyles.regulartext.copyWith(color: AppColors.whiteColor),
+          style: TextStyles.regulartext.copyWith(color: AppColors.textColorPrimary),
           items: _sortOptions.map((option) {
             return DropdownMenuItem(
               value: option,
               child: Text(
                 option,
                 style: TextStyles.regulartext
-                    .copyWith(color: AppColors.whiteColor),
+                    .copyWith(color: AppColors.textColorPrimary),
               ),
             );
           }).toList(),

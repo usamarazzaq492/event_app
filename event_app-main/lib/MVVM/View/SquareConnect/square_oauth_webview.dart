@@ -170,7 +170,7 @@ class _SquareOAuthWebViewState extends State<SquareOAuthWebView> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new,
-                      color: Colors.white, size: 20),
+                      color: AppColors.textColorPrimary, size: 20),
                   onPressed: () {
                     HapticUtils.navigation();
                     Navigator.of(context).pop();
@@ -225,7 +225,7 @@ class _SquareOAuthWebViewState extends State<SquareOAuthWebView> {
                 child: Text(
                   'Blank Screen? Open in Browser instead',
                   style: TextStyle(
-                    color: Colors.white54,
+                    color: AppColors.textColorSecondary,
                     fontSize: 9.sp,
                     decoration: TextDecoration.underline,
                   ),
@@ -248,7 +248,7 @@ class _SquareOAuthWebViewState extends State<SquareOAuthWebView> {
             SizedBox(height: 3.h),
             Text(
               'Preparing Square connection...',
-              style: TextStyles.regularwhite.copyWith(color: Colors.white70),
+              style: TextStyles.regulartext.copyWith(color: AppColors.textColorSecondary),
             ),
           ],
         ),
@@ -274,7 +274,7 @@ class _SquareOAuthWebViewState extends State<SquareOAuthWebView> {
             Text(
               _errorMessage ?? 'An unknown error occurred',
               textAlign: TextAlign.center,
-              style: TextStyles.regularwhite.copyWith(color: Colors.white70),
+              style: TextStyles.regulartext.copyWith(color: AppColors.textColorSecondary),
             ),
             SizedBox(height: 5.h),
             SizedBox(

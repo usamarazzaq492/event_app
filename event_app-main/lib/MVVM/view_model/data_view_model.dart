@@ -50,10 +50,11 @@ class DataViewModel extends GetxController {
         prevState
             ? 'You unfollowed this user'
             : 'You are now following this user',
-        backgroundColor: AppColors.blueColor,
-        colorText: Colors.white,
+        
+        
         duration: const Duration(seconds: 2),
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } catch (e) {
       // 🔴 Revert changes on failure
       isFollowing.value = prevState;
@@ -62,10 +63,11 @@ class DataViewModel extends GetxController {
       Get.snackbar(
         'Error',
         'Failed to ${prevState ? 'unfollow' : 'follow'} user: ${e.toString()}',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
+        
+        
         duration: const Duration(seconds: 3),
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 
@@ -96,17 +98,15 @@ class DataViewModel extends GetxController {
       Get.snackbar(
         "Success",
         response["message"] ?? "Profile updated successfully.",
-        backgroundColor: AppColors.blueColor,
-        colorText: AppColors.whiteColor,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       Get.to(() => const BottomNavBar());
     } catch (e) {
       Get.snackbar(
         "Error",
         "Failed to update profile",
-        backgroundColor: Colors.red,
-        colorText: AppColors.whiteColor,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       isLoading.value = false;
     }
@@ -124,9 +124,8 @@ class DataViewModel extends GetxController {
       Get.snackbar(
         "Error",
         "Failed to fetch profile",
-        backgroundColor: Colors.red,
-        colorText: AppColors.whiteColor,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       isLoading.value = false;
     }

@@ -35,7 +35,7 @@ class AppErrorWidget extends StatelessWidget {
               'Oops! Something went wrong',
               style: TextStyles.homeheadingtext.copyWith(
                 fontSize: 16.sp,
-                color: AppColors.whiteColor,
+                color: AppColors.textColorPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -44,7 +44,7 @@ class AppErrorWidget extends StatelessWidget {
               message,
               style: TextStyles.regularwhite.copyWith(
                 fontSize: 12.sp,
-                color: Colors.white70,
+                color: AppColors.textColorSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -110,7 +110,7 @@ class AppEmptyStateWidget extends StatelessWidget {
               title,
               style: TextStyles.homeheadingtext.copyWith(
                 fontSize: 16.sp,
-                color: AppColors.whiteColor,
+                color: AppColors.textColorPrimary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -119,7 +119,7 @@ class AppEmptyStateWidget extends StatelessWidget {
               message,
               style: TextStyles.regularwhite.copyWith(
                 fontSize: 12.sp,
-                color: Colors.white70,
+                color: AppColors.textColorSecondary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -175,7 +175,7 @@ class AppLoadingWidget extends StatelessWidget {
               message!,
               style: TextStyles.regularwhite.copyWith(
                 fontSize: 12.sp,
-                color: Colors.white70,
+                color: AppColors.textColorSecondary,
               ),
               textAlign: TextAlign.center,
             ),

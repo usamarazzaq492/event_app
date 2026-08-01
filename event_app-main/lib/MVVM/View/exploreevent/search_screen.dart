@@ -65,7 +65,7 @@ class _SearchScreenState extends State<SearchScreen>
         Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+              icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textColorPrimary),
               onPressed: () {
                 HapticUtils.navigation();
                 Navigator.pop(context);
@@ -116,8 +116,8 @@ class _SearchScreenState extends State<SearchScreen>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.white.withValues(alpha: 0.06),
-                Colors.white.withValues(alpha: 0.02),
+                AppColors.textColorPrimary.withValues(alpha: 0.06),
+                AppColors.textColorPrimary.withValues(alpha: 0.02),
               ],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -164,7 +164,7 @@ class _SearchScreenState extends State<SearchScreen>
                 : Icons.location_off,
             color: controller.isLocationEnabled.value
                 ? AppColors.blueColor
-                : Colors.grey,
+                : AppColors.textColorSecondary,
             size: 20.sp,
           ),
           SizedBox(width: 3.w),
@@ -174,7 +174,7 @@ class _SearchScreenState extends State<SearchScreen>
                   ? 'Location enabled - Finding nearby events'
                   : 'Location disabled - Search by city only',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textColorPrimary,
                 fontSize: 10.sp,
               ),
             ),
@@ -205,10 +205,10 @@ class _SearchScreenState extends State<SearchScreen>
             text: controller.selectedCity.value == 'All Cities'
                 ? ''
                 : controller.selectedCity.value),
-        style: TextStyle(color: Colors.white, fontSize: 12.sp),
+        style: TextStyle(color: AppColors.textColorPrimary, fontSize: 12.sp),
         decoration: InputDecoration(
           hintText: 'Enter city name...',
-          hintStyle: TextStyle(color: Colors.white70, fontSize: 12.sp),
+          hintStyle: TextStyle(color: AppColors.textColorSecondary, fontSize: 12.sp),
           border: InputBorder.none,
           suffixIcon: Icon(Icons.location_city,
               color: AppColors.blueColor, size: 20.sp),
@@ -248,7 +248,7 @@ class _SearchScreenState extends State<SearchScreen>
                     border: Border.all(
                       color: isSelected
                           ? AppColors.blueColor
-                          : Colors.grey.withValues(alpha: 0.3),
+                          : AppColors.textColorSecondary.withValues(alpha: 0.26),
                       width: 1,
                     ),
                   ),
@@ -256,7 +256,7 @@ class _SearchScreenState extends State<SearchScreen>
                     child: Text(
                       category,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white70,
+                        color: isSelected ? Colors.white : AppColors.textColorSecondary,
                         fontSize: 9.sp,
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -276,7 +276,7 @@ class _SearchScreenState extends State<SearchScreen>
       children: [
         Text(
           'Search Radius: ${controller.searchRadius.value.round()}km',
-          style: TextStyle(color: Colors.white, fontSize: 10.sp),
+          style: TextStyle(color: AppColors.textColorPrimary, fontSize: 10.sp),
         ),
         SizedBox(height: 1.h),
         Slider(
@@ -285,7 +285,7 @@ class _SearchScreenState extends State<SearchScreen>
           max: 100.0,
           divisions: 19,
           activeColor: AppColors.blueColor,
-          inactiveColor: Colors.grey,
+          inactiveColor: AppColors.textColorSecondary,
           onChanged: (value) => controller.updateSearchRadius(value),
         ),
       ],
@@ -325,7 +325,7 @@ class _SearchScreenState extends State<SearchScreen>
             child: Text(
               title,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white70,
+                color: isSelected ? Colors.white : AppColors.textColorSecondary,
                 fontSize: 12.sp,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
@@ -365,11 +365,11 @@ class _SearchScreenState extends State<SearchScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.location_off, size: 50.sp, color: Colors.grey),
+              Icon(Icons.location_off, size: 50.sp, color: AppColors.textColorSecondary),
               SizedBox(height: 2.h),
               Text(
                 'Enable location to see nearby events',
-                style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                style: TextStyle(color: AppColors.textColorSecondary, fontSize: 12.sp),
               ),
               SizedBox(height: 2.h),
               ElevatedButton(
@@ -386,7 +386,7 @@ class _SearchScreenState extends State<SearchScreen>
         return Center(
           child: Text(
             'No nearby events found',
-            style: TextStyle(color: Colors.white, fontSize: 12.sp),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: 12.sp),
           ),
         );
       } else {
@@ -419,7 +419,7 @@ class _SearchScreenState extends State<SearchScreen>
         return Center(
           child: Text(
             'No events found with current filters',
-            style: TextStyle(color: Colors.white, fontSize: 12.sp),
+            style: TextStyle(color: AppColors.textColorPrimary, fontSize: 12.sp),
           ),
         );
       } else {
@@ -453,9 +453,9 @@ class _SearchScreenState extends State<SearchScreen>
         decoration: BoxDecoration(
           color: AppColors.signinoptioncolor,
           borderRadius: BorderRadius.circular(2.h),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-                color: Colors.black26, blurRadius: 4, offset: Offset(0, 2))
+                color: AppColors.textColorSecondary.withValues(alpha: 0.26), blurRadius: 4, offset: Offset(0, 2))
           ],
         ),
         child: Row(
@@ -467,7 +467,7 @@ class _SearchScreenState extends State<SearchScreen>
                 width: 20.w,
                 height: 10.h,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Container(color: Colors.grey),
+                placeholder: (context, url) => Container(color: AppColors.textColorSecondary),
                 errorWidget: (context, url, error) =>
                     const Icon(Icons.error, color: Colors.red),
               ),
@@ -498,7 +498,7 @@ class _SearchScreenState extends State<SearchScreen>
                           child: Text(
                             'PROMOTED',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textColorPrimary,
                               fontSize: 7.sp,
                               fontWeight: FontWeight.bold,
                             ),
@@ -523,7 +523,7 @@ class _SearchScreenState extends State<SearchScreen>
                           '${event.address} ${event.city}${event.state != null && event.state!.isNotEmpty ? ' ${event.state}' : ''}',
                           overflow: TextOverflow.ellipsis,
                           style:
-                              TextStyle(fontSize: 9.sp, color: Colors.white70),
+                              TextStyle(fontSize: 9.sp, color: AppColors.textColorSecondary),
                         ),
                       ),
                     ],

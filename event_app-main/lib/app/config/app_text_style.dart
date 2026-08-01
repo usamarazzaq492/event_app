@@ -6,7 +6,7 @@ import 'app_colors.dart';
 class TextStyles {
   static TextStyle get heading => TextStyle(
         fontSize: 16.sp,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontWeight: FontWeight.w600,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
@@ -30,28 +30,28 @@ class TextStyles {
   static TextStyle get regularwhite => TextStyle(
         fontSize: 10.sp,
         fontWeight: FontWeight.w500,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
   static TextStyle get regularhint => TextStyle(
         fontSize: 9.sp,
         fontWeight: FontWeight.w200,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
   static TextStyle get regularhometext => TextStyle(
         fontSize: 9.sp,
         fontWeight: FontWeight.w400,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
   static TextStyle get regularlocatext => TextStyle(
         fontSize: 7.sp,
         fontWeight: FontWeight.w400,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         overflow: TextOverflow.ellipsis,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
@@ -59,7 +59,7 @@ class TextStyles {
   static TextStyle get regularhometext1 => TextStyle(
         fontSize: 10.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
@@ -73,7 +73,7 @@ class TextStyles {
   static TextStyle get regularhometext2 => TextStyle(
         fontSize: 11.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
@@ -96,14 +96,14 @@ class TextStyles {
   static TextStyle get buttontext => TextStyle(
         fontSize: 9.sp,
         fontWeight: FontWeight.w600,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
   static TextStyle get profiletext => TextStyle(
         fontSize: 12.sp,
         fontWeight: FontWeight.w500,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
@@ -117,14 +117,14 @@ class TextStyles {
   static TextStyle get homeheadingtext => TextStyle(
         fontSize: 12.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
   static TextStyle get tickettext => TextStyle(
         fontSize: 12.sp,
         fontWeight: FontWeight.bold,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );
@@ -138,7 +138,7 @@ class TextStyles {
   static TextStyle get ticketwhitetext => TextStyle(
         fontSize: 10.sp,
         fontWeight: FontWeight.w500,
-        color: AppColors.whiteColor,
+        color: AppColors.textColorPrimary,
         fontFamily: 'Montserrat',
         fontFamilyFallback: const ['Inter', 'Roboto', 'Arial'],
       );

@@ -1,4 +1,5 @@
 
+import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -17,7 +18,7 @@ class ReviewTab extends StatelessWidget {
               itemCount: 4,
               itemBuilder: (BuildContext context, int index) {
                 return
-                Image.asset('assets/images/review.png',color: Colors.white,);
+                Image.asset('assets/images/review.png',color: AppColors.textColorPrimary,);
 
 
               }

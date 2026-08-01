@@ -96,8 +96,8 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result['error'] ?? 'Failed to get connection link'),
-              backgroundColor: Colors.red,
+              content: Text(result['error'] ?? 'Failed to get connection link', style: const TextStyle(color: Colors.white)),
+              backgroundColor: AppColors.textColorPrimary,
             ),
           );
         }
@@ -106,8 +106,8 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
+            content: Text('Error: $e', style: const TextStyle(color: Colors.white)),
+            backgroundColor: AppColors.textColorPrimary,
           ),
         );
       }
@@ -147,16 +147,16 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Square account disconnected'),
-                backgroundColor: Colors.orange,
+                content: Text('Square account disconnected', style: TextStyle(color: Colors.white)),
+                backgroundColor: AppColors.textColorPrimary,
               ),
             );
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Failed to disconnect Square account'),
-              backgroundColor: Colors.red,
+              content: Text('Failed to disconnect Square account', style: TextStyle(color: Colors.white)),
+              backgroundColor: AppColors.textColorPrimary,
             ),
           );
         }
@@ -192,11 +192,11 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
       } else if (controller.error.isNotEmpty) {
         return Center(
             child: Text(controller.error.value,
-                style: const TextStyle(color: Colors.white)));
+                style: const TextStyle(color: AppColors.textColorPrimary)));
       } else if (controller.userProfile.value == null) {
         return const Center(
             child: Text('Profile not found',
-                style: TextStyle(color: Colors.white)));
+                style: TextStyle(color: AppColors.textColorPrimary)));
       }
 
       final profile = controller.userProfile.value!;
@@ -225,19 +225,19 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
                   width: double.infinity,
                   padding: EdgeInsets.all(4.w),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.03),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.08),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.08),
                       width: 1.5,
                     ),
                   ),
                   child: Text(
                     bio,
-                    style: TextStyles.regularwhite.copyWith(
+                    style: TextStyles.regulartext.copyWith(
                       height: 1.5,
                       fontSize: 11.sp,
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.9),
                     ),
                   ),
                 ),
@@ -257,7 +257,7 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
 
             splitInterests.isEmpty
                 ? Text('No interests added',
-                    style: TextStyles.regularwhite.copyWith(color: Colors.grey))
+                    style: TextStyles.regulartext.copyWith(color: AppColors.textColorSecondary))
                 : Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -279,7 +279,7 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
                         avatar: Icon(icon, color: Colors.white, size: 12.sp),
                         label: Text(
                           interest,
-                          style: TextStyles.regularwhite,
+                          style: TextStyles.regulartext.copyWith(color: Colors.white),
                         ),
                         backgroundColor: color,
                         padding: EdgeInsets.symmetric(
@@ -319,10 +319,10 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
       return Container(
         height: 15.h,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.03),
+          color: AppColors.textColorPrimary.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.08),
+            color: AppColors.textColorPrimary.withValues(alpha: 0.08),
             width: 1.5,
           ),
         ),
@@ -344,12 +344,12 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
           decoration: BoxDecoration(
             color: isConnected
                 ? Colors.green.withValues(alpha: 0.05)
-                : Colors.white.withValues(alpha: 0.03),
+                : AppColors.textColorPrimary.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
               color: isConnected
                   ? Colors.green.withValues(alpha: 0.2)
-                  : Colors.white.withValues(alpha: 0.08),
+                  : AppColors.textColorPrimary.withValues(alpha: 0.08),
               width: 1.5,
             ),
           ),
@@ -381,7 +381,7 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
                         Text(
                           isConnected ? 'Square Connected' : 'Connect Square',
                           style: TextStyles.subheading.copyWith(
-                            color: Colors.white,
+                            color: AppColors.textColorPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -389,9 +389,9 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
                             _squareStatus?['merchant_name'] != null)
                           Text(
                             _squareStatus!['merchant_name'],
-                            style: TextStyles.regularwhite.copyWith(
+                            style: TextStyles.regulartext.copyWith(
                               fontSize: 9.sp,
-                              color: Colors.white60,
+                              color: AppColors.textColorSecondary,
                             ),
                           ),
                       ],
@@ -404,9 +404,9 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
                 isConnected
                     ? 'Your Square account is linked. Payments will be deposited directly, with a 10% commission automatically handled.'
                     : 'Link your Square account to start receiving payments directly from your event bookings.',
-                style: TextStyles.regularwhite.copyWith(
+                style: TextStyles.regulartext.copyWith(
                   fontSize: 10.sp,
-                  color: Colors.white70,
+                  color: AppColors.textColorSecondary,
                   height: 1.4,
                 ),
               ),

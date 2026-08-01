@@ -105,19 +105,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       if (res['statusCode'] == 201 || res['statusCode'] == 200) {
         Get.snackbar('Reported', res['message'] ?? 'Report submitted.',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: AppColors.signinoptioncolor,
-            colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       } else {
         Get.snackbar('Error', res['message'] ?? 'Could not submit report.',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red,
-            colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
       }
     } catch (e) {
       Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-          colorText: Colors.white);
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 
@@ -220,16 +220,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Widget _buildLoadingState() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[900]!,
-      highlightColor: Colors.grey[800]!,
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
       child: CustomScrollView(
         physics: const NeverScrollableScrollPhysics(),
         slivers: [
           SliverAppBar(
             expandedHeight: 40.h,
-            backgroundColor: Colors.grey[900],
+            backgroundColor: Colors.grey[300],
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(color: Colors.grey[900]),
+              background: Container(color: Colors.grey[300]),
             ),
           ),
           SliverToBoxAdapter(
@@ -242,7 +242,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     width: 60.w,
                     height: 3.h,
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: AppColors.textColorPrimary,
                       borderRadius: BorderRadius.circular(1.h),
                     ),
                   ),
@@ -251,7 +251,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     width: 40.w,
                     height: 2.h,
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: AppColors.textColorPrimary,
                       borderRadius: BorderRadius.circular(1.h),
                     ),
                   ),
@@ -264,7 +264,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               width: double.infinity,
                               height: 10.h,
                               decoration: BoxDecoration(
-                                color: Colors.black,
+                                color: AppColors.textColorPrimary,
                                 borderRadius: BorderRadius.circular(2.h),
                               ),
                             ),
@@ -299,9 +299,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           SizedBox(height: 1.h),
           Text(
             'The event you\'re looking for doesn\'t exist or has been removed.',
-            style: TextStyles.regularwhite.copyWith(
+            style: TextStyles.regulartext.copyWith(
               fontSize: 11.sp,
-              color: Colors.white70,
+              color: AppColors.textColorSecondary,
             ),
             textAlign: TextAlign.center,
           ),
@@ -339,12 +339,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.15),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: IconButton(
                 icon: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 14.sp),
+                    color: AppColors.textColorPrimary, size: 14.sp),
                 onPressed: () {
                   HapticUtils.navigation();
                   NavigationUtils.pop(context);
@@ -362,14 +368,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             child: Container(
               margin: EdgeInsets.all(1.h),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(1.2.h),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.15),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: PopupMenuButton<String>(
                 icon: Icon(Icons.more_vert_rounded,
-                    color: Colors.white, size: 16.sp),
-                color: AppColors.signinoptioncolor,
+                    color: AppColors.textColorPrimary, size: 16.sp),
+                color: Colors.white,
                 elevation: 10,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(2.h)),
@@ -398,9 +410,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             'Share failed',
                             'Could not open share. Please try again.',
                             snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: AppColors.blueColor,
-                            colorText: Colors.white,
-                          );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                         }
                       }
                     });
@@ -409,8 +420,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       Get.snackbar(
                           'Sign in required', 'Please sign in to report.',
                           snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.blueColor,
-                          colorText: Colors.white,
+                          
+                          
                           mainButton: TextButton(
                               onPressed: () {
                                 Get.closeCurrentSnackbar();
@@ -418,8 +429,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               },
                               child: const Text('Sign in',
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold))));
+                                      color: AppColors.textColorPrimary,
+                                      fontWeight: FontWeight.bold))),
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                       return;
                     }
                     await _showReportEventSheet(event.eventId!);
@@ -430,11 +443,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       value: 'share',
                       child: Row(children: [
                         Icon(Icons.share_rounded,
-                            color: Colors.white, size: 16.sp),
-                        const SizedBox(width: 8),
+                            color: AppColors.textColorPrimary, size: 16.sp),
+                        SizedBox(width: 8),
                         Text('Share',
                             style:
-                                TextStyle(color: Colors.white, fontSize: 11.sp))
+                                TextStyle(color: AppColors.textColorPrimary, fontSize: 11.sp))
                       ])),
                   PopupMenuItem(
                       value: 'report',
@@ -444,7 +457,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         const SizedBox(width: 8),
                         Text('Report',
                             style:
-                                TextStyle(color: Colors.white, fontSize: 11.sp))
+                                TextStyle(color: AppColors.textColorPrimary, fontSize: 11.sp))
                       ])),
                 ],
               ),
@@ -459,14 +472,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               child: Container(
                 margin: EdgeInsets.all(1.h),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(1.2.h),
-                  border:
-                      Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: IconButton(
                   icon: Icon(Icons.person_add_rounded,
-                      color: Colors.white, size: 16.sp),
+                      color: AppColors.textColorPrimary, size: 16.sp),
                   onPressed: () {
                     HapticUtils.light();
                     NavigationUtils.push(
@@ -491,12 +509,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               placeholder: (context, url) => Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.grey.shade800, Colors.grey.shade700],
+                    colors: [Colors.grey.shade300, Colors.grey.shade100],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                 ),
-                child: const Center(
+                child: Center(
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor:
@@ -507,14 +525,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               errorWidget: (context, url, error) => Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.grey.shade800, Colors.grey.shade700],
+                    colors: [Colors.grey.shade300, Colors.grey.shade100],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                 ),
                 child: Icon(
                   Icons.image_not_supported,
-                  color: Colors.grey.shade400,
+                  color: Colors.grey.shade500,
                   size: 32.sp,
                 ),
               ),
@@ -527,8 +545,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withValues(alpha: 0.3),
-                    Colors.black.withValues(alpha: 0.7),
+                    AppColors.textColorPrimary.withValues(alpha: 0.3),
+                    AppColors.textColorPrimary.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -548,19 +566,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       color: AppColors.blueColor.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(2.h),
                       boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
+                        BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2),),
                       ],
                     ),
                     child: Text(
                       event.category?.toUpperCase() ?? 'EVENT',
-                      style: TextStyles.regularwhite.copyWith(
+                      style: TextStyles.regulartext.copyWith(
                         fontSize: 10.sp,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -596,9 +611,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             SizedBox(width: 2.w),
             Text(
               '${formatDate(event.startDate)} • ${formatTime(event.startTime)}',
-              style: TextStyles.regularwhite.copyWith(
+              style: TextStyles.regulartext.copyWith(
                 fontSize: 11.sp,
-                color: Colors.white70,
+                color: AppColors.textColorSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -630,18 +645,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           child: Container(
             padding: EdgeInsets.all(4.w),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.03),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.03),
               borderRadius: BorderRadius.circular(2.5.h),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.08),
                 width: 1.5,
               ),
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: const BoxDecoration(
+                  padding: EdgeInsets.all(2),
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       colors: [AppColors.blueColor, Colors.transparent],
@@ -657,14 +672,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       height: 55,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                         child: Image.asset(
                           AppImages.profilePlaceholder,
                           fit: BoxFit.contain,
                         ),
                       ),
                       errorWidget: (context, url, error) => Container(
-                        color: Colors.white.withValues(alpha: 0.05),
+                        color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                         child: Image.asset(
                           AppImages.profilePlaceholder,
                           fit: BoxFit.contain,
@@ -682,7 +697,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         'HOSTED BY',
                         style: TextStyle(
                           fontSize: 8.sp,
-                          color: Colors.white38,
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
                         ),
@@ -693,7 +708,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13.sp,
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                           letterSpacing: -0.2,
                         ),
                       ),
@@ -741,9 +756,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               SizedBox(height: 0.5.h),
               Text(
                 '${formatTime(event.startTime)} - ${formatTime(event.endTime)}',
-                style: TextStyles.regularwhite.copyWith(
+                style: TextStyles.regulartext.copyWith(
                   fontSize: 11.sp,
-                  color: Colors.white70,
+                  color: AppColors.textColorSecondary,
                 ),
               ),
               if (event.endDate != null &&
@@ -751,9 +766,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 SizedBox(height: 0.5.h),
                 Text(
                   'Ends: ${formatDate(event.endDate)}',
-                  style: TextStyles.regularwhite.copyWith(
+                  style: TextStyles.regulartext.copyWith(
                     fontSize: 10.sp,
-                    color: Colors.white60,
+                    color: AppColors.textColorSecondary,
                   ),
                 ),
               ],
@@ -779,9 +794,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               SizedBox(height: 0.5.h),
               Text(
                 _formatCityState(event.city, event.state),
-                style: TextStyles.regularwhite.copyWith(
+                style: TextStyles.regulartext.copyWith(
                   fontSize: 11.sp,
-                  color: Colors.white70,
+                  color: AppColors.textColorSecondary,
                 ),
               ),
               if (event.latitude != null && event.longitude != null) ...[
@@ -800,9 +815,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       Get.snackbar(
                         'Location not available',
                         'This event does not have a valid location.',
-                        backgroundColor: Colors.redAccent,
-                        colorText: Colors.white,
-                      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                       return;
                     }
 
@@ -818,17 +832,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         Get.snackbar(
                           'Maps not available',
                           'Could not open Google Maps on this device.',
-                          backgroundColor: Colors.redAccent,
-                          colorText: Colors.white,
-                        );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                       }
                     } catch (_) {
                       Get.snackbar(
                         'Maps not available',
                         'Could not open Google Maps on this device.',
-                        backgroundColor: Colors.redAccent,
-                        colorText: Colors.white,
-                      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                     }
                   },
                   child: Container(
@@ -853,7 +865,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         SizedBox(width: 1.w),
                         Text(
                           'View on Map',
-                          style: TextStyles.regularwhite.copyWith(
+                          style: TextStyles.regulartext.copyWith(
                             fontSize: 9.sp,
                             color: AppColors.blueColor,
                             fontWeight: FontWeight.w600,
@@ -891,9 +903,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               SizedBox(width: 2.w),
                               Text(
                                 tier.tierName,
-                                style: TextStyles.regularwhite.copyWith(
+                                style: TextStyles.regulartext.copyWith(
                                   fontSize: 11.sp,
-                                  color: Colors.white,
+                                  color: AppColors.textColorPrimary,
                                 ),
                               ),
                               if (tier.tierName
@@ -978,12 +990,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Container(
           padding: EdgeInsets.all(4.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(2.5.h),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1.5,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1009,7 +1024,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       title.toUpperCase(),
                       style: TextStyle(
                         fontSize: 8.sp,
-                        color: Colors.white38,
+                        color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.2,
                       ),
@@ -1056,12 +1071,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Container(
           padding: EdgeInsets.all(4.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(2.5.h),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1.5,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1078,7 +1096,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     'ABOUT THIS EVENT',
                     style: TextStyle(
                       fontSize: 8.sp,
-                      color: Colors.white38,
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
                     ),
@@ -1093,7 +1111,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ? TextOverflow.visible
                     : TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: Colors.white70,
+                  color: AppColors.textColorSecondary,
                   fontSize: 11.sp,
                   height: 1.6,
                 ),
@@ -1112,7 +1130,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     children: [
                       Text(
                         _isDescriptionExpanded ? 'Read Less' : 'Read More',
-                        style: TextStyles.regularwhite.copyWith(
+                        style: TextStyles.regulartext.copyWith(
                           color: AppColors.blueColor,
                           fontSize: 10.sp,
                           fontWeight: FontWeight.bold,
@@ -1145,17 +1163,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Container(
           margin: EdgeInsets.symmetric(horizontal: 2.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(3.h),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1.5,
-            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -1165,7 +1179,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               Container(
                 padding: EdgeInsets.all(4.w),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.02),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.02),
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(3.h),
                     topRight: Radius.circular(3.h),
@@ -1209,7 +1223,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               'EVENT STATUS',
                               style: TextStyle(
                                 fontSize: 8.sp,
-                                color: Colors.white38,
+                                color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 1.2,
                               ),
@@ -1303,7 +1317,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                           ? Icons.block_rounded
                                           : Icons.shopping_bag_rounded,
                       color: hasEventEnded
-                          ? Colors.grey
+                          ? AppColors.textColorSecondary
                           : hasEventStarted
                               ? Colors.orange
                               : isBooked
@@ -1325,8 +1339,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             'Sign in to get tickets',
                             'Create an account to purchase tickets.',
                             snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: AppColors.signinoptioncolor,
-                            colorText: Colors.white,
+                            
+                            
                             mainButton: TextButton(
                               onPressed: () =>
                                   Get.toNamed(RouteName.loginScreen),
@@ -1338,7 +1352,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 ),
                               ),
                             ),
-                          );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                           return;
                         }
                         NavigationUtils.push(
@@ -1489,8 +1504,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(2.h),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.15),
-                width: 1,
+                color: Colors.transparent,
+                width: 0,
               ),
             ),
             child: Row(
@@ -1566,7 +1581,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppColors.textColorPrimary,
                       ),
                     ),
                   ],
@@ -1605,12 +1620,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Container(
           padding: EdgeInsets.all(4.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(3.h),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1.5,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1630,7 +1648,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         'ORGANIZER TOOLS',
                         style: TextStyle(
                           fontSize: 8.sp,
-                          color: Colors.white38,
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
                         ),
@@ -1640,7 +1658,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -1650,7 +1668,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               SizedBox(height: 3.h),
               if (_isLoadingQrCodes)
-                const Center(
+                Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: CircularProgressIndicator(),
@@ -1659,11 +1677,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               else if (_qrCodes.isEmpty)
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    padding: EdgeInsets.symmetric(vertical: 20),
                     child: Text(
                       'No payment QR codes generated yet.',
                       style: TextStyle(
-                        color: Colors.white38,
+                        color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                         fontSize: 10.sp,
                       ),
                     ),
@@ -1719,12 +1737,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Container(
           padding: EdgeInsets.all(3.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(2.h),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
-              width: 1,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1755,14 +1776,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               Container(
                 padding: EdgeInsets.all(2.w),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.textColorPrimary,
                   borderRadius: BorderRadius.circular(1.5.h),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
+                    BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4),),
                   ],
                 ),
                 child: QrImageView(
@@ -1801,12 +1818,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         child: Container(
           padding: EdgeInsets.all(4.w),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
+            color: Colors.white,
             borderRadius: BorderRadius.circular(3.h),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-              width: 1.5,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1826,7 +1846,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         'EVENT CONTENT',
                         style: TextStyle(
                           fontSize: 8.sp,
-                          color: Colors.white38,
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
                         ),
@@ -1836,7 +1856,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -1860,10 +1880,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   width: double.infinity,
                   padding: EdgeInsets.all(6.w),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.02),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.02),
                     borderRadius: BorderRadius.circular(2.h),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.05),
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                       width: 1,
                     ),
                   ),
@@ -1888,7 +1908,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.textColorPrimary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -1897,7 +1917,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         'This live stream is available for ticket holders only.',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: Colors.white38,
+                          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
                           height: 1.5,
                         ),
                         textAlign: TextAlign.center,
@@ -1914,8 +1934,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               'Sign in to get tickets',
                               'Create an account to purchase tickets.',
                               snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: AppColors.signinoptioncolor,
-                              colorText: Colors.white,
+                              
+                              
                               mainButton: TextButton(
                                 onPressed: () =>
                                     Get.toNamed(RouteName.loginScreen),
@@ -1927,7 +1947,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   ),
                                 ),
                               ),
-                            );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
                             return;
                           }
                           NavigationUtils.push(
@@ -1979,27 +2000,27 @@ class _ReportEventReasonDialogState extends State<_ReportEventReasonDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: AppColors.signinoptioncolor,
-      title: const Text('Report Event', style: TextStyle(color: Colors.white)),
+      backgroundColor: Colors.white,
+      title: Text('Report Event', style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text('Optionally describe the issue:',
-              style: TextStyle(color: Colors.white70, fontSize: 12)),
+              style: TextStyle(color: AppColors.textColorSecondary, fontSize: 12)),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Reason (optional)',
-              hintStyle: const TextStyle(color: Colors.white38),
+              hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38)),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
-              fillColor: Colors.white.withValues(alpha: 0.1),
+              fillColor: AppColors.textColorPrimary.withValues(alpha: 0.1),
             ),
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: AppColors.textColorPrimary),
           ),
         ],
       ),
@@ -2007,7 +2028,7 @@ class _ReportEventReasonDialogState extends State<_ReportEventReasonDialog> {
         TextButton(
             onPressed: () => Navigator.pop(context),
             child:
-                const Text('Cancel', style: TextStyle(color: Colors.white70))),
+                const Text('Cancel', style: TextStyle(color: AppColors.textColorSecondary))),
         TextButton(
             onPressed: () => Navigator.pop(context, _controller.text.trim()),
             child: const Text('Submit',

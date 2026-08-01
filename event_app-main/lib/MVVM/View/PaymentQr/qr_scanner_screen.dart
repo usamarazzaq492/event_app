@@ -39,11 +39,12 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         'Camera Access',
         'Camera permission is needed to scan QR codes.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent.withValues(alpha: 0.8),
-        colorText: Colors.white,
+        
+        
         margin: EdgeInsets.all(4.w),
         borderRadius: 1.5.h,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     }
   }
 
@@ -114,11 +115,12 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         'Scan Error',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
+        
+        
         margin: EdgeInsets.all(4.w),
         borderRadius: 1.5.h,
-      );
+backgroundColor: AppColors.textColorPrimary,
+colorText: Colors.white,);
     } finally {
       if (mounted) {
         setState(() {
@@ -131,7 +133,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.textColorPrimary,
       body: Stack(
         children: [
           if (_hasPermission)
@@ -168,14 +170,14 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.5.h),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(3.h),
-                    border: Border.all(color: Colors.white12),
+                    border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.12)),
                   ),
                   child: Text(
                     'Align QR code within the frame',
                     style: TextStyle(
-                        color: Colors.white70,
+                        color: AppColors.textColorSecondary,
                         fontSize: 10.sp,
                         fontWeight: FontWeight.w500),
                   ),
@@ -187,7 +189,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           // 🔷 Processing indicator
           if (_isProcessing)
             Container(
-              color: Colors.black54,
+              color: AppColors.textColorSecondary,
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Center(
@@ -199,7 +201,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                       SizedBox(height: 2.h),
                       const Text('Validating...',
                           style: TextStyle(
-                              color: Colors.white,
+                              color: AppColors.textColorPrimary,
                               fontWeight: FontWeight.bold)),
                     ],
                   ),
@@ -222,9 +224,9 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               left: 4.w,
               right: 4.w),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.4),
-            border: const Border(
-              bottom: BorderSide(color: Colors.white10, width: 0.5),
+            color: AppColors.textColorPrimary.withValues(alpha: 0.4),
+            border: Border(
+              bottom: BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.12), width: 0.5),
             ),
           ),
           child: Row(
@@ -237,12 +239,12 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                 child: Container(
                   padding: EdgeInsets.all(1.2.h),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white10),
+                    border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.12)),
                   ),
                   child: Icon(Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white, size: 16.sp),
+                      color: AppColors.textColorPrimary, size: 16.sp),
                 ),
               ),
               Expanded(
@@ -250,7 +252,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                   child: Text(
                     'Scan QR Code',
                     style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textColorPrimary,
                         fontSize: 16.sp,
                         fontWeight: FontWeight.bold),
                   ),
@@ -269,14 +271,14 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       children: [
         ColorFiltered(
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.7),
+            AppColors.textColorPrimary.withValues(alpha: 0.7),
             BlendMode.srcOut,
           ),
           child: Stack(
             children: [
               Container(
                 decoration: const BoxDecoration(
-                  color: Colors.black,
+                  color: AppColors.textColorPrimary,
                   backgroundBlendMode: BlendMode.dstOut,
                 ),
               ),
@@ -285,7 +287,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                   width: 70.w,
                   height: 70.w,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.textColorPrimary,
                     borderRadius: BorderRadius.circular(3.h),
                   ),
                 ),
@@ -329,16 +331,16 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         decoration: BoxDecoration(
           border: Border(
             top: top == 0
-                ? const BorderSide(color: Colors.white, width: 4)
+                ? const BorderSide(color: AppColors.textColorPrimary, width: 4)
                 : BorderSide.none,
             bottom: bottom == 0
-                ? const BorderSide(color: Colors.white, width: 4)
+                ? const BorderSide(color: AppColors.textColorPrimary, width: 4)
                 : BorderSide.none,
             left: left == 0
-                ? const BorderSide(color: Colors.white, width: 4)
+                ? const BorderSide(color: AppColors.textColorPrimary, width: 4)
                 : BorderSide.none,
             right: right == 0
-                ? const BorderSide(color: Colors.white, width: 4)
+                ? const BorderSide(color: AppColors.textColorPrimary, width: 4)
                 : BorderSide.none,
           ),
           borderRadius: BorderRadius.only(
@@ -365,16 +367,16 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           Container(
             padding: EdgeInsets.all(6.w),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: AppColors.textColorPrimary.withValues(alpha: 0.05),
               shape: BoxShape.circle,
             ),
             child: Icon(Icons.camera_alt_rounded,
-                size: 60.sp, color: Colors.white24),
+                size: 60.sp, color: AppColors.textColorPrimary.withValues(alpha: 0.24)),
           ),
           SizedBox(height: 4.h),
           Text('Camera Access Needed',
               style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textColorPrimary,
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold)),
           SizedBox(height: 2.h),
@@ -383,7 +385,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
             child: Text(
               'We need camera permission to scan ticket QR codes and process your payment.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white54, fontSize: 11.sp),
+              style: TextStyle(color: AppColors.textColorSecondary, fontSize: 11.sp),
             ),
           ),
           SizedBox(height: 5.h),
@@ -397,7 +399,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               ),
               child: const Text('Grant Permission',
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
+                      color: AppColors.textColorPrimary, fontWeight: FontWeight.bold)),
             ),
           ),
         ],
