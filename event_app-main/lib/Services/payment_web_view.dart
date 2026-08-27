@@ -176,7 +176,7 @@ class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
                   color: AppColors.blueColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check, size: 40, color: AppColors.textColorPrimary),
+                child: const Icon(Icons.check, size: 40, color: Colors.white),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -218,7 +218,7 @@ class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
                     );
                   },
                   child: const Text("View E-Ticket",
-                      style: TextStyle(color: AppColors.textColorPrimary)),
+                      style: TextStyle(color: Colors.white)),
                 ),
               if (!widget.isPromotion) const SizedBox(height: 10),
               TextButton(
