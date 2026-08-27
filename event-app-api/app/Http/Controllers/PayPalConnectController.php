@@ -59,7 +59,7 @@ class PayPalConnectController extends Controller
             'flowEntry' => 'static',
             'client_id' => $clientId,
             'response_type' => 'code',
-            'scope' => 'openid profile email https://uri.paypal.com/services/paypalattributes',
+            'scope' => 'openid profile email',
             'state' => $state,
             'redirect_uri' => $redirectUri,
         ]);
