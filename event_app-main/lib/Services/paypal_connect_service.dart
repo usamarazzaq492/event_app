@@ -47,8 +47,10 @@ class PayPalConnectService {
         final data = jsonDecode(response.body);
         return data['oauth_url'];
       }
+      print('PayPal Connect Error: ${response.statusCode} - ${response.body}');
       return null;
     } catch (e) {
+      print('PayPal Connect Exception: $e');
       return null;
     }
   }
