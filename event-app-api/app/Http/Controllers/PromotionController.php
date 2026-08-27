@@ -290,7 +290,7 @@ class PromotionController extends Controller
     private function getPayPalAccessToken($environment)
     {
         $clientId = config('paypal.client_id');
-        $clientSecret = config('paypal.client_secret');
+        $clientSecret = config('paypal.secret');
         
         $url = $environment === 'production' 
             ? 'https://api-m.paypal.com/v1/oauth2/token' 
