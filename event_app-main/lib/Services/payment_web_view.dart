@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../app/config/app_colors.dart';
-import '../MVVM/View/ticketScreen/ticket_screen.dart';
 import '../MVVM/View/bottombar/bottom_navigation_bar.dart';
 
 class PayPalPaymentPage extends StatefulWidget {
