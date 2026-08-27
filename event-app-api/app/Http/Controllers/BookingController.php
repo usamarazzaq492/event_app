@@ -337,8 +337,9 @@ class BookingController extends Controller
                 );
             }
 
+            // Use an empty object so it encodes as '{}' instead of '[]'
             $response = Http::withHeaders($headers)
-                ->post($url, []);
+                ->post($url, (object)[]);
 
             if (!$response->successful()) {
                 Log::error('PayPal capture error', ['error' => $response->json()]);
