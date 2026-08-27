@@ -33,6 +33,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   int selectedIndex = 0;
   List<String> paymentOptions = ['PayPal'];
   List<String> addedCards = []; // Integrate saved cards later
+  bool isProcessing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -98,9 +99,11 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                           width: double.infinity,
                           height: 6.5.h,
                           child: GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               HapticUtils.buttonPress();
-                              Navigator.push(
+                              if (isProcessing) return;
+                              setState(() => isProcessing = true);
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => PayPalPaymentPage(
@@ -113,6 +116,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                                   ),
                                 ),
                               );
+                              if (mounted) setState(() => isProcessing = false);
                             },
                             child: Container(
                               decoration: BoxDecoration(

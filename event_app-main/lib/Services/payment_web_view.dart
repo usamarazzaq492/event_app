@@ -55,6 +55,7 @@ class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
   }
 
   Future<void> sendToBackend(String nonce) async {
+    if (isLoading) return; // Prevent multiple requests for the same purchase
     setState(() => isLoading = true);
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
