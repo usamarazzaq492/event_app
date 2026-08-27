@@ -256,12 +256,19 @@
             document.getElementById('loading-overlay').classList.toggle('active', show);
         }
 
-        // Send message to Flutter WebView
         function notifyFlutter(message) {
-            if (window.FlutterWebView) {
-                window.FlutterWebView.postMessage(message);
-            } else {
-                console.log('FlutterWebView channel not found', message);
+            try {
+                if (window.FlutterWebView) {
+                    window.FlutterWebView.postMessage(message.toString());
+                } else if (window.opener && window.opener.FlutterWebView) {
+                    window.opener.FlutterWebView.postMessage(message.toString());
+                } else if (window.parent && window.parent.FlutterWebView) {
+                    window.parent.FlutterWebView.postMessage(message.toString());
+                } else {
+                    console.log('FlutterWebView channel not found', message);
+                }
+            } catch (e) {
+                console.error('Error notifying Flutter:', e);
             }
         }
 
@@ -269,12 +276,31 @@
         paypal.Buttons({
             createOrder: function(data, actions) {
                 // Set up the transaction
-                return actions.order.create({
-                    purchase_units: [{
+                let purchaseUnit = {
+                    amount: {
+                        value: totalAmount,
+                        currency_code: "USD"
+                    }
+                };
+
+                @if(isset($merchantId) && !empty($merchantId))
+                purchaseUnit.payee = {
+                    merchant_id: "{{ $merchantId }}"
+                };
+                purchaseUnit.payment_instruction = {
+                    disbursement_mode: "INSTANT",
+                    platform_fees: [{
                         amount: {
-                            value: totalAmount
+                            currency_code: "USD",
+                            value: "{{ number_format($processingFee, 2, '.', '') }}"
                         }
                     }]
+                };
+                @endif
+
+                return actions.order.create({
+                    intent: 'CAPTURE',
+                    purchase_units: [purchaseUnit]
                 });
             },
             onApprove: function(data, actions) {
@@ -285,6 +311,11 @@
                 notifyFlutter(data.orderID);
                 showMessage('Payment authorized. Completing booking...');
                 
+                // Attempt to close the popup if it opened one
+                setTimeout(() => {
+                    try { window.close(); } catch(e) {}
+                }, 1500);
+
                 // Keep loading state until Flutter closes the webview
                 setTimeout(() => {
                     toggleLoading(false);
