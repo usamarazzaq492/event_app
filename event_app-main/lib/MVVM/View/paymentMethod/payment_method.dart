@@ -138,7 +138,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                                 child: Text(
                                   'PAY NOW',
                                   style: TextStyle(
-                                    color: AppColors.textColorPrimary,
+                                    color: Colors.white,
                                     fontSize: 13.sp,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 1,
@@ -292,7 +292,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                           isSelected ? AppColors.blueColor : Colors.transparent,
                     ),
                     child: isSelected
-                        ? const Icon(Icons.check, size: 12, color: AppColors.textColorPrimary)
+                        ? const Icon(Icons.check, size: 12, color: Colors.white)
                         : null,
                   ),
                 ],

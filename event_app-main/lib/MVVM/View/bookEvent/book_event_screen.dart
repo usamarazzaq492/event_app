@@ -361,7 +361,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                 child: Text(
                   'Prices shown are per ticket, excluding processing fees.',
                   style: TextStyle(
-                      color: Colors.white30,
+                      color: AppColors.textColorSecondary,
                       fontSize: 9.5.sp,
                       height: 1.3),
                 ),
@@ -601,7 +601,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                           style: TextStyle(
                             color: (tier.available ?? 999) < 10
                                 ? Colors.orangeAccent
-                                : Colors.white30,
+                                : AppColors.textColorSecondary,
                             fontSize: 9.5.sp,
                             fontWeight: FontWeight.w600,
                           ),
@@ -626,7 +626,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                         Text(
                           'Available',
                           style: TextStyle(
-                            color: Colors.white30,
+                            color: AppColors.textColorSecondary,
                             fontSize: 9.5.sp,
                             fontWeight: FontWeight.w500,
                           ),
@@ -777,7 +777,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                         style: TextStyle(
                           color: hasSelection
                               ? AppColors.textColorSecondary
-                              : Colors.white30,
+                              : AppColors.textColorSecondary,
                           fontSize: 9.5.sp,
                           height: 1.3,
                         ),
@@ -858,7 +858,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                         'Continue',
                         style: TextStyle(
                           color:
-                              hasSelection ? AppColors.textColorPrimary : Colors.white30,
+                              hasSelection ? Colors.white : AppColors.textColorSecondary,
                           fontSize: 13.sp,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.3,
@@ -868,7 +868,7 @@ class _BookEventScreenState extends State<BookEventScreen>
                       Icon(
                         Icons.arrow_forward_rounded,
                         color:
-                            hasSelection ? AppColors.textColorPrimary : Colors.white30,
+                            hasSelection ? Colors.white : AppColors.textColorSecondary,
                         size: 15.sp,
                       ),
                     ],
