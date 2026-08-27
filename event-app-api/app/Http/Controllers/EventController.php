@@ -47,18 +47,18 @@ class EventController extends Controller
             }
         }
 
-        // Enforce compulsory Square connection for organizers
-        $hasSquare = DB::table('organizer_square_accounts')
-            ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+        // Enforce compulsory PayPal connection for organizers
+        $hasPayPal = DB::table('organizer_paypal_accounts')
+            ->join('organizers', 'organizer_paypal_accounts.organizerId', '=', 'organizers.organizerId')
             ->where('organizers.userId', $request->user()->userId)
-            ->where('organizer_square_accounts.status', 'connected')
+            ->where('organizer_paypal_accounts.status', 'connected')
             ->exists();
 
-        if (!$hasSquare) {
+        if (!$hasPayPal) {
             return response()->json([
                 'success' => false,
-                'message' => 'You must connect your Square account in settings before you can create an event.',
-            ], 400);
+                'message' => 'Please connect your PayPal account in Profile -> About before creating events.',
+            ], 403);
         }
 
         $path = $request->file('eventImage')->store('events', 'public');
@@ -344,11 +344,11 @@ class EventController extends Controller
         $hasLiveStreamAccess = $isOrganizer || $isBooked;
     }
 
-    // Check if the organizer has connected Square
-    $isOrganizerSquareConnected = DB::table('organizer_square_accounts')
-        ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+    // Check if the organizer has connected PayPal
+    $isOrganizerPayPalConnected = DB::table('organizer_paypal_accounts')
+        ->join('organizers', 'organizer_paypal_accounts.organizerId', '=', 'organizers.organizerId')
         ->where('organizers.userId', $event->userId)
-        ->where('organizer_square_accounts.status', 'connected')
+        ->where('organizer_paypal_accounts.status', 'connected')
         ->exists();
 
     // Convert event object to array
@@ -356,7 +356,7 @@ class EventController extends Controller
     $eventArray['isBooked'] = $isBooked;
     $eventArray['isOrganizer'] = $isOrganizer;
     $eventArray['hasLiveStreamAccess'] = $hasLiveStreamAccess;
-    $eventArray['isOrganizerSquareConnected'] = $isOrganizerSquareConnected;
+    $eventArray['isOrganizerPayPalConnected'] = $isOrganizerPayPalConnected;
 
     // ── Append active ticket tiers ───────────────────────────────────────────
     $tiers = EventTicketTier::where('eventId', $id)

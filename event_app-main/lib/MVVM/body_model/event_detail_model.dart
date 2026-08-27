@@ -26,7 +26,7 @@ class EventDetailModel {
   String? addDate;
   String? editDate;
   bool? isBooked; // changed to bool
-  bool? isOrganizerSquareConnected;
+  bool? isOrganizerPayPalConnected;
   bool? isPromoted;
   String? promotionStartDate;
   String? promotionEndDate;
@@ -59,7 +59,7 @@ class EventDetailModel {
     this.addDate,
     this.editDate,
     this.isBooked, // updated
-    this.isOrganizerSquareConnected,
+    this.isOrganizerPayPalConnected,
     this.isPromoted,
     this.promotionStartDate,
     this.promotionEndDate,
@@ -93,7 +93,7 @@ class EventDetailModel {
     addDate = json['addDate'];
     editDate = json['editDate'];
     isBooked = json['isBooked'] == true || json['isBooked'] == '1'; // updated
-    isOrganizerSquareConnected = json['isOrganizerSquareConnected'] == true || json['isOrganizerSquareConnected'] == '1';
+    isOrganizerPayPalConnected = json['isOrganizerPayPalConnected'] == true || json['isOrganizerPayPalConnected'] == '1';
     isPromoted = json['isPromoted'] == 1 || json['isPromoted'] == true;
     promotionStartDate = json['promotionStartDate'];
     promotionEndDate = json['promotionEndDate'];
@@ -133,7 +133,7 @@ class EventDetailModel {
     data['addDate'] = addDate;
     data['editDate'] = editDate;
     data['isBooked'] = isBooked; // updated
-    data['isOrganizerSquareConnected'] = isOrganizerSquareConnected;
+    data['isOrganizerPayPalConnected'] = isOrganizerPayPalConnected;
     if (ticketTiers != null) {
       data['ticket_tiers'] = ticketTiers!.map((v) => v.toJson()).toList();
     }

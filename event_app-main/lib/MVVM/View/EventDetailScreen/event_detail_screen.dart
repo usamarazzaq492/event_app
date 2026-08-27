@@ -1302,7 +1302,7 @@ colorText: Colors.white,);
                                   ? 'ALREADY BOOKED'
                                   : isCreator
                                       ? 'YOUR EVENT'
-                                      : (event.isOrganizerSquareConnected == false)
+                                      : (event.isOrganizerPayPalConnected == false)
                                           ? 'UNAVAILABLE'
                                           : 'GET TICKETS',
                       icon: hasEventEnded
@@ -1313,7 +1313,7 @@ colorText: Colors.white,);
                                   ? Icons.check_circle_rounded
                                   : isCreator
                                       ? Icons.person_rounded
-                                      : (event.isOrganizerSquareConnected == false)
+                                      : (event.isOrganizerPayPalConnected == false)
                                           ? Icons.block_rounded
                                           : Icons.shopping_bag_rounded,
                       color: hasEventEnded
@@ -1324,14 +1324,14 @@ colorText: Colors.white,);
                                   ? Colors.green
                                   : isCreator
                                       ? Colors.purple
-                                      : (event.isOrganizerSquareConnected == false)
+                                      : (event.isOrganizerPayPalConnected == false)
                                           ? Colors.red
                                           : AppColors.blueColor,
                       isDisabled: hasEventStarted ||
                           isBooked ||
                           hasEventEnded ||
                           isCreator ||
-                          (event.isOrganizerSquareConnected == false),
+                          (event.isOrganizerPayPalConnected == false),
                       onTap: () {
                         HapticUtils.buttonPress();
                         if (!authViewModel.isLoggedIn.value) {
