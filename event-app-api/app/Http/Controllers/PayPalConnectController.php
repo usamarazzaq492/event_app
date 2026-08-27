@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Crypt;
 
 class PayPalConnectController extends Controller
 {
@@ -31,11 +32,8 @@ class PayPalConnectController extends Controller
             $organizer = (object)['organizerId' => $organizerId, 'userId' => $user->userId];
         }
 
-        $state = Str::random(40);
-        session([
-            'paypal_oauth_state' => $state,
-            'paypal_oauth_organizer_id' => $organizer->organizerId
-        ]);
+        // Use an encrypted stateless token to pass organizer ID
+        $state = Crypt::encryptString($organizer->organizerId . '|' . Str::random(20));
 
         $clientId = config('paypal.client_id');
         $redirectUri = env('APP_URL') . '/paypal/callback';
@@ -81,8 +79,16 @@ class PayPalConnectController extends Controller
     public function handleCallback(Request $request)
     {
         $state = $request->get('state');
-        if ($state !== session('paypal_oauth_state')) {
-            Log::error('PayPal OAuth state mismatch');
+        if (!$state) {
+            return redirect()->route('profile')->with('error', 'OAuth state missing.');
+        }
+
+        try {
+            $decrypted = Crypt::decryptString($state);
+            $parts = explode('|', $decrypted);
+            $organizerId = $parts[0];
+        } catch (\Exception $e) {
+            Log::error('PayPal OAuth state decrypt failed');
             if ($request->expectsJson()) {
                 return response()->json(['error' => 'Invalid OAuth state'], 400);
             }
@@ -93,8 +99,6 @@ class PayPalConnectController extends Controller
         if (!$code) {
             return redirect()->route('profile')->with('error', 'Authorization code not received');
         }
-
-        $organizerId = session('paypal_oauth_organizer_id');
 
         try {
             $environment = config('paypal.environment');
@@ -142,7 +146,7 @@ class PayPalConnectController extends Controller
                 ]
             );
 
-            session()->forget(['paypal_oauth_state', 'paypal_oauth_organizer_id']);
+
 
             if ($request->expectsJson()) {
                 return response()->json([
