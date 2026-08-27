@@ -154,32 +154,44 @@ class _TicketScreenState extends State<TicketScreen> {
       final filtered = ticketVM.tickets;
 
       if (filtered.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+        return RefreshIndicator(
+          color: AppColors.blueColor,
+          onRefresh: () async => await ticketVM.getTickets(),
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
             children: [
-              Icon(Icons.receipt_long,
-                  size: 50.sp,
-                  color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
-              SizedBox(height: 2.h),
-              Text(
-                "No tickets found",
-                style: TextStyle(
-                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
-                    fontSize: 14.sp),
-              ),
+              SizedBox(height: 30.h),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.receipt_long,
+                      size: 50.sp,
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
+                  SizedBox(height: 2.h),
+                  Text(
+                    "No tickets found",
+                    style: TextStyle(
+                        color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                        fontSize: 14.sp),
+                  ),
+                ],
+              )
+                  .animate()
+                  .fade(duration: 500.ms)
+                  .scale(begin: const Offset(0.9, 0.9)),
             ],
-          )
-              .animate()
-              .fade(duration: 500.ms)
-              .scale(begin: const Offset(0.9, 0.9)),
+          ),
         );
       }
 
-      return ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
-        itemCount: filtered.length,
-        itemBuilder: (context, index) {
+      return RefreshIndicator(
+        color: AppColors.blueColor,
+        onRefresh: () async => await ticketVM.getTickets(),
+        child: ListView.builder(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+          itemCount: filtered.length,
+          itemBuilder: (context, index) {
           final t = filtered[index];
           final imageUrl = "https://eventgo-live.com${t['eventImage'] ?? ''}";
           final eventTitle = t['eventTitle'] ?? 'No Title';
@@ -510,7 +522,8 @@ class _TicketScreenState extends State<TicketScreen> {
               .fade(duration: 400.ms, delay: (index * 100).ms)
               .slideY(begin: 0.1, duration: 400.ms, curve: Curves.easeOutQuad);
         },
-      );
+      ),
+    );
     });
   }
 

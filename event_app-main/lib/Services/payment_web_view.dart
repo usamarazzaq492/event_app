@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../app/config/app_colors.dart';
 import '../MVVM/View/ticketScreen/ticket_screen.dart';
+import '../MVVM/View/bottombar/bottom_navigation_bar.dart';
 
 class PayPalPaymentPage extends StatefulWidget {
   final String category;
@@ -142,10 +143,12 @@ class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.signinoptioncolor,
         title: Text(title,
-            style: const TextStyle(color: AppColors.textColorPrimary, fontSize: 16)),
+            style: const TextStyle(
+                color: AppColors.textColorPrimary, fontSize: 16)),
         content: SingleChildScrollView(
           child: Text(details,
-              style: const TextStyle(color: AppColors.textColorSecondary, fontSize: 12)),
+              style: const TextStyle(
+                  color: AppColors.textColorSecondary, fontSize: 12)),
         ),
         actions: [
           TextButton(
@@ -211,11 +214,12 @@ class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const TicketScreen(),
+                        builder: (_) => const BottomNavBar(initialIndex: 3),
                       ),
+                      (route) => false,
                     );
                   },
                   child: const Text("View E-Ticket",
@@ -247,7 +251,8 @@ class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textColorPrimary),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: AppColors.textColorPrimary),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(widget.isPromotion ? 'Promote Event' : 'Complete Payment',
