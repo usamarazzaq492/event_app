@@ -125,19 +125,19 @@ class PromotionController extends Controller
             $amount = self::BOOST_PRICE;
             $durationDays = self::BOOST_DURATION_DAYS;
 
-            // Process Square payment
-            $paymentResponse = $this->processSquarePayment(
+            // Process PayPal payment
+            $paymentResponse = $this->processPayPalPayment(
                 $request->payment_nonce,
                 $amount,
                 "Event Promotion: {$event->eventTitle}",
                 $user->userId
             );
 
-            if (!$paymentResponse->getPayment() || !$paymentResponse->getPayment()->getId()) {
+            if (!$paymentResponse) {
                 throw new \Exception('Payment processing failed', 500);
             }
 
-            $paymentId = $paymentResponse->getPayment()->getId();
+            $paymentId = $paymentResponse; // Use the PayPal order/capture ID
 
             // Calculate promotion dates (store in UTC for consistency across timezones)
             $startDate = now()->utc();
@@ -150,7 +150,7 @@ class PromotionController extends Controller
                 'package' => $package,
                 'amount' => $amount,
                 'duration_days' => $durationDays,
-                'squarePaymentId' => $paymentId,
+                'squarePaymentId' => $paymentId, // Keep legacy column name for now
                 'status' => 'completed',
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -242,83 +242,73 @@ class PromotionController extends Controller
     }
 
     /**
-     * Process Square payment
+     * Process PayPal payment
      */
-    private function processSquarePayment($paymentNonce, $amount, $note, $userId)
+    private function processPayPalPayment($orderId, $amount, $note, $userId)
     {
         try {
-            // Validate amount
-            if (!is_numeric($amount) || $amount <= 0) {
-                throw new \InvalidArgumentException('Invalid payment amount: must be a positive number');
+            $environment = config('paypal.environment', 'sandbox');
+            $accessToken = $this->getPayPalAccessToken($environment);
+            
+            $url = $environment === 'production' 
+                ? "https://api-m.paypal.com/v2/checkout/orders/{$orderId}/capture" 
+                : "https://api-m.sandbox.paypal.com/v2/checkout/orders/{$orderId}/capture";
+
+            $headers = [
+                'Authorization' => "Bearer {$accessToken}",
+                'Content-Type' => 'application/json'
+            ];
+
+            // Use an empty object so it encodes as '{}' instead of '[]'
+            $response = \Illuminate\Support\Facades\Http::withHeaders($headers)
+                ->post($url, (object)[]);
+
+            if (!$response->successful()) {
+                \Illuminate\Support\Facades\Log::error('PayPal capture error', ['error' => $response->json()]);
+                throw new \Exception('PayPal payment failed: ' . json_encode($response->json()));
             }
 
-            // Convert to cents and ensure it's an integer
-            $amountCents = (int)round($amount * 100);
-
-            // Create Money object using SDK 42.0+ syntax
-            $amountMoney = new Money();
-            $amountMoney->setAmount($amountCents);
-            $amountMoney->setCurrency('USD');
-
-            // Verify location ID - use config() with fallbacks for better compatibility with cached configurations
-            $locationId = config('square.location_id', '') ?: env('SQUARE_LOCATION_ID', '');
-            if (empty($locationId)) {
-                throw new \RuntimeException('Square location ID is not configured. Please set SQUARE_LOCATION_ID in your .env file.');
-            }
-
-            // Create payment request with newer SDK syntax
-            $paymentRequest = new CreatePaymentRequest([
-                'idempotencyKey' => Str::uuid()->toString(),
-                'sourceId' => $paymentNonce,
-                'amountMoney' => $amountMoney,
+            $captureData = $response->json();
+            
+            // Log successful capture
+            \Illuminate\Support\Facades\Log::info('PayPal payment captured', [
+                'orderId' => $orderId,
+                'status' => $captureData['status'] ?? 'UNKNOWN'
             ]);
 
-            // Set additional parameters
-            $paymentRequest->setNote(substr($note, 0, 500));
-            $paymentRequest->setCustomerId((string)$userId);
-            $paymentRequest->setAutocomplete(true);
-            $paymentRequest->setLocationId($locationId);
+            return $orderId;
 
-            // Debug the final request payload
-            Log::debug('Square Payment Request', [
-                'amount_money' => [
-                    'amount' => $amountMoney->getAmount(),
-                    'currency' => $amountMoney->getCurrency()
-                ],
-                'sourceId' => $paymentNonce,
-                'customer_id' => $userId,
-                'location_id' => $locationId
-            ]);
-
-            // Process payment using the Payments API - use create() not createPayment()
-            $paymentsApi = $this->getSquareClient()->payments;
-            $response = $paymentsApi->create($paymentRequest);
-
-            // Check for errors in response
-            if ($response->getErrors()) {
-                $errors = $response->getErrors();
-                Log::error('Square payment error', ['errors' => $errors]);
-                throw new \RuntimeException('Square payment failed: ' . json_encode($errors));
-            }
-
-            return $response;
-
-        } catch (\Square\Exceptions\SquareApiException $e) {
-            Log::error('Square API Exception', [
-                'message' => $e->getMessage(),
-                'errors' => $e->getErrors(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw new \RuntimeException('Payment processing failed: ' . $e->getMessage());
         } catch (\Exception $e) {
-            Log::error('Square payment exception', [
-                'message' => $e->getMessage(),
-                'user_id' => $userId,
-                'trace' => $e->getTraceAsString()
+            \Illuminate\Support\Facades\Log::error('PayPal processing error', [
+                'error' => $e->getMessage(),
+                'orderId' => $orderId
             ]);
             throw $e;
         }
     }
+
+    private function getPayPalAccessToken($environment)
+    {
+        $clientId = config('paypal.client_id');
+        $clientSecret = config('paypal.client_secret');
+        
+        $url = $environment === 'production' 
+            ? 'https://api-m.paypal.com/v1/oauth2/token' 
+            : 'https://api-m.sandbox.paypal.com/v1/oauth2/token';
+
+        $response = \Illuminate\Support\Facades\Http::asForm()
+            ->withBasicAuth($clientId, $clientSecret)
+            ->post($url, [
+                'grant_type' => 'client_credentials'
+            ]);
+
+        if ($response->successful()) {
+            return $response->json()['access_token'];
+        }
+
+        throw new \Exception('Failed to obtain PayPal access token');
+    }
+
 }
 
 
