@@ -119,11 +119,11 @@ Route::prefix('v1')->group(function () {
         // 📱 Payment QR Code Management
         Route::post('/payment-qr/{qrId}/deactivate', [PaymentQrController::class, 'deactivateQrCode']);
 
-        // 🔗 Square Connect
-        Route::prefix('square')->group(function () {
-            Route::get('/status', [App\Http\Controllers\SquareConnectController::class, 'checkStatus']);
-            Route::get('/connect', [App\Http\Controllers\SquareConnectController::class, 'initiateOAuth']);
-            Route::post('/disconnect', [App\Http\Controllers\SquareConnectController::class, 'disconnect']);
+        // 🔗 PayPal Connect
+        Route::prefix('paypal')->group(function () {
+            Route::get('/status', [App\Http\Controllers\PayPalConnectController::class, 'checkStatus']);
+            Route::get('/connect', [App\Http\Controllers\PayPalConnectController::class, 'initiateOAuth']);
+            Route::post('/disconnect', [App\Http\Controllers\PayPalConnectController::class, 'disconnect']);
         });
 
         // 🎫 Ticket Check-in (for organizers)

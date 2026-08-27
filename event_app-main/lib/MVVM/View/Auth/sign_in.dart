@@ -85,7 +85,7 @@ class _SigninScreenState extends State<SigninScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primaryColor,
+                  AppColors.backgroundColor,
                   AppColors.backgroundColor,
                   AppColors.signinoptioncolor,
                 ],

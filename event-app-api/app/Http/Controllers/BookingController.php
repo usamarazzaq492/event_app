@@ -7,48 +7,38 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
-use Square\SquareClient;
-use Square\Environments;
-use Square\Types\Money;
-use Square\Payments\Requests\CreatePaymentRequest;
-use Square\Customers\Requests\CreateCustomerRequest;
-use Square\Cards\Requests\CreateCardRequest;
 use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
-    // Constants for fee structure
     const PROCESSING_FEE_PERCENT = 2.9;
     const FIXED_PROCESSING_FEE = 0.30;
-    const COMMISSION_RATE = 1.0; // App owner commission rate (percentage of subtotal)
 
-    private $squareClient;
 
     /**
-     * Get or initialize SquareClient (lazy initialization)
+     * Helper to get PayPal Access Token
      */
-    private function getSquareClient()
+    private function getPayPalAccessToken($environment = null)
     {
-        if ($this->squareClient === null) {
-            // Use config() with fallbacks for better compatibility with cached configurations
-            $accessToken = config('square.access_token', '') ?: env('SQUARE_ACCESS_TOKEN', '') ?: env('SQUARE_TOKEN', '');
-            $environment = config('square.environment', '') ?: env('SQUARE_ENVIRONMENT', 'sandbox');
+        $clientId = config('paypal.client_id');
+        $secret = config('paypal.secret');
+        $env = $environment ?? config('paypal.environment', 'sandbox');
+        
+        $url = $env === 'production' 
+            ? 'https://api-m.paypal.com/v1/oauth2/token' 
+            : 'https://api-m.sandbox.paypal.com/v1/oauth2/token';
 
-            if (empty($accessToken)) {
-                throw new \Exception('Square access token not configured. Please set SQUARE_ACCESS_TOKEN or SQUARE_TOKEN in your .env file.');
-            }
+        $response = Http::withBasicAuth($clientId, $secret)
+            ->asForm()
+            ->post($url, [
+                'grant_type' => 'client_credentials'
+            ]);
 
-            $this->squareClient = new SquareClient(
-                token: $accessToken,
-                options: [
-                    'baseUrl' => $environment === 'production'
-                        ? Environments::Production->value
-                        : Environments::Sandbox->value,
-                ]
-            );
+        if ($response->successful()) {
+            return $response->json()['access_token'];
         }
 
-        return $this->squareClient;
+        throw new \Exception('Failed to get PayPal access token');
     }
 
     /**
@@ -138,20 +128,21 @@ class BookingController extends Controller
             $isFree      = $subtotal == 0;
 
             // ── Calculate fees ───────────────────────────────────────────────
+            $commissionRate = config('paypal.commission_rate', 10.0);
             $processingFee   = $isFree ? 0 : round(($subtotal * self::PROCESSING_FEE_PERCENT / 100) + self::FIXED_PROCESSING_FEE, 2);
             $totalAmount     = round($subtotal + $processingFee, 2);
-            $commission      = round($subtotal * (self::COMMISSION_RATE / 100), 2);
+            $commission      = round($subtotal * ($commissionRate / 100), 2);
             $organizerPayout = round(($subtotal - $commission) + $processingFee, 2);
 
-            // ── Process Square payment (skip for free bookings) ──────────────
-            $squarePaymentId = null;
+            // ── Process PayPal payment (skip for free bookings) ──────────────
+            $paypalPaymentId = null;
 
             if (!$isFree) {
                 if (empty($request->payment_nonce)) {
-                    throw new \Exception('payment_nonce is required for paid events.', 422);
+                    throw new \Exception('payment_nonce (PayPal Order ID) is required for paid events.', 422);
                 }
 
-                $paymentResponse = $this->processSquarePayment(
+                $paypalPaymentId = $this->processPayPalPayment(
                     $request->payment_nonce,
                     $totalAmount,
                     $commission,
@@ -159,20 +150,14 @@ class BookingController extends Controller
                     $user->userId,
                     $event
                 );
-
-                if (!$paymentResponse->getPayment() || !$paymentResponse->getPayment()->getId()) {
-                    throw new \Exception('Invalid payment response from Square', 500);
-                }
-
-                $squarePaymentId = $paymentResponse->getPayment()->getId();
             }
 
-            // ── Get organizer Square account metadata ────────────────────────
-            $organizerSquareAccount = DB::table('organizer_square_accounts')
-                ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
+            // ── Get organizer PayPal account metadata ────────────────────────
+            $organizerPaypalAccount = DB::table('organizer_paypal_accounts')
+                ->join('organizers', 'organizer_paypal_accounts.organizerId', '=', 'organizers.organizerId')
                 ->where('organizers.userId', $event->userId)
-                ->where('organizer_square_accounts.status', 'connected')
-                ->select('organizer_square_accounts.squareMerchantId', 'organizer_square_accounts.squareLocationId')
+                ->where('organizer_paypal_accounts.status', 'connected')
+                ->select('organizer_paypal_accounts.paypalMerchantId')
                 ->first();
 
             // ── Insert booking row ───────────────────────────────────────────
@@ -186,17 +171,16 @@ class BookingController extends Controller
                 'serviceFee'                => 0,
                 'processingFee'             => $processingFee,
                 'totalAmount'               => $totalAmount,
-                'squarePaymentId'           => $squarePaymentId,
+                'paypalPaymentId'           => $paypalPaymentId,
                 'appOwnerCommission'        => $commission,
                 'organizerPayout'           => $organizerPayout,
-                'organizerSquareMerchantId' => $organizerSquareAccount->squareMerchantId ?? null,
-                'organizerSquareLocationId' => $organizerSquareAccount->squareLocationId ?? null,
-                'paymentType'               => $organizerSquareAccount ? 'split' : 'direct',
+                'organizerPaypalMerchantId' => $organizerPaypalAccount->paypalMerchantId ?? null,
+                'paymentType'               => $organizerPaypalAccount ? 'split' : 'direct',
                 'splitPaymentDetails'       => json_encode([
-                    'commission_rate'         => self::COMMISSION_RATE,
+                    'commission_rate'         => $commissionRate,
                     'commission_amount'       => $commission,
                     'organizer_payout_amount' => $organizerPayout,
-                    'organizer_has_square'    => $organizerSquareAccount ? true : false,
+                    'organizer_has_paypal'    => $organizerPaypalAccount ? true : false,
                 ]),
                 'feeBreakdown' => json_encode([
                     'tiers'                     => $tierSummary,
@@ -204,7 +188,7 @@ class BookingController extends Controller
                     'processing_fee_percentage' => self::PROCESSING_FEE_PERCENT,
                     'fixed_processing_fee'      => self::FIXED_PROCESSING_FEE,
                     'processing_fee'            => $processingFee,
-                    'commission_rate'           => self::COMMISSION_RATE,
+                    'commission_rate'           => $commissionRate,
                     'commission_amount'         => $commission,
                     'organizer_payout_amount'   => $organizerPayout,
                     'is_free'                   => $isFree,
@@ -274,53 +258,14 @@ class BookingController extends Controller
     }
 
     /**
-     * Charge using saved card
+     * Charge using saved card (Not Supported for PayPal initially)
      */
     public function chargeWithSavedCard(Request $request, $eventId)
     {
-        $validated = $request->validate([
-            'amount' => 'required|numeric|min:0.50',
-            'card_id' => 'required|string'
-        ]);
-
-        $user = $request->user();
-        $event = DB::table('events')->find($eventId);
-
-        return DB::transaction(function () use ($validated, $user, $event) {
-            $paymentMethod = DB::table('user_payment_methods')
-                ->where('userId', $user->userId)
-                ->where('square_card_id', $validated['card_id'])
-                ->first();
-
-            if (!$paymentMethod) {
-                throw new \Exception('Payment method not found', 404);
-            }
-
-            $amountMoney = new Money();
-            $amountMoney->setAmount((int) round($validated['amount'] * 100));
-            $amountMoney->setCurrency('USD');
-
-            $paymentRequest = new CreatePaymentRequest([
-                'idempotencyKey' => Str::uuid()->toString(),
-                'sourceId' => $paymentMethod->square_card_id,
-                'amount_money' => $amountMoney,
-                'customer_id' => $paymentMethod->square_customer_id,
-                'note' => "Event booking: {$event->eventTitle}",
-                'autocomplete' => true
-            ]);
-
-            $paymentResponse = $this->getSquareClient()->payments->create($paymentRequest);
-
-            if (!$paymentResponse->getPayment() || !$paymentResponse->getPayment()->getId()) {
-                throw new \Exception('Invalid payment response from Square', 500);
-            }
-
-            return response()->json([
-                'success' => true,
-                'payment_id' => $paymentResponse->getPayment()->getId()
-            ]);
-
-        }, 3);
+        return response()->json([
+            'success' => false,
+            'error' => 'Saved cards are not supported with PayPal.'
+        ], 400);
     }
 
     private function calculatePricing($basePrice, $ticketType, $quantity)
@@ -336,7 +281,8 @@ class BookingController extends Controller
         $totalAmount = $subtotal + $processingFee;
 
         // Calculate commission and payout for split payment
-        $commission = $subtotal * (self::COMMISSION_RATE / 100);
+        $commissionRate = config('paypal.commission_rate', 10.0);
+        $commission = $subtotal * ($commissionRate / 100);
         $organizerPayout = ($subtotal - $commission) + $processingFee;
 
         return [
@@ -352,162 +298,74 @@ class BookingController extends Controller
                 'service_fee' => 0, // Removed
                 'processing_fee_percentage' => self::PROCESSING_FEE_PERCENT,
                 'fixed_processing_fee' => self::FIXED_PROCESSING_FEE,
-                'commission_rate' => self::COMMISSION_RATE,
+                'commission_rate' => $commissionRate,
                 'commission_amount' => round($commission, 2),
                 'organizer_payout_amount' => round($organizerPayout, 2)
             ]
         ];
     }
 
-    private function processSquarePayment($paymentNonce, $amount, $commission, $note, $customerId, $event)
-{
-    try {
-        // Validate amount
-        if (!is_numeric($amount) || $amount <= 0) {
-            throw new \InvalidArgumentException('Invalid payment amount: must be a positive number');
-        }
-
-        // Convert to cents and ensure it's an integer
-        $amountCents = (int)round($amount * 100);
-
-        // Create Money object using SDK 42.0+ syntax
-        $amountMoney = new Money();
-        $amountMoney->setAmount($amountCents);
-        $amountMoney->setCurrency('USD');
-
-        // Get organizer's Square account (if connected)
-        $organizerSquareAccount = DB::table('organizer_square_accounts')
-            ->join('organizers', 'organizer_square_accounts.organizerId', '=', 'organizers.organizerId')
-            ->where('organizers.userId', $event->userId)
-            ->where('organizer_square_accounts.status', 'connected')
-            ->select('organizer_square_accounts.*')
-            ->first();
-
-        if (!$organizerSquareAccount) {
-            throw new \RuntimeException('The organizer has not connected their Square account. Payments cannot be processed for this event.');
-        }
-
+    private function processPayPalPayment($orderId, $amount, $commission, $note, $customerId, $event)
+    {
         try {
-            // Decrypt access token
-            $accessToken = Crypt::decryptString($organizerSquareAccount->accessToken);
+            $environment = config('paypal.environment', 'sandbox');
+            $accessToken = $this->getPayPalAccessToken($environment);
+            
+            $url = $environment === 'production' 
+                ? "https://api-m.paypal.com/v2/checkout/orders/{$orderId}/capture" 
+                : "https://api-m.sandbox.paypal.com/v2/checkout/orders/{$orderId}/capture";
 
-            // Get application ID for split payments (required when using applicationFeeMoney)
-            $applicationId = config('square.application_id', env('SQUARE_APPLICATION_ID', ''));
+            // Get organizer's PayPal account
+            $organizerPaypalAccount = DB::table('organizer_paypal_accounts')
+                ->join('organizers', 'organizer_paypal_accounts.organizerId', '=', 'organizers.organizerId')
+                ->where('organizers.userId', $event->userId)
+                ->where('organizer_paypal_accounts.status', 'connected')
+                ->select('organizer_paypal_accounts.*')
+                ->first();
 
-            if (empty($applicationId)) {
-                throw new \RuntimeException('Square Application ID is required for split payments. Please set SQUARE_APPLICATION_ID in your .env file.');
-            }
-
-            // Create Square client with organizer's token and application ID
-            $squareClientOptions = [
-                'baseUrl' => $organizerSquareAccount->environment === 'production'
-                    ? Environments::Production->value
-                    : Environments::Sandbox->value,
+            $headers = [
+                'Authorization' => "Bearer {$accessToken}",
+                'Content-Type' => 'application/json'
             ];
 
-            // Add applicationId for split payments
-            $squareClientOptions['applicationId'] = $applicationId;
+            // If split payment is enabled and merchant ID is present, set the Payee Header
+            if ($organizerPaypalAccount && !empty($organizerPaypalAccount->paypalMerchantId)) {
+                $headers['PayPal-Auth-Assertion'] = $this->generatePayPalAuthAssertion(
+                    config('paypal.client_id'), 
+                    $organizerPaypalAccount->paypalMerchantId
+                );
+            }
 
-            $squareClient = new SquareClient(
-                token: $accessToken,
-                options: $squareClientOptions
-            );
+            $response = Http::withHeaders($headers)
+                ->post($url, []);
 
-            $locationId = $organizerSquareAccount->squareLocationId;
-            $useSplitPayment = true;
+            if (!$response->successful()) {
+                Log::error('PayPal capture error', ['error' => $response->json()]);
+                throw new \Exception('PayPal payment failed: ' . json_encode($response->json()));
+            }
 
-            Log::info('Using split payment', [
-                'organizer_id' => $event->userId,
-                'merchant_id' => $organizerSquareAccount->squareMerchantId,
-                'application_id' => $applicationId
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Organizer Square account error', [
-                'error' => $e->getMessage(),
-                'organizer_id' => $event->userId
-            ]);
-            throw new \RuntimeException('There is a problem with the organizer\'s payment setup. Please contact support.');
-        }
-
-        if (empty($locationId)) {
-            throw new \RuntimeException('Square location ID is not configured');
-        }
-
-        // Prepare payment request data
-        $paymentRequestData = [
-            'idempotencyKey' => Str::uuid()->toString(),
-            'sourceId' => $paymentNonce,
-            'amountMoney' => $amountMoney
-        ];
-
-        // Create payment request
-        $paymentRequest = new CreatePaymentRequest($paymentRequestData);
-
-        // If split payment, set application fee (app owner's commission)
-        if ($useSplitPayment && $commission > 0) {
-            $commissionCents = (int)round($commission * 100);
-            $applicationFeeMoney = new Money();
-            $applicationFeeMoney->setAmount($commissionCents);
-            $applicationFeeMoney->setCurrency('USD');
+            $captureData = $response->json();
             
-            // Fix: Use correct setter for app fee money
-            $paymentRequest->setAppFeeMoney($applicationFeeMoney);
+            if ($captureData['status'] !== 'COMPLETED') {
+                throw new \Exception('PayPal order not completed. Status: ' . $captureData['status']);
+            }
 
-            Log::debug('Split payment with application fee', [
-                'commission' => $commission,
-                'commission_cents' => $commissionCents
+            return $captureData['purchase_units'][0]['payments']['captures'][0]['id'] ?? $orderId;
+            
+        } catch (\Exception $e) {
+            Log::error('PayPal Processing Error', [
+                'error' => $e->getMessage(),
+                'order_id' => $orderId
             ]);
+            throw $e;
         }
-
-        // Set additional parameters
-        $paymentRequest->setNote(substr($note, 0, 500));
-        $paymentRequest->setCustomerId((string)$customerId);
-        $paymentRequest->setAutocomplete(true);
-        $paymentRequest->setLocationId($locationId);
-
-        // Debug the final request payload
-        Log::debug('Square Payment Request', [
-            'amount_money' => [
-                'amount' => $amountMoney->getAmount(),
-                'currency' => $amountMoney->getCurrency()
-            ],
-            'sourceId' => $paymentNonce,
-            'customer_id' => $customerId,
-            'location_id' => $locationId,
-            'split_payment' => $useSplitPayment,
-            'application_fee' => $useSplitPayment ? $commission : null
-        ]);
-
-        // Process payment using the Payments API
-        $paymentsApi = $squareClient->payments;
-        $response = $paymentsApi->create($paymentRequest);
-
-        // Check for errors in response
-        if ($response->getErrors()) {
-            $errors = $response->getErrors();
-            Log::error('Square payment error', ['errors' => $errors]);
-            throw new \RuntimeException('Square payment failed: ' . json_encode($errors));
-        }
-
-        return $response;
-
-    } catch (\Square\Exceptions\SquareApiException $e) {
-        Log::error('Square API Exception', [
-            'message' => $e->getMessage(),
-            'errors' => $e->getErrors(),
-            'trace' => $e->getTraceAsString()
-        ]);
-        throw new \RuntimeException('Payment processing failed: ' . $e->getMessage());
-    } catch (\Exception $e) {
-        Log::error('Payment Processing Error', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-            'amount' => $amount,
-            'customer' => $customerId
-        ]);
-        throw $e;
     }
-}
+
+    private function generatePayPalAuthAssertion($clientId, $merchantId) {
+        $header = base64_encode(json_encode(["alg" => "none"]));
+        $payload = base64_encode(json_encode(["iss" => $clientId, "payer_id" => $merchantId]));
+        return "{$header}.{$payload}.";
+    }
 
     private function generateTickets($bookingId, $quantity, $event, $user, string $tierName = 'general', float $tierPrice = 0)
     {
@@ -550,53 +408,9 @@ class BookingController extends Controller
 
     private function saveCustomerCard($userId, $paymentNonce)
     {
-        try {
-            $user = DB::table('mstuser')->where('userId', $userId)->first();
-            if (!$user) {
-                throw new \Exception("User not found");
-            }
-
-            $customerRequest = new CreateCustomerRequest([
-                'reference_id' => (string) $userId,
-                'email_address' => $user->email,
-                'given_name' => $user->name,
-                'idempotencyKey' => Str::uuid()->toString()
-            ]);
-
-            $customerResponse = $this->getSquareClient()->customers->create($customerRequest);
-            $customerId = $customerResponse->getCustomer()->getId();
-
-            $cardRequest = new CreateCardRequest([
-                'idempotencyKey' => Str::uuid()->toString(),
-                'sourceId' => $paymentNonce,
-                'card' => [
-                    'customer_id' => $customerId,
-                    'cardholder_name' => $user->name
-                ]
-            ]);
-
-            $cardResponse = $this->getSquareClient()->cards->create($cardRequest);
-
-            DB::table('user_payment_methods')->insert([
-                'userId' => $userId,
-                'square_customer_id' => $customerId,
-                'square_card_id' => $cardResponse->getCard()->getId(),
-                'last_four' => $cardResponse->getCard()->getLast4(),
-                'brand' => $cardResponse->getCard()->getCardBrand(),
-                'exp_date' => $cardResponse->getCard()->getExpMonth() . '/' . $cardResponse->getCard()->getExpYear(),
-                'created_at' => now()
-            ]);
-
-            return true;
-
-        } catch (\Exception $e) {
-            Log::error("Card save failed", [
-                'user_id' => $userId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return false;
-        }
+        // Saved cards logic via PayPal requires Vault integration which is out of scope.
+        // Silently return false.
+        return false;
     }
 
     private function generateReceiptUrl($bookingId)

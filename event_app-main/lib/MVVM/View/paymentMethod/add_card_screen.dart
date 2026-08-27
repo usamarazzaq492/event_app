@@ -40,7 +40,7 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primaryColor,
+                  AppColors.backgroundColor,
                   AppColors.backgroundColor,
                   AppColors.signinoptioncolor,
                 ],
@@ -239,7 +239,7 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
           style: TextStyles.regulartext.copyWith(
             fontSize: 11.sp,
             fontWeight: FontWeight.w500,
-            color: AppColors.textColorSecondary,
+            color: AppColors.textColorPrimary,
           ),
         ),
         SizedBox(height: 1.h),

@@ -241,7 +241,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
                 style: TextStyle(
                   fontSize: 8.sp,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                  color: AppColors.textColorPrimary,
                   letterSpacing: 1.5,
                 ),
               ),
@@ -318,7 +318,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
             style: TextStyle(
               fontSize: 7.sp,
               fontWeight: FontWeight.w800,
-              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+              color: AppColors.textColorPrimary,
               letterSpacing: 1.0,
             ),
           ),
@@ -394,7 +394,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
             style: TextStyle(
               fontSize: 7.sp,
               fontWeight: FontWeight.w800,
-              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+              color: AppColors.textColorPrimary,
               letterSpacing: 1.0,
             ),
           ),
@@ -453,7 +453,7 @@ class _EventUpdateScreenState extends State<EventUpdateScreen> {
             style: TextStyle(
               fontSize: 7.sp,
               fontWeight: FontWeight.w800,
-              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+              color: AppColors.textColorPrimary,
               letterSpacing: 1.0,
             ),
           ),

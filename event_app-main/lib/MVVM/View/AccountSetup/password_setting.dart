@@ -92,7 +92,7 @@ class _PasswordSettingState extends State<PasswordSetting> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primaryColor,
+                  AppColors.backgroundColor,
                   AppColors.backgroundColor,
                   AppColors.signinoptioncolor,
                 ],

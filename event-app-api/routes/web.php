@@ -82,22 +82,22 @@ Route::post('/profile/delete', [AuthController::class, 'deleteAccount'])->name('
 // Ticket routes
 Route::get('/ticket/{bookingId}', [TicketController::class, 'downloadTicket'])->name('ticket.download')->middleware('auth');
 
-// Square Payment Routes
-Route::get('/square-payment/{eventId}', [App\Http\Controllers\Web\SquarePaymentController::class, 'showEventPayment'])->name('square.payment');
-Route::post('/square-payment/{eventId}', [App\Http\Controllers\Web\SquarePaymentController::class, 'processEventPayment'])->name('square.payment.process');
+// PayPal Payment Routes
+Route::get('/paypal-payment/{eventId}', [App\Http\Controllers\Web\PayPalPaymentController::class, 'showEventPayment'])->name('paypal.payment');
+Route::post('/paypal-payment/{eventId}', [App\Http\Controllers\Web\PayPalPaymentController::class, 'processEventPayment'])->name('paypal.payment.process');
 
-Route::get('/square-donate/{transactionId}', [App\Http\Controllers\Web\SquarePaymentController::class, 'showDonationForm'])->name('square.donate');
-Route::post('/square-donate/{transactionId}', [App\Http\Controllers\Web\SquarePaymentController::class, 'processDonation'])->name('square.donate.process');
+Route::get('/paypal-donate/{transactionId}', [App\Http\Controllers\Web\PayPalPaymentController::class, 'showDonationForm'])->name('paypal.donate');
+Route::post('/paypal-donate/{transactionId}', [App\Http\Controllers\Web\PayPalPaymentController::class, 'processDonation'])->name('paypal.donate.process');
 
-// Square Connect OAuth Routes
+// PayPal Connect OAuth Routes
 Route::middleware('auth')->group(function () {
-    Route::get('/square/connect', [App\Http\Controllers\SquareConnectController::class, 'initiateOAuth'])->name('square.connect');
-    Route::post('/square/disconnect', [App\Http\Controllers\SquareConnectController::class, 'disconnect'])->name('square.disconnect');
+    Route::get('/paypal/connect', [App\Http\Controllers\PayPalConnectController::class, 'initiateOAuth'])->name('paypal.connect');
+    Route::post('/paypal/disconnect', [App\Http\Controllers\PayPalConnectController::class, 'disconnect'])->name('paypal.disconnect');
 });
 
-// OAuth callback must be accessible without auth (Square redirects here)
+// OAuth callback must be accessible without auth (PayPal redirects here)
 // Security is handled via state token validation in the controller
-Route::get('/square/callback', [App\Http\Controllers\SquareConnectController::class, 'handleCallback'])->name('square.callback');
+Route::get('/paypal/callback', [App\Http\Controllers\PayPalConnectController::class, 'handleCallback'])->name('paypal.callback');
 
 // Debug route for testing CSRF
 Route::get('/test-csrf', function () {

@@ -1391,7 +1391,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
   Widget _label(String text) => Text(
         text,
         style: TextStyle(
-          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+          color: AppColors.textColorPrimary,
           fontSize: 8.5.sp,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.2,

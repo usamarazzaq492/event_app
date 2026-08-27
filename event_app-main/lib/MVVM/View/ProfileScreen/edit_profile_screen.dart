@@ -144,7 +144,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primaryColor,
+                  AppColors.backgroundColor,
                   AppColors.backgroundColor,
                   AppColors.signinoptioncolor,
                 ],
@@ -382,7 +382,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           style: TextStyles.regulartext.copyWith(
             fontSize: 11.sp,
             fontWeight: FontWeight.w500,
-            color: AppColors.textColorSecondary,
+            color: AppColors.textColorPrimary,
           ),
         ),
         SizedBox(height: 1.h),

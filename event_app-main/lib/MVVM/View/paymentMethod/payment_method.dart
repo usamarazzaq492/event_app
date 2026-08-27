@@ -31,7 +31,7 @@ class PaymentMethodScreen extends StatefulWidget {
 
 class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   int selectedIndex = 0;
-  List<String> paymentOptions = ['Square Payment'];
+  List<String> paymentOptions = ['PayPal'];
   List<String> addedCards = []; // Integrate saved cards later
 
   @override
@@ -103,7 +103,7 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => SquarePaymentPage(
+                                  builder: (_) => PayPalPaymentPage(
                                     category: widget.category,
                                     seats: widget.seats,
                                     id: widget.id,

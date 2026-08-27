@@ -108,7 +108,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primaryColor,
+                    AppColors.backgroundColor,
                     AppColors.backgroundColor,
                     AppColors.signinoptioncolor,
                   ],
@@ -150,7 +150,8 @@ class _SignupScreenState extends State<SignupScreen> {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryColor.withValues(alpha: 0.1),
+                                color: AppColors.primaryColor
+                                    .withValues(alpha: 0.1),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -209,7 +210,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: AppColors.signinoptioncolor,
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(24),
                       topRight: Radius.circular(24),
                     ),
@@ -528,8 +529,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                         'Apple Sign In',
                                         'Could not get credentials from Apple.',
                                         snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                                        backgroundColor:
+                                            AppColors.textColorPrimary,
+                                        colorText: Colors.white,
+                                      );
                                       return;
                                     }
                                     await controller.signInWithApple(
@@ -550,16 +553,20 @@ colorText: Colors.white,);
                                             ? e.message
                                             : 'Could not sign in with Apple',
                                         snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                                        backgroundColor:
+                                            AppColors.textColorPrimary,
+                                        colorText: Colors.white,
+                                      );
                                     }
                                   } catch (e) {
                                     Get.snackbar(
                                       'Apple Sign In',
                                       'Could not sign in with Apple. Please try again.',
                                       snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                                      backgroundColor:
+                                          AppColors.textColorPrimary,
+                                      colorText: Colors.white,
+                                    );
                                   }
                                 },
                                 style: SignInWithAppleButtonStyle.black,
@@ -593,7 +600,7 @@ colorText: Colors.white,);
           style: TextStyles.regulartext.copyWith(
             fontSize: 12.sp,
             fontWeight: FontWeight.w500,
-            color: AppColors.textColorSecondary,
+            color: AppColors.textColorPrimary,
           ),
         ),
         SizedBox(height: 1.h),

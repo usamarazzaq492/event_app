@@ -142,7 +142,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      AppColors.primaryColor,
+                      AppColors.backgroundColor,
                       AppColors.backgroundColor,
                       AppColors.signinoptioncolor,
                     ],

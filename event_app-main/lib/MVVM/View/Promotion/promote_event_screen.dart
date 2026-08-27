@@ -103,11 +103,11 @@ class _PromoteEventScreenState extends State<PromoteEventScreen> {
         _error = null;
       });
 
-      // Navigate to Square payment page with 'boost' package
+      // Navigate to PayPal payment page with 'boost' package
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => SquarePaymentPage(
+          builder: (context) => PayPalPaymentPage(
             category: 'boost', // Always use 'boost' for new system
             seats: 1,
             id: widget.eventId,

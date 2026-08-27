@@ -56,7 +56,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryColor,
+      backgroundColor: AppColors.backgroundColor,
       body: Padding(
         padding: EdgeInsets.only(top: 7.h),
         child: Stack(
@@ -141,26 +141,6 @@ class OnboardingContent extends StatelessWidget {
                 fit: BoxFit.cover,
                 semanticLabel: title,
               ),
-              // Subtle gradient overlay to blend into the bottom container
-              Positioned(
-                bottom: -2, // Slight overlap to prevent gaps
-                left: 0,
-                right: 0,
-                height: 10.h,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        AppColors.textColorPrimary.withValues(alpha: 0.5),
-                        AppColors.textColorPrimary,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -171,11 +151,18 @@ class OnboardingContent extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
           decoration: BoxDecoration(
-            color: AppColors.textColorPrimary,
+            color: Colors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(4.h),
               topRight: Radius.circular(4.h),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
           ),
           child: Column(
             children: [

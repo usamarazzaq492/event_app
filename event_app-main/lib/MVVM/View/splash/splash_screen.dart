@@ -1,5 +1,4 @@
 import 'package:event_app/MVVM/view_model/auth_view_model.dart';
-import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -35,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Colors.white,
       body: Center(
         child: TweenAnimationBuilder<double>(
           duration: const Duration(seconds: 1),

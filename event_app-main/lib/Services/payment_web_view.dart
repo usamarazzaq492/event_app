@@ -8,7 +8,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../../app/config/app_colors.dart';
 import '../MVVM/View/ticketScreen/ticket_screen.dart';
 
-class SquarePaymentPage extends StatefulWidget {
+class PayPalPaymentPage extends StatefulWidget {
   final String category;
   final int seats;
   final int? id;
@@ -17,7 +17,7 @@ class SquarePaymentPage extends StatefulWidget {
   final List<TicketTier>? selectedTiers;
   final double? totalAmount;
 
-  const SquarePaymentPage({
+  const PayPalPaymentPage({
     super.key,
     required this.category,
     required this.seats,
@@ -28,10 +28,10 @@ class SquarePaymentPage extends StatefulWidget {
   });
 
   @override
-  State<SquarePaymentPage> createState() => _SquarePaymentPageState();
+  State<PayPalPaymentPage> createState() => _PayPalPaymentPageState();
 }
 
-class _SquarePaymentPageState extends State<SquarePaymentPage> {
+class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
   late final WebViewController _controller;
   bool isLoading = false;
 
@@ -50,8 +50,8 @@ class _SquarePaymentPageState extends State<SquarePaymentPage> {
         },
       )
       ..loadRequest(Uri.parse(widget.isPromotion
-          ? '${AppUrl.webBaseUrl}/square-payment/${widget.id}?is_promotion=true&package=${Uri.encodeComponent(widget.category)}'
-          : '${AppUrl.webBaseUrl}/square-payment/${widget.id}?quantity=${widget.seats}&ticket_type=${Uri.encodeComponent(widget.category)}&subtotal=${widget.totalAmount}'));
+          ? '${AppUrl.webBaseUrl}/paypal-payment/${widget.id}?is_promotion=true&package=${Uri.encodeComponent(widget.category)}'
+          : '${AppUrl.webBaseUrl}/paypal-payment/${widget.id}?quantity=${widget.seats}&ticket_type=${Uri.encodeComponent(widget.category)}&subtotal=${widget.totalAmount}'));
   }
 
   Future<void> sendToBackend(String nonce) async {

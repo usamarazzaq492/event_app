@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:event_app/MVVM/view_model/public_profile_controller.dart';
-import 'package:event_app/Services/square_connect_service.dart';
+import 'package:event_app/Services/paypal_connect_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:event_app/app/config/app_colors.dart';
 import 'package:event_app/app/config/app_text_style.dart';
@@ -21,14 +21,14 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
   final controller = Get.put(PublicProfileController());
 
   final IconData defaultIcon = FontAwesomeIcons.bolt;
-  bool _isCheckingSquare = false;
-  Map<String, dynamic>? _squareStatus;
+  bool _isCheckingPayPal = false;
+  Map<String, dynamic>? _paypalStatus;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _checkSquareStatus();
+    _checkPayPalStatus();
   }
 
   @override
@@ -41,62 +41,61 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // Refresh status when returning to app from browser
-      _checkSquareStatus();
+      _checkPayPalStatus();
     }
   }
 
-  Future<void> _checkSquareStatus() async {
+  Future<void> _checkPayPalStatus() async {
     debugPrint(
-        'AboutTab: _checkSquareStatus called. _isCheckingSquare: $_isCheckingSquare');
-    if (_isCheckingSquare) return;
+        'AboutTab: _checkPayPalStatus called. _isCheckingPayPal: $_isCheckingPayPal');
+    if (_isCheckingPayPal) return;
 
     setState(() {
-      _isCheckingSquare = true;
+      _isCheckingPayPal = true;
     });
 
     try {
-      final status = await SquareConnectService.checkConnectionStatus();
-      debugPrint('AboutTab: _checkSquareStatus result: $status');
-
+      final status = await PayPalConnectService().checkStatus();
+      debugPrint('AboutTab: _checkPayPalStatus result: $status');
+      
       if (mounted) {
         setState(() {
-          _squareStatus = status;
-          _isCheckingSquare = false;
+          _paypalStatus = status;
+          _isCheckingPayPal = false;
         });
       }
     } catch (e) {
-      debugPrint('AboutTab: _checkSquareStatus error: $e');
+      debugPrint('AboutTab: _checkPayPalStatus error: $e');
       if (mounted) {
-        setState(() => _isCheckingSquare = false);
+        setState(() => _isCheckingPayPal = false);
       }
     }
   }
 
-  Future<void> _connectSquare() async {
-    setState(() => _isCheckingSquare = true);
+  Future<void> _connectPayPal() async {
+    setState(() => _isCheckingPayPal = true);
 
     try {
-      final result = await SquareConnectService.getOAuthUrl();
-
-      if (result['success'] == true && result['oauth_url'] != null) {
-        final url = result['oauth_url'] as String;
-        final uri = Uri.parse(url);
-
-        // Square Sandbox significantly prefers external browsers on mobile to avoid rendering issues
+      final result = await PayPalConnectService().getConnectUrl();
+      
+      if (result != null) {
+        final uri = Uri.parse(result);
+        
+        // PayPal Sandbox prefers external browsers on mobile
         final launched = await launchUrl(
           uri,
           mode: LaunchMode.externalApplication,
         );
 
         if (!launched && mounted) {
-          // Fallback if external launch fails (unlikely)
+          // Fallback if external launch fails
           await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(result['error'] ?? 'Failed to get connection link', style: const TextStyle(color: Colors.white)),
+              content: const Text('Failed to get connection link', style: TextStyle(color: Colors.white)),
               backgroundColor: AppColors.textColorPrimary,
             ),
           );
@@ -113,49 +112,49 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
       }
     } finally {
       if (mounted) {
-        setState(() => _isCheckingSquare = false);
+        setState(() => _isCheckingPayPal = false);
       }
     }
   }
 
-  Future<void> _disconnectSquare() async {
+  Future<void> _disconnectPayPal() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Disconnect Square Account'),
+        backgroundColor: AppColors.signinoptioncolor,
+        title: const Text('Disconnect PayPal Account'),
         content: const Text(
-            'Are you sure you want to disconnect your Square account? You will need to reconnect to receive payments directly.'),
+            'Are you sure you want to disconnect your PayPal account? You will need to reconnect to receive payments directly.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Disconnect'),
+            child: const Text('Disconnect', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
 
     if (confirm == true) {
-      final success = await SquareConnectService.disconnect();
-      if (mounted) {
-        if (success) {
-          await _checkSquareStatus();
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Square account disconnected', style: TextStyle(color: Colors.white)),
-                backgroundColor: AppColors.textColorPrimary,
-              ),
-            );
-          }
-        } else {
+      final success = await PayPalConnectService().disconnect();
+      if (success) {
+        if (mounted) {
+          await _checkPayPalStatus();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Failed to disconnect Square account', style: TextStyle(color: Colors.white)),
+                content: Text('PayPal account disconnected', style: TextStyle(color: Colors.white)),
+                backgroundColor: AppColors.textColorPrimary,
+                duration: Duration(seconds: 2)),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to disconnect PayPal account', style: TextStyle(color: Colors.white)),
               backgroundColor: AppColors.textColorPrimary,
             ),
           );
@@ -246,10 +245,10 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
 
             SizedBox(height: 3.h),
 
-            /// 🔹 Square Payment Connection (for Organizers)
+            /// 🔹 PayPal Payment Connection (for Organizers)
             buildSectionHeader('Payment Account', Icons.payment),
-            _buildSquareConnectionCard(),
-
+            _buildPayPalConnectionCard(),
+            
             SizedBox(height: 3.h),
 
             /// 🔹 Interests header
@@ -313,26 +312,18 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
     );
   }
 
-  /// 🔹 Square Connection Card
-  Widget _buildSquareConnectionCard() {
-    if (_isCheckingSquare) {
-      return Container(
-        height: 15.h,
-        decoration: BoxDecoration(
-          color: AppColors.textColorPrimary.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: AppColors.textColorPrimary.withValues(alpha: 0.08),
-            width: 1.5,
-          ),
-        ),
-        child: const Center(
+  /// 🔹 PayPal Connection Card
+  Widget _buildPayPalConnectionCard() {
+    if (_isCheckingPayPal) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
           child: CircularProgressIndicator(color: AppColors.blueColor),
         ),
       );
     }
 
-    final isConnected = _squareStatus?['connected'] == true;
+    final isConnected = _paypalStatus?['connected'] == true;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(15),
@@ -379,20 +370,22 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isConnected ? 'Square Connected' : 'Connect Square',
+                          isConnected ? 'PayPal Connected' : 'Connect PayPal',
                           style: TextStyles.subheading.copyWith(
                             color: AppColors.textColorPrimary,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         if (isConnected &&
-                            _squareStatus?['merchant_name'] != null)
+                            _paypalStatus?['merchant_email'] != null)
                           Text(
-                            _squareStatus!['merchant_name'],
+                            _paypalStatus!['merchant_email'],
                             style: TextStyles.regulartext.copyWith(
                               fontSize: 9.sp,
                               color: AppColors.textColorSecondary,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                       ],
                     ),
@@ -402,8 +395,8 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
               SizedBox(height: 2.h),
               Text(
                 isConnected
-                    ? 'Your Square account is linked. Payments will be deposited directly, with a 10% commission automatically handled.'
-                    : 'Link your Square account to start receiving payments directly from your event bookings.',
+                    ? 'Your PayPal account is linked. Payments will be deposited directly, with a 10% commission automatically handled.'
+                    : 'Link your PayPal account to start receiving payments directly from your event bookings.',
                 style: TextStyles.regulartext.copyWith(
                   fontSize: 10.sp,
                   color: AppColors.textColorSecondary,
@@ -413,7 +406,7 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
               SizedBox(height: 3.h),
               ButtonWidget(
                 text: isConnected ? 'Disconnect Account' : 'Connect Account',
-                onPressed: isConnected ? _disconnectSquare : _connectSquare,
+                onPressed: isConnected ? _disconnectPayPal : _connectPayPal,
                 backgroundColor: isConnected
                     ? Colors.red.withValues(alpha: 0.8)
                     : AppColors.blueColor,

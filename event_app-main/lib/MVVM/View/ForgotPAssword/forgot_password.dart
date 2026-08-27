@@ -56,7 +56,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.primaryColor,
+                  AppColors.backgroundColor,
                   AppColors.backgroundColor,
                   AppColors.signinoptioncolor,
                 ],
@@ -160,7 +160,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           style: TextStyles.regulartext.copyWith(
                             fontSize: 12.sp,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.textColorSecondary,
+                            color: AppColors.textColorPrimary,
                           ),
                         ),
                         SizedBox(height: 1.h),
