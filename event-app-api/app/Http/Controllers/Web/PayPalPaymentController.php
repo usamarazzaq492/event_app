@@ -46,7 +46,7 @@ class PayPalPaymentController extends Controller
             DB::table('donation_transactions')
                 ->where('id', $transactionId)
                 ->update([
-                    'paypalPaymentId' => $request->paypalOrderId,
+                    'squarePaymentId' => $request->paypalOrderId,
                     'updated_at' => now(),
                 ]);
 
@@ -188,10 +188,10 @@ class PayPalPaymentController extends Controller
                 'serviceFee' => 0,
                 'processingFee' => $processingFee,
                 'totalAmount' => $totalAmount,
-                'paypalPaymentId' => $request->paypalOrderId,
+                'squarePaymentId' => $request->paypalOrderId,
                 'appOwnerCommission' => $commission,
                 'organizerPayout' => $organizerPayout,
-                'organizerPaypalMerchantId' => $organizerPaypal->paypalMerchantId ?? null,
+                'organizerSquareMerchantId' => $organizerPaypal->paypalMerchantId ?? null,
                 'paymentType' => $organizerPaypal ? 'split' : 'direct',
                 'splitPaymentDetails' => json_encode([
                     'commission_rate' => $commissionRate,

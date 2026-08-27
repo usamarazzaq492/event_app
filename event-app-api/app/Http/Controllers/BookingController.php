@@ -172,10 +172,10 @@ class BookingController extends Controller
                 'serviceFee'                => 0,
                 'processingFee'             => $processingFee,
                 'totalAmount'               => $totalAmount,
-                'paypalPaymentId'           => $paypalPaymentId,
+                'squarePaymentId'           => $paypalPaymentId,
                 'appOwnerCommission'        => $commission,
                 'organizerPayout'           => $organizerPayout,
-                'organizerPaypalMerchantId' => $organizerPaypalAccount->paypalMerchantId ?? null,
+                'organizerSquareMerchantId' => $organizerPaypalAccount->paypalMerchantId ?? null,
                 'paymentType'               => $organizerPaypalAccount ? 'split' : 'direct',
                 'splitPaymentDetails'       => json_encode([
                     'commission_rate'         => $commissionRate,
