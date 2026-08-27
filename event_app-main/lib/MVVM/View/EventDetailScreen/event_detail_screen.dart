@@ -1776,7 +1776,7 @@ colorText: Colors.white,);
               Container(
                 padding: EdgeInsets.all(2.w),
                 decoration: BoxDecoration(
-                  color: AppColors.textColorPrimary,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(1.5.h),
                   boxShadow: [
                     BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4),),
@@ -1787,7 +1787,7 @@ colorText: Colors.white,);
                   version: QrVersions.auto,
                   size: 22.w,
                   padding: EdgeInsets.zero,
-                  backgroundColor: Colors.transparent,
+                  backgroundColor: Colors.white,
                 ),
               ),
               if (isLimitReached) ...[

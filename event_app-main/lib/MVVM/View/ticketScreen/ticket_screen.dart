@@ -273,7 +273,7 @@ class _TicketScreenState extends State<TicketScreen> {
                         Container(
                           padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppColors.textColorPrimary,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(1.5.h),
                             boxShadow: [
                               BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 10),),
@@ -285,7 +285,7 @@ class _TicketScreenState extends State<TicketScreen> {
                                 : jsonEncode(qrCodeData),
                             version: QrVersions.auto,
                             size: 40.w,
-                            backgroundColor: AppColors.textColorPrimary,
+                            backgroundColor: Colors.white,
                           ),
                         ),
                         SizedBox(height: 2.h),

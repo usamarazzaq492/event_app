@@ -576,7 +576,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
           child: Container(
             padding: EdgeInsets.all(6.w),
             decoration: BoxDecoration(
-              color: AppColors.textColorPrimary,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(2.5.h),
               boxShadow: [
                 BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 10),),
@@ -588,7 +588,7 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                   data: qrString,
                   version: QrVersions.auto,
                   size: 65.w,
-                  backgroundColor: AppColors.textColorPrimary,
+                  backgroundColor: Colors.white,
                   padding: EdgeInsets.zero,
                 ),
                 SizedBox(height: 3.h),
@@ -726,13 +726,13 @@ class _GeneratePaymentQrScreenState extends State<GeneratePaymentQrScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2.h),
                   child: Container(
-                    color: AppColors.textColorPrimary,
+                    color: Colors.white,
                     padding: EdgeInsets.all(4.w),
                     child: QrImageView(
                       data: qrString,
                       version: QrVersions.auto,
                       size: 45.w,
-                      backgroundColor: AppColors.textColorPrimary,
+                      backgroundColor: Colors.white,
                       padding: EdgeInsets.zero,
                     ),
                   ),
