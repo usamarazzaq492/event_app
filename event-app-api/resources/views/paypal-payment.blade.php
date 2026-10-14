@@ -292,7 +292,7 @@
                     platform_fees: [{
                         amount: {
                             currency_code: "USD",
-                            value: "{{ number_format($processingFee, 2, '.', '') }}"
+                            value: "{{ number_format($commission, 2, '.', '') }}"
                         }
                     }]
                 };
