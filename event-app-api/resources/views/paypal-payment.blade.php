@@ -322,8 +322,12 @@
                 }, 10000);
             },
             onError: function(err) {
-                showMessage('An error occurred during payment processing.', true);
-                console.error(err);
+                let msg = 'An error occurred during payment processing.';
+                if (err && (err.message || typeof err === 'string')) {
+                    msg += ' Detail: ' + (err.message || err);
+                }
+                showMessage(msg, true);
+                console.error('PayPal onError:', err);
             },
             onCancel: function(data) {
                 console.log('User cancelled payment');
