@@ -1,4 +1,3 @@
-import 'dart:ui' show Rect;
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -7,7 +6,7 @@ import 'package:intl/intl.dart';
 class ShareUtils {
   /// Non-zero rect for iOS/iPad so share sheet does not throw (avoids zero-origin validation).
   static Rect? get _sharePositionOrigin =>
-      kIsWeb ? null : Rect.fromLTWH(0, 0, 1, 1);
+      kIsWeb ? null : const Rect.fromLTWH(0, 0, 1, 1);
 
   /// Share event with enhanced content
   static Future<void> shareEvent({

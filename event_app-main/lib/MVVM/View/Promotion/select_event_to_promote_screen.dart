@@ -90,7 +90,8 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
                           'Choose an event to boost its visibility',
                           style: TextStyle(
                             fontSize: 11.sp,
-                            color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.38),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -212,7 +213,8 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
               Text(
                 "Create an event first to promote it!",
                 textAlign: TextAlign.center,
-                style: TextStyles.regulartext.copyWith(color: AppColors.textColorSecondary),
+                style: TextStyles.regulartext
+                    .copyWith(color: AppColors.textColorSecondary),
               ),
             ],
           ),
@@ -243,8 +245,10 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
         color: AppColors.signinoptioncolor,
         borderRadius: BorderRadius.circular(2.h),
         border: isCurrentlyPromoted
-            ? Border.all(color: Colors.orange.withValues(alpha: 0.5), width: 1.5)
-            : Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+            ? Border.all(
+                color: Colors.orange.withValues(alpha: 0.5), width: 1.5)
+            : Border.all(
+                color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
         boxShadow: [
           BoxShadow(
             color: AppColors.textColorPrimary.withValues(alpha: 0.04),
@@ -268,7 +272,7 @@ class _SelectEventToPromoteScreenState extends State<SelectEventToPromoteScreen>
                 width: 65,
                 height: 65,
                 color: AppColors.textColorPrimary.withValues(alpha: 0.05),
-                child: Center(
+                child: const Center(
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
               ),

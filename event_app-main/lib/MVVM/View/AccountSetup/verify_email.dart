@@ -182,7 +182,7 @@ class _VerifyEmailState extends State<VerifyEmail> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),

@@ -331,9 +331,9 @@ class _TicketScreenState extends State<TicketScreen> {
                             Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 2.h),
-                                child: CustomPaint(
+                                child: const CustomPaint(
                                   painter: TicketDashedLinePainter(),
-                                  child: Container(
+                                  child: SizedBox(
                                       height: 1, width: double.infinity),
                                 ),
                               ),

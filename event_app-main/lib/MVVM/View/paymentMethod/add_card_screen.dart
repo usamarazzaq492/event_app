@@ -69,14 +69,14 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(width: 48), // Spacer for balance
+                    const SizedBox(width: 48), // Spacer for balance
                   ],
                 ),
                 SizedBox(height: 3.h),
 
                 /// Visual Card Illustration with a subtle glow
                 Container(
-                  padding: EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
@@ -105,7 +105,7 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
@@ -113,7 +113,11 @@ class _AddNewCardScreenState extends State<AddNewCardScreen> {
                     color: AppColors.signinoptionbordercolor,
                   ),
                   boxShadow: [
-                    BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, -4),),
+                    BoxShadow(
+                      color: AppColors.blueColor.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
+                    ),
                   ],
                 ),
                 child: SingleChildScrollView(

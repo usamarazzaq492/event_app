@@ -109,7 +109,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
@@ -117,7 +117,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     color: AppColors.signinoptionbordercolor,
                   ),
                   boxShadow: [
-                    BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, -4),),
+                    BoxShadow(
+                      color: AppColors.blueColor.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, -4),
+                    ),
                   ],
                 ),
                 child: SingleChildScrollView(

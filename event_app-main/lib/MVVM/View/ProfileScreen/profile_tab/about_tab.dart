@@ -94,8 +94,8 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Failed to get connection link', style: TextStyle(color: Colors.white)),
+            const SnackBar(
+              content: Text('Failed to get connection link', style: TextStyle(color: Colors.white)),
               backgroundColor: AppColors.textColorPrimary,
             ),
           );
@@ -141,8 +141,8 @@ class _AboutTabState extends State<AboutTab> with WidgetsBindingObserver {
     if (confirm == true) {
       final success = await PayPalConnectService().disconnect();
       if (success) {
+        await _checkPayPalStatus();
         if (mounted) {
-          await _checkPayPalStatus();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
                 content: Text('PayPal account disconnected', style: TextStyle(color: Colors.white)),

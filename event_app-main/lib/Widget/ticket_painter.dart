@@ -2,6 +2,8 @@ import 'package:event_app/app/config/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class TicketDashedLinePainter extends CustomPainter {
+  const TicketDashedLinePainter();
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()

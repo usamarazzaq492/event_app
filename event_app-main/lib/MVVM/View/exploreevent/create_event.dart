@@ -94,7 +94,8 @@ class _CreateEventState extends State<CreateEvent> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, color: AppColors.textColorSecondary, size: 18),
+            icon: const Icon(Icons.close,
+                color: AppColors.textColorSecondary, size: 18),
             onPressed: () => setState(() => _bannerText = null),
             style: IconButton.styleFrom(
               minimumSize: Size.zero,
@@ -148,7 +149,7 @@ class _CreateEventState extends State<CreateEvent> {
                           duration: const Duration(milliseconds: 250),
                           child: _bannerText != null
                               ? _buildBanner()
-                              : SizedBox.shrink(),
+                              : const SizedBox.shrink(),
                         ),
                         SizedBox(height: 2.h),
 
@@ -175,7 +176,8 @@ class _CreateEventState extends State<CreateEvent> {
                                 child: Text(
                                     'Only YouTube and Facebook URLs are supported',
                                     style: TextStyle(
-                                        color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+                                        color: AppColors.textColorPrimary
+                                            .withValues(alpha: 0.24),
                                         fontSize: 9.sp,
                                         fontWeight: FontWeight.w600)),
                               ),
@@ -364,7 +366,9 @@ class _CreateEventState extends State<CreateEvent> {
                     color: AppColors.blueColor, size: 16.sp),
                 SizedBox(width: 2.w),
                 Text(
-                  _localTiers.isEmpty ? 'Add a Ticket Tier' : 'Add Another Tier',
+                  _localTiers.isEmpty
+                      ? 'Add a Ticket Tier'
+                      : 'Add Another Tier',
                   style: TextStyle(
                     color: AppColors.blueColor,
                     fontWeight: FontWeight.w700,
@@ -387,8 +391,7 @@ class _CreateEventState extends State<CreateEvent> {
         decoration: BoxDecoration(
           color: AppColors.blueColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(3.h),
-          border:
-              Border.all(color: AppColors.blueColor.withValues(alpha: 0.3)),
+          border: Border.all(color: AppColors.blueColor.withValues(alpha: 0.3)),
         ),
         child: Text(
           label,
@@ -472,7 +475,9 @@ class _CreateEventState extends State<CreateEvent> {
                           child: Text(
                             desc,
                             style: TextStyle(
-                                color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 8.5.sp),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.38),
+                                fontSize: 8.5.sp),
                           ),
                         ),
                       Padding(
@@ -481,15 +486,21 @@ class _CreateEventState extends State<CreateEvent> {
                           padding: EdgeInsets.symmetric(
                               horizontal: 1.8.w, vertical: 0.25.h),
                           decoration: BoxDecoration(
-                            color: AppColors.textColorPrimary.withValues(alpha: 0.24).withValues(alpha: 0.15),
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.24)
+                                .withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(1.h),
                             border: Border.all(
-                                color: AppColors.textColorPrimary.withValues(alpha: 0.24).withValues(alpha: 0.4)),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.24)
+                                    .withValues(alpha: 0.4)),
                           ),
                           child: Text(
                             cap != null ? 'Cap: $cap' : 'Unlimited',
                             style: TextStyle(
-                                color: AppColors.textColorPrimary.withValues(alpha: 0.24), fontSize: 8.sp),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.24),
+                                fontSize: 8.sp),
                           ),
                         ),
                       ),
@@ -501,7 +512,9 @@ class _CreateEventState extends State<CreateEvent> {
                 Text(
                   isFree ? 'FREE' : '\$${price.toStringAsFixed(2)}',
                   style: TextStyle(
-                    color: isFree ? Colors.greenAccent : AppColors.textColorPrimary,
+                    color: isFree
+                        ? Colors.greenAccent
+                        : AppColors.textColorPrimary,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
@@ -742,18 +755,20 @@ class _CreateEventState extends State<CreateEvent> {
             hintText: hint,
             filled: true,
             fillColor: AppColors.textColorPrimary.withValues(alpha: 0.03),
-            hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.12), fontSize: 10.sp),
+            hintStyle: TextStyle(
+                color: AppColors.textColorPrimary.withValues(alpha: 0.12),
+                fontSize: 10.sp),
             contentPadding:
                 EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.h),
-              borderSide:
-                  BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+              borderSide: BorderSide(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.h),
-              borderSide:
-                  BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+              borderSide: BorderSide(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.h),
@@ -814,19 +829,22 @@ class _CreateEventState extends State<CreateEvent> {
             filled: true,
             fillColor: AppColors.textColorPrimary.withValues(alpha: 0.03),
             suffixIcon: Icon(Icons.calendar_month_rounded,
-                color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 16.sp),
-            hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.12), fontSize: 10.sp),
+                color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+                size: 16.sp),
+            hintStyle: TextStyle(
+                color: AppColors.textColorPrimary.withValues(alpha: 0.12),
+                fontSize: 10.sp),
             contentPadding:
                 EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.h),
-              borderSide:
-                  BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+              borderSide: BorderSide(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.h),
-              borderSide:
-                  BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
+              borderSide: BorderSide(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.05)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(1.5.h),
@@ -880,7 +898,9 @@ class _CreateEventState extends State<CreateEvent> {
                   child: Text(
                     value == label ? 'Select $label' : value,
                     style: TextStyle(
-                      color: value == label ? AppColors.textColorPrimary.withValues(alpha: 0.12) : AppColors.textColorPrimary,
+                      color: value == label
+                          ? AppColors.textColorPrimary.withValues(alpha: 0.12)
+                          : AppColors.textColorPrimary,
                       fontSize: 10.sp,
                       fontWeight: FontWeight.w600,
                     ),
@@ -889,7 +909,8 @@ class _CreateEventState extends State<CreateEvent> {
                 ),
                 SizedBox(width: 2.w),
                 Icon(Icons.access_time_rounded,
-                    color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 16.sp),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+                    size: 16.sp),
               ],
             ),
           ),
@@ -930,16 +951,20 @@ class _CreateEventState extends State<CreateEvent> {
                         padding: EdgeInsets.all(3.w),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.03),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.03),
                         ),
                         child: Icon(Icons.add_photo_alternate_rounded,
-                            color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 30.sp),
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.24),
+                            size: 30.sp),
                       ),
                       SizedBox(height: 1.5.h),
                       Text(
                         'Tap to upload cover image',
                         style: TextStyle(
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.12),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.12),
                           fontSize: 10.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1055,9 +1080,12 @@ class _CreateEventState extends State<CreateEvent> {
       );
     } else if (imageFile == null) {
       _showBanner('Please select an image', color: Colors.red);
-      Get.snackbar('Error', 'Please select an image',
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+      Get.snackbar(
+        'Error',
+        'Please select an image',
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -1152,10 +1180,9 @@ class _TierFormSheetState extends State<_TierFormSheet> {
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.signinoptioncolor.withValues(alpha: 0.96),
-              borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(4.h)),
-              border:
-                  Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.08)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(4.h)),
+              border: Border.all(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.08)),
             ),
             child: Form(
               key: _formKey,
@@ -1170,7 +1197,8 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                         width: 10.w,
                         height: 0.5.h,
                         decoration: BoxDecoration(
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.24),
                           borderRadius: BorderRadius.circular(1.h),
                         ),
                       ),
@@ -1193,7 +1221,9 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                           ? 'Update the details for this tier.'
                           : 'Define who can buy this tier and at what price.',
                       style: TextStyle(
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 10.sp),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.38),
+                          fontSize: 10.sp),
                     ),
 
                     // Preset chips (only on add)
@@ -1201,7 +1231,8 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                       SizedBox(height: 2.h),
                       Text('QUICK PICK',
                           style: TextStyle(
-                              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                              color: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.38),
                               fontSize: 8.5.sp,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.2)),
@@ -1218,8 +1249,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                                     decoration: BoxDecoration(
                                       color: AppColors.blueColor
                                           .withValues(alpha: 0.1),
-                                      borderRadius:
-                                          BorderRadius.circular(3.h),
+                                      borderRadius: BorderRadius.circular(3.h),
                                       border: Border.all(
                                           color: AppColors.blueColor
                                               .withValues(alpha: 0.3)),
@@ -1261,8 +1291,8 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                       controller: _priceCtrl,
                       hint: '0.00  (set 0 for free)',
                       icon: Icons.attach_money_rounded,
-                      keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
                             RegExp(r'^\d*\.?\d{0,2}')),
@@ -1289,15 +1319,15 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                             _label('LIMIT QUANTITY'),
                             Text('Set max tickets for this tier',
                                 style: TextStyle(
-                                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                                    color: AppColors.textColorPrimary
+                                        .withValues(alpha: 0.38),
                                     fontSize: 8.5.sp)),
                           ],
                         ),
                         Switch(
                           value: _hasCapLimit,
-                          activeThumbColor: AppColors.blueColor,
-                          onChanged: (v) =>
-                              setState(() => _hasCapLimit = v),
+                          activeColor: AppColors.blueColor,
+                          onChanged: (v) => setState(() => _hasCapLimit = v),
                         ),
                       ],
                     ),
@@ -1358,8 +1388,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                           borderRadius: BorderRadius.circular(4.h),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.blueColor
-                                  .withValues(alpha: 0.4),
+                              color: AppColors.blueColor.withValues(alpha: 0.4),
                               blurRadius: 18,
                               offset: const Offset(0, 6),
                             ),
@@ -1416,31 +1445,31 @@ class _TierFormSheetState extends State<_TierFormSheet> {
       style: TextStyle(color: AppColors.textColorPrimary, fontSize: 12.sp),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.24), fontSize: 11.sp),
+        hintStyle: TextStyle(
+            color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+            fontSize: 11.sp),
         prefixIcon: Icon(icon, color: AppColors.blueColor, size: 14.sp),
         filled: true,
         fillColor: AppColors.textColorPrimary.withValues(alpha: 0.04),
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide:
-              BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
+          borderSide: BorderSide(
+              color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide:
-              BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
+          borderSide: BorderSide(
+              color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide:
-              BorderSide(color: AppColors.blueColor, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.blueColor, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide: BorderSide(
-              color: Colors.red.withValues(alpha: 0.6), width: 1.5),
+          borderSide:
+              BorderSide(color: Colors.red.withValues(alpha: 0.6), width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),

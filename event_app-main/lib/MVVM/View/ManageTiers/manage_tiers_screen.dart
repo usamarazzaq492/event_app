@@ -75,11 +75,10 @@ class _ManageTiersScreenState extends State<ManageTiersScreen>
             Get.snackbar(
               'Tier Added',
               '"$name" tier created successfully.',
-              
-              
               snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+              backgroundColor: AppColors.textColorPrimary,
+              colorText: Colors.white,
+            );
           }
           if (mounted) setState(() => _busy = false);
         },
@@ -112,19 +111,16 @@ colorText: Colors.white,);
             Get.snackbar(
               'Tier Updated',
               '"$name" tier updated.',
-              
-              
               snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+              backgroundColor: AppColors.textColorPrimary,
+              colorText: Colors.white,
+            );
           }
           if (mounted) setState(() => _busy = false);
         },
       ),
     );
   }
-
-
 
   // ── Build ────────────────────────────────────────────────────────────────────
   @override
@@ -137,12 +133,14 @@ colorText: Colors.white,);
           Positioned(
             top: -10.h,
             right: -15.w,
-            child: _Glow(color: AppColors.blueColor.withValues(alpha: 0.07), size: 55.w),
+            child: _Glow(
+                color: AppColors.blueColor.withValues(alpha: 0.07), size: 55.w),
           ),
           Positioned(
             bottom: -5.h,
             left: -10.w,
-            child: _Glow(color: Colors.purpleAccent.withValues(alpha: 0.05), size: 40.w),
+            child: _Glow(
+                color: Colors.purpleAccent.withValues(alpha: 0.05), size: 40.w),
           ),
 
           SafeArea(
@@ -185,7 +183,8 @@ colorText: Colors.white,);
             color: AppColors.backgroundColor.withValues(alpha: 0.85),
             border: Border(
               bottom: BorderSide(
-                  color: AppColors.textColorPrimary.withValues(alpha: 0.07), width: 0.5),
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.07),
+                  width: 0.5),
             ),
           ),
           child: Row(
@@ -200,7 +199,9 @@ colorText: Colors.white,);
                   decoration: BoxDecoration(
                     color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
+                    border: Border.all(
+                        color:
+                            AppColors.textColorPrimary.withValues(alpha: 0.1)),
                   ),
                   child: Icon(Icons.arrow_back_ios_new_rounded,
                       color: AppColors.textColorPrimary, size: 15.sp),
@@ -223,14 +224,16 @@ colorText: Colors.white,);
                     Text(
                       widget.eventTitle,
                       style: TextStyle(
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 9.5.sp),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.38),
+                          fontSize: 9.5.sp),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
               if (_busy)
-                SizedBox(
+                const SizedBox(
                   width: 18,
                   height: 18,
                   child: CircularProgressIndicator(
@@ -255,7 +258,7 @@ colorText: Colors.white,);
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
+              const SizedBox(
                 width: 36,
                 height: 36,
                 child: CircularProgressIndicator(
@@ -263,8 +266,9 @@ colorText: Colors.white,);
               ),
               SizedBox(height: 2.h),
               Text('Loading tiers…',
-                  style:
-                      TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 11.sp)),
+                  style: TextStyle(
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                      fontSize: 11.sp)),
             ],
           ),
         );
@@ -352,7 +356,10 @@ colorText: Colors.white,);
             Text(
               'Add tiers like Adult, Child, VIP,\nor Senior 55+ so attendees can pick\nwhat they need.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 11.sp, height: 1.5),
+              style: TextStyle(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                  fontSize: 11.sp,
+                  height: 1.5),
             ),
             SizedBox(height: 4.h),
             GestureDetector(
@@ -377,7 +384,8 @@ colorText: Colors.white,);
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.add_rounded, color: AppColors.textColorPrimary),
+                    const Icon(Icons.add_rounded,
+                        color: AppColors.textColorPrimary),
                     SizedBox(width: 2.w),
                     Text(
                       'Add Your First Tier',
@@ -420,11 +428,10 @@ colorText: Colors.white,);
           Get.snackbar(
             'Removed',
             '"${tier.tierName}" tier removed.',
-            
-            
             snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+            backgroundColor: AppColors.textColorPrimary,
+            colorText: Colors.white,
+          );
         }
         if (mounted) setState(() => _busy = false);
       },
@@ -465,8 +472,7 @@ colorText: Colors.white,);
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
               child: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
+                padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
                 child: Row(
                   children: [
                     // Emoji icon
@@ -506,7 +512,8 @@ colorText: Colors.white,);
                               child: Text(
                                 tier.description!,
                                 style: TextStyle(
-                                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                                    color: AppColors.textColorPrimary
+                                        .withValues(alpha: 0.38),
                                     fontSize: 9.sp),
                               ),
                             ),
@@ -518,7 +525,8 @@ colorText: Colors.white,);
                                   tier.quantityCap != null
                                       ? '${tier.available}/${tier.quantityCap} left'
                                       : 'Unlimited',
-                                  AppColors.textColorPrimary.withValues(alpha: 0.24),
+                                  AppColors.textColorPrimary
+                                      .withValues(alpha: 0.24),
                                 ),
                                 if (tier.quantitySold > 0) ...[
                                   SizedBox(width: 1.5.w),
@@ -556,10 +564,8 @@ colorText: Colors.white,);
                           padding: EdgeInsets.symmetric(
                               horizontal: 2.w, vertical: 0.4.h),
                           decoration: BoxDecoration(
-                            color: AppColors.blueColor
-                                .withValues(alpha: 0.1),
-                            borderRadius:
-                                BorderRadius.circular(0.8.h),
+                            color: AppColors.blueColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(0.8.h),
                             border: Border.all(
                                 color: AppColors.blueColor
                                     .withValues(alpha: 0.25)),
@@ -568,8 +574,7 @@ colorText: Colors.white,);
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.edit_rounded,
-                                  color: AppColors.blueColor,
-                                  size: 9.sp),
+                                  color: AppColors.blueColor, size: 9.sp),
                               SizedBox(width: 1.w),
                               Text('Edit',
                                   style: TextStyle(
@@ -599,8 +604,7 @@ colorText: Colors.white,);
         borderRadius: BorderRadius.circular(1.h),
         border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
-      child: Text(label,
-          style: TextStyle(color: color, fontSize: 8.sp)),
+      child: Text(label, style: TextStyle(color: color, fontSize: 8.sp)),
     );
   }
 }
@@ -688,8 +692,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
     if (!_formKey.currentState!.validate()) return;
     final name = _nameCtrl.text.trim();
     final price = double.tryParse(_priceCtrl.text.trim()) ?? 0.0;
-    final cap =
-        _hasCapLimit ? (int.tryParse(_capCtrl.text.trim())) : null;
+    final cap = _hasCapLimit ? (int.tryParse(_capCtrl.text.trim())) : null;
     final desc = _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim();
     setState(() => _isSaving = true);
     widget.onSave(name, price, cap, desc);
@@ -698,8 +701,8 @@ class _TierFormSheetState extends State<_TierFormSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: ClipRRect(
         borderRadius: BorderRadius.vertical(top: Radius.circular(4.h)),
         child: BackdropFilter(
@@ -707,8 +710,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.signinoptioncolor.withValues(alpha: 0.96),
-              borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(4.h)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(4.h)),
               border: Border.all(
                   color: AppColors.textColorPrimary.withValues(alpha: 0.08)),
             ),
@@ -725,7 +727,8 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                         width: 10.w,
                         height: 0.5.h,
                         decoration: BoxDecoration(
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.24),
                           borderRadius: BorderRadius.circular(1.h),
                         ),
                       ),
@@ -748,7 +751,9 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                           ? 'Update the details for this tier.'
                           : 'Define who can buy this tier and at what price.',
                       style: TextStyle(
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 10.sp),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.38),
+                          fontSize: 10.sp),
                     ),
 
                     // Preset chips (only on add)
@@ -756,7 +761,8 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                       SizedBox(height: 2.h),
                       Text('QUICK PICK',
                           style: TextStyle(
-                              color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                              color: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.38),
                               fontSize: 8.5.sp,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.2)),
@@ -782,10 +788,9 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                       controller: _nameCtrl,
                       hint: 'e.g. Adult, VIP, Child, Senior 55+',
                       icon: Icons.label_rounded,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? 'Tier name is required'
-                              : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Tier name is required'
+                          : null,
                     ),
 
                     SizedBox(height: 2.h),
@@ -797,8 +802,8 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                       controller: _priceCtrl,
                       hint: '0.00  (set 0 for free)',
                       icon: Icons.attach_money_rounded,
-                      keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true),
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(
                             RegExp(r'^\d*\.?\d{0,2}')),
@@ -825,15 +830,15 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                             _label('LIMIT QUANTITY'),
                             Text('Set max tickets for this tier',
                                 style: TextStyle(
-                                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                                    color: AppColors.textColorPrimary
+                                        .withValues(alpha: 0.38),
                                     fontSize: 8.5.sp)),
                           ],
                         ),
                         Switch(
                           value: _hasCapLimit,
-                          activeThumbColor: AppColors.blueColor,
-                          onChanged: (v) =>
-                              setState(() => _hasCapLimit = v),
+                          activeColor: AppColors.blueColor,
+                          onChanged: (v) => setState(() => _hasCapLimit = v),
                         ),
                       ],
                     ),
@@ -895,7 +900,8 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                                   end: Alignment.bottomRight,
                                 ),
                           color: _isSaving
-                              ? AppColors.textColorPrimary.withValues(alpha: 0.06)
+                              ? AppColors.textColorPrimary
+                                  .withValues(alpha: 0.06)
                               : null,
                           borderRadius: BorderRadius.circular(4.h),
                           boxShadow: _isSaving
@@ -911,7 +917,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                         ),
                         child: Center(
                           child: _isSaving
-                              ? SizedBox(
+                              ? const SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
@@ -920,9 +926,7 @@ class _TierFormSheetState extends State<_TierFormSheet> {
                                   ),
                                 )
                               : Text(
-                                  _isEditing
-                                      ? 'Save Changes'
-                                      : 'Add Tier',
+                                  _isEditing ? 'Save Changes' : 'Add Tier',
                                   style: TextStyle(
                                     color: AppColors.textColorPrimary,
                                     fontWeight: FontWeight.bold,
@@ -971,38 +975,35 @@ class _TierFormSheetState extends State<_TierFormSheet> {
       style: TextStyle(color: AppColors.textColorPrimary, fontSize: 12.sp),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle:
-            TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.24), fontSize: 11.sp),
-        prefixIcon:
-            Icon(icon, color: AppColors.blueColor, size: 14.sp),
+        hintStyle: TextStyle(
+            color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+            fontSize: 11.sp),
+        prefixIcon: Icon(icon, color: AppColors.blueColor, size: 14.sp),
         filled: true,
         fillColor: AppColors.textColorPrimary.withValues(alpha: 0.04),
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.5.h),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide:
-              BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
+          borderSide: BorderSide(
+              color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide:
-              BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
+          borderSide: BorderSide(
+              color: AppColors.textColorPrimary.withValues(alpha: 0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide:
-              BorderSide(color: AppColors.blueColor, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.blueColor, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide: BorderSide(
-              color: Colors.red.withValues(alpha: 0.6), width: 1.5),
+          borderSide:
+              BorderSide(color: Colors.red.withValues(alpha: 0.6), width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2.h),
-          borderSide:
-              const BorderSide(color: Colors.red, width: 1.5),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
         ),
         errorStyle: TextStyle(color: Colors.red, fontSize: 9.sp),
       ),
@@ -1025,8 +1026,7 @@ class _PresetChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.blueColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(3.h),
-          border: Border.all(
-              color: AppColors.blueColor.withValues(alpha: 0.3)),
+          border: Border.all(color: AppColors.blueColor.withValues(alpha: 0.3)),
         ),
         child: Text(
           label,
@@ -1089,7 +1089,9 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                   '"$tierName" will be deactivated.\nExisting bookings are not affected.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: AppColors.textColorSecondary, fontSize: 10.sp, height: 1.5),
+                      color: AppColors.textColorSecondary,
+                      fontSize: 10.sp,
+                      height: 1.5),
                 ),
                 SizedBox(height: 3.h),
                 Row(
@@ -1100,11 +1102,12 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 1.5.h),
                           decoration: BoxDecoration(
-                            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(3.h),
                             border: Border.all(
-                                color:
-                                    AppColors.textColorPrimary.withValues(alpha: 0.1)),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.1)),
                           ),
                           child: Center(
                             child: Text('Cancel',
@@ -1126,8 +1129,7 @@ class _ConfirmDeleteDialog extends StatelessWidget {
                             color: Colors.red.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(3.h),
                             border: Border.all(
-                                color:
-                                    Colors.red.withValues(alpha: 0.4)),
+                                color: Colors.red.withValues(alpha: 0.4)),
                           ),
                           child: Center(
                             child: Text('Remove',

@@ -188,7 +188,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     alignment: Alignment.bottomRight,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
@@ -224,10 +224,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         decoration: BoxDecoration(
                           color: AppColors.blueColor,
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.textColorPrimary, width: 2),
+                          border: Border.all(
+                              color: AppColors.textColorPrimary, width: 2),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.textColorPrimary.withValues(alpha: 0.2),
+                              color: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.2),
                               blurRadius: 5,
                             ),
                           ],
@@ -250,7 +252,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.signinoptioncolor,
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),

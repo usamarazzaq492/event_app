@@ -131,7 +131,8 @@ class _NotificationScreenState extends State<NotificationScreen>
                                   style: TextStyle(
                                     fontSize: 9.sp,
                                     fontWeight: FontWeight.w900,
-                                    color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                                    color: AppColors.textColorPrimary
+                                        .withValues(alpha: 0.38),
                                     letterSpacing: 1.5,
                                   ),
                                 ),
@@ -294,11 +295,11 @@ class _NotificationScreenState extends State<NotificationScreen>
                                 width: 2,
                               ),
                             ),
-                            padding: EdgeInsets.all(2),
+                            padding: const EdgeInsets.all(2),
                             child: CircleAvatar(
                               radius: 20.sp,
-                              backgroundColor:
-                                  AppColors.textColorPrimary.withValues(alpha: 0.05),
+                              backgroundColor: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.05),
                               backgroundImage: actorImage != null &&
                                       actorImage.toString().isNotEmpty
                                   ? CachedNetworkImageProvider(
@@ -331,7 +332,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                               children: [
                                 TextSpan(
                                   text: '$actorName ',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontWeight: FontWeight.w900,
                                       color: AppColors.textColorPrimary),
                                 ),
@@ -341,8 +342,8 @@ class _NotificationScreenState extends State<NotificationScreen>
                                       : 'is now following you',
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      color:
-                                          AppColors.textColorPrimary.withValues(alpha: 0.7)),
+                                      color: AppColors.textColorPrimary
+                                          .withValues(alpha: 0.7)),
                                 ),
                               ],
                             ),
@@ -351,7 +352,8 @@ class _NotificationScreenState extends State<NotificationScreen>
                           Text(
                             timeAgo.toUpperCase(),
                             style: TextStyle(
-                              color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+                              color: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.24),
                               fontSize: 7.sp,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.5,
@@ -369,8 +371,9 @@ class _NotificationScreenState extends State<NotificationScreen>
                           width: 12.w,
                           height: 12.w,
                           fit: BoxFit.cover,
-                          placeholder: (_, __) =>
-                              Container(color: AppColors.textColorPrimary.withValues(alpha: 0.12)),
+                          placeholder: (_, __) => Container(
+                              color: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.12)),
                         ),
                       ),
                   ],
@@ -421,10 +424,12 @@ class _NotificationScreenState extends State<NotificationScreen>
                           child: Container(
                             padding: EdgeInsets.symmetric(vertical: 1.2.h),
                             decoration: BoxDecoration(
-                              color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                              color: AppColors.textColorPrimary
+                                  .withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(1.2.h),
                               border: Border.all(
-                                color: AppColors.textColorPrimary.withValues(alpha: 0.1),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.1),
                                 width: 1,
                               ),
                             ),

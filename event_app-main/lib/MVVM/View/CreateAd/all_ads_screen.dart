@@ -431,7 +431,7 @@ class _AllAdsScreenState extends State<AllAdsScreen> with RefreshOnNavigation {
                           placeholder: (context, url) => Container(
                             color: AppColors.textColorPrimary
                                 .withValues(alpha: 0.05),
-                            child: Center(
+                            child: const Center(
                               child: CircularProgressIndicator(strokeWidth: 2),
                             ),
                           ),

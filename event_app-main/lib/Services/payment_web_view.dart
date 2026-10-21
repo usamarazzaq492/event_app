@@ -116,7 +116,7 @@ class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
         try {
           final Map<String, dynamic> body = jsonDecode(response.body);
           if (body.containsKey('details')) {
-            errorMsg = "Validation: " + body['details'].toString();
+            errorMsg = "Validation: ${body['details']}";
           } else if (body.containsKey('error')) {
             errorMsg = body['error'].toString();
           } else if (body.containsKey('message')) {

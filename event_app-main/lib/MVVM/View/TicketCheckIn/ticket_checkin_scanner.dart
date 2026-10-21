@@ -59,8 +59,9 @@ class _TicketCheckInScannerState extends State<TicketCheckInScanner> {
               'Camera Permission Required',
               'Please grant camera permission to scan ticket QR codes',
               snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+              backgroundColor: AppColors.textColorPrimary,
+              colorText: Colors.white,
+            );
           }
         }
       }
@@ -75,8 +76,9 @@ colorText: Colors.white,);
           'Error',
           'Failed to initialize camera. Please try again.',
           snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
       }
     }
   }
@@ -95,8 +97,9 @@ colorText: Colors.white,);
           'Camera Permission Required',
           'Please grant camera permission to scan ticket QR codes',
           snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
       debugPrint('Error requesting camera permission: $e');
@@ -104,8 +107,9 @@ colorText: Colors.white,);
         'Error',
         'Failed to request camera permission. Please try again.',
         snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -211,12 +215,12 @@ colorText: Colors.white,);
           '✅ Ticket Checked In',
           'Ticket #${data['ticket_number']} checked in successfully',
           snackPosition: SnackPosition.TOP,
-          
-          
           duration: const Duration(seconds: 3),
-          icon: const Icon(Icons.check_circle, color: AppColors.textColorPrimary),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+          icon:
+              const Icon(Icons.check_circle, color: AppColors.textColorPrimary),
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
 
         // Show success dialog with details
         _showCheckInSuccess(data);
@@ -237,11 +241,10 @@ colorText: Colors.white,);
         'Error',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        
-        
         duration: const Duration(seconds: 3),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     } finally {
       setState(() {
         _isProcessing = false;
@@ -302,7 +305,7 @@ colorText: Colors.white,);
         backgroundColor: AppColors.textColorPrimary,
         title: Row(
           children: [
-            Icon(Icons.warning, color: Colors.orange, size: 28),
+            const Icon(Icons.warning, color: Colors.orange, size: 28),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -327,7 +330,7 @@ colorText: Colors.white,);
             if (warning != null) ...[
               const SizedBox(height: 15),
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
@@ -438,7 +441,7 @@ colorText: Colors.white,);
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.camera_alt_outlined,
                     size: 80,
                     color: AppColors.textColorSecondary,

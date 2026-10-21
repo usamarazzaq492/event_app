@@ -355,8 +355,6 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                   'Sign in to create events',
                   'Create an account to host your own events.',
                   snackPosition: SnackPosition.BOTTOM,
-                  
-                  
                   mainButton: TextButton(
                     onPressed: () {
                       Get.toNamed(RouteName.loginScreen);
@@ -369,8 +367,9 @@ class _ExploreEventScreenState extends State<ExploreEventScreen>
                       ),
                     ),
                   ),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                  backgroundColor: AppColors.textColorPrimary,
+                  colorText: Colors.white,
+                );
               }
             },
           ),
@@ -391,7 +390,8 @@ colorText: Colors.white,);
           decoration: BoxDecoration(
             color: AppColors.backgroundColor.withValues(alpha: 0.8),
             border: Border(
-                bottom: BorderSide(color: AppColors.textColorPrimary.withValues(alpha: 0.1))),
+                bottom: BorderSide(
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.1))),
           ),
           child: Row(
             children: [
@@ -474,11 +474,14 @@ colorText: Colors.white,);
                 turns: isActive ? 0.5 : 0,
                 duration: const Duration(milliseconds: 300),
                 child: Icon(icon,
-                    color: isActive ? AppColors.blueColor : AppColors.textColorPrimary,
+                    color: isActive
+                        ? AppColors.blueColor
+                        : AppColors.textColorPrimary,
                     size: 16.sp),
               )
             : Icon(icon,
-                color: isActive ? AppColors.blueColor : AppColors.textColorPrimary,
+                color:
+                    isActive ? AppColors.blueColor : AppColors.textColorPrimary,
                 size: 16.sp),
       ),
     );
@@ -501,17 +504,20 @@ colorText: Colors.white,);
                       color: AppColors.textColorPrimary.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(2.h),
                       border: Border.all(
-                        color: AppColors.textColorPrimary.withValues(alpha: 0.1),
+                        color:
+                            AppColors.textColorPrimary.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
                     child: TextField(
                       controller: _searchController,
-                      style: TextStyle(color: AppColors.textColorPrimary),
+                      style: const TextStyle(color: AppColors.textColorPrimary),
                       decoration: InputDecoration(
                         hintText: 'Search events, categories, locations...',
-                        hintStyle:
-                            TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 11.sp),
+                        hintStyle: TextStyle(
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.38),
+                            fontSize: 11.sp),
                         prefixIcon: Icon(
                           Icons.search_rounded,
                           color: AppColors.blueColor,
@@ -554,7 +560,8 @@ colorText: Colors.white,);
                               .withValues(alpha: 0.8),
                           borderRadius: BorderRadius.circular(1.5.h),
                           border: Border.all(
-                            color: AppColors.textColorPrimary.withValues(alpha: 0.1),
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.1),
                             width: 1,
                           ),
                         ),
@@ -566,7 +573,8 @@ colorText: Colors.white,);
                                   title: Text(
                                     suggestion,
                                     style: TextStyle(
-                                        color: AppColors.textColorPrimary, fontSize: 11.sp),
+                                        color: AppColors.textColorPrimary,
+                                        fontSize: 11.sp),
                                   ),
                                   leading: Icon(
                                     Icons.history_rounded,
@@ -687,7 +695,9 @@ colorText: Colors.white,);
                       child: Text(
                         category,
                         style: TextStyle(
-                          color: isSelected ? Colors.white : AppColors.textColorSecondary,
+                          color: isSelected
+                              ? Colors.white
+                              : AppColors.textColorSecondary,
                           fontSize: 10.sp,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.w500,
@@ -737,8 +747,9 @@ colorText: Colors.white,);
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Search Radius',
-                        style:
-                            TextStyle(color: AppColors.textColorSecondary, fontSize: 10.sp)),
+                        style: TextStyle(
+                            color: AppColors.textColorSecondary,
+                            fontSize: 10.sp)),
                     Text('${_radiusKm.round()} km',
                         style: TextStyle(
                             color: AppColors.blueColor,
@@ -750,7 +761,8 @@ colorText: Colors.white,);
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 4,
                     activeTrackColor: AppColors.blueColor,
-                    inactiveTrackColor: AppColors.textColorPrimary.withValues(alpha: 0.1),
+                    inactiveTrackColor:
+                        AppColors.textColorPrimary.withValues(alpha: 0.1),
                     thumbColor: AppColors.textColorPrimary,
                     overlayColor: AppColors.blueColor.withValues(alpha: 0.2),
                   ),
@@ -801,7 +813,9 @@ colorText: Colors.white,);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: AppColors.textColorSecondary, fontSize: 9.sp)),
+        Text(label,
+            style:
+                TextStyle(color: AppColors.textColorSecondary, fontSize: 9.sp)),
         SizedBox(height: 1.h),
         GestureDetector(
           onTap: () {
@@ -828,7 +842,10 @@ colorText: Colors.white,);
                         ? DateFormat('MMM d, yyyy').format(date)
                         : 'Anytime',
                     style: TextStyle(
-                        color: date != null ? AppColors.textColorPrimary : AppColors.textColorPrimary.withValues(alpha: 0.38),
+                        color: date != null
+                            ? AppColors.textColorPrimary
+                            : AppColors.textColorPrimary
+                                .withValues(alpha: 0.38),
                         fontSize: 10.sp),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -923,8 +940,9 @@ colorText: Colors.white,);
                           height: 12.h,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => Container(
-                            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
-                            child: Center(
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.05),
+                            child: const Center(
                               child: SizedBox(
                                 width: 20,
                                 height: 20,
@@ -934,9 +952,12 @@ colorText: Colors.white,);
                             ),
                           ),
                           errorWidget: (context, url, error) => Container(
-                            color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.05),
                             child: Icon(Icons.image_not_supported_rounded,
-                                color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 20.sp),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.24),
+                                size: 20.sp),
                           ),
                         ),
                       ),
@@ -987,7 +1008,8 @@ colorText: Colors.white,);
                             child: Text(
                               '${_formatDate(event.startDate)} • ${_formatTime(event.startTime)}',
                               style: TextStyle(
-                                  color: AppColors.textColorSecondary, fontSize: 9.sp),
+                                  color: AppColors.textColorSecondary,
+                                  fontSize: 9.sp),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -1018,12 +1040,12 @@ colorText: Colors.white,);
                           },
                         ),
                       SizedBox(height: 1.h),
-
                     ],
                   ),
                 ),
                 Icon(Icons.arrow_forward_ios_rounded,
-                    color: AppColors.textColorPrimary.withValues(alpha: 0.24), size: 12.sp),
+                    color: AppColors.textColorPrimary.withValues(alpha: 0.24),
+                    size: 12.sp),
               ],
             ),
           ),
@@ -1141,11 +1163,10 @@ colorText: Colors.white,);
         'Location unavailable',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        
-        
         duration: const Duration(seconds: 3),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -1199,7 +1220,9 @@ colorText: Colors.white,);
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.search_off_rounded,
-                          size: 60.sp, color: AppColors.textColorPrimary.withValues(alpha: 0.12)),
+                          size: 60.sp,
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.12)),
                       SizedBox(height: 2.h),
                       Text(
                         "No Events Found",
@@ -1211,8 +1234,10 @@ colorText: Colors.white,);
                       SizedBox(height: 1.h),
                       Text(
                         "Try adjusting your filters to find more events.",
-                        style:
-                            TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38), fontSize: 10.sp),
+                        style: TextStyle(
+                            color: AppColors.textColorPrimary
+                                .withValues(alpha: 0.38),
+                            fontSize: 10.sp),
                       ),
                       SizedBox(height: 3.h),
                       OutlinedButton(

@@ -49,7 +49,7 @@ class EventTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(2.h),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textColorPrimary.withOpacity(0.26),
+            color: AppColors.textColorPrimary.withValues(alpha: 0.26),
             blurRadius: 6,
             offset: const Offset(0, 3),
           )
@@ -108,7 +108,7 @@ class EventTab extends StatelessWidget {
                     Text(
                       event.category ?? '',
                       style: TextStyles.regulartext.copyWith(
-                        color: AppColors.textColorSecondary.withOpacity(0.5),
+                        color: AppColors.textColorSecondary.withValues(alpha: 0.5),
                       ),
                     ),
                     const Spacer(),

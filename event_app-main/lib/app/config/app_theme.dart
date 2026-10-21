@@ -41,11 +41,11 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: 24,
             vertical: 12,
           ),
-          textStyle: TextStyle(
+          textStyle: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             color: AppColors.textColorPrimary,
@@ -185,7 +185,7 @@ class AppTheme {
 
       // Text theme with fixed sizes (no Sizer dependency)
       textTheme: TextTheme(
-        displayLarge: TextStyle(
+        displayLarge: const TextStyle(
           fontSize: 32,
           fontWeight: FontWeight.w900,
           color: AppColors.textColorPrimary,

@@ -302,7 +302,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
       child: Align(
         alignment: Alignment.centerLeft,
         child: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textColorPrimary),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: AppColors.textColorPrimary),
           onPressed: () {
             HapticUtils.navigation();
             Navigator.of(context).pop();
@@ -380,8 +381,6 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                       Get.snackbar(
                         'Sign in required',
                         'Please sign in to report or block users.',
-                        
-                        
                         mainButton: TextButton(
                           onPressed: () {
                             Get.closeCurrentSnackbar();
@@ -392,8 +391,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen>
                                   color: AppColors.textColorPrimary,
                                   fontWeight: FontWeight.bold)),
                         ),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                        backgroundColor: AppColors.textColorPrimary,
+                        colorText: Colors.white,
+                      );
                       return;
                     }
                     final profile = controller.profile.value;
@@ -416,7 +416,8 @@ colorText: Colors.white,);
                           Icon(Icons.share_rounded, color: AppColors.blueColor),
                           SizedBox(width: 12),
                           Text('Share Profile',
-                              style: TextStyle(color: AppColors.textColorPrimary)),
+                              style:
+                                  TextStyle(color: AppColors.textColorPrimary)),
                         ],
                       ),
                     ),
@@ -427,7 +428,8 @@ colorText: Colors.white,);
                           Icon(Icons.flag_rounded, color: Colors.orange),
                           SizedBox(width: 12),
                           Text('Report User',
-                              style: TextStyle(color: AppColors.textColorPrimary)),
+                              style:
+                                  TextStyle(color: AppColors.textColorPrimary)),
                         ],
                       ),
                     ),
@@ -438,7 +440,8 @@ colorText: Colors.white,);
                           Icon(Icons.block_rounded, color: Colors.red),
                           SizedBox(width: 12),
                           Text('Block User',
-                              style: TextStyle(color: AppColors.textColorPrimary)),
+                              style:
+                                  TextStyle(color: AppColors.textColorPrimary)),
                         ],
                       ),
                     ),
@@ -600,7 +603,8 @@ colorText: Colors.white,);
               borderRadius: BorderRadius.circular(2.h),
               border: isFollowing
                   ? Border.all(
-                      color: AppColors.textColorPrimary.withValues(alpha: 0.1), width: 1)
+                      color: AppColors.textColorPrimary.withValues(alpha: 0.1),
+                      width: 1)
                   : null,
               boxShadow: isFollowing
                   ? null
@@ -621,8 +625,6 @@ colorText: Colors.white,);
                     Get.snackbar(
                       'Sign in required',
                       'Please sign in or sign up first to follow users',
-                      
-                      
                       duration: const Duration(seconds: 3),
                       mainButton: TextButton(
                         onPressed: () {
@@ -637,8 +639,9 @@ colorText: Colors.white,);
                           ),
                         ),
                       ),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                      backgroundColor: AppColors.textColorPrimary,
+                      colorText: Colors.white,
+                    );
                     return;
                   }
                   final userId = profile.userId;
@@ -656,14 +659,18 @@ colorText: Colors.white,);
                         isFollowing
                             ? Icons.person_remove_rounded
                             : Icons.person_add_rounded,
-                        color: isFollowing ? AppColors.textColorSecondary : Colors.white,
+                        color: isFollowing
+                            ? AppColors.textColorSecondary
+                            : Colors.white,
                         size: 16.sp,
                       ),
                       SizedBox(width: 2.w),
                       Text(
                         isFollowing ? 'Unfollow' : 'Follow',
                         style: TextStyle(
-                          color: isFollowing ? AppColors.textColorSecondary : Colors.white,
+                          color: isFollowing
+                              ? AppColors.textColorSecondary
+                              : Colors.white,
                           fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
                         ),
@@ -725,7 +732,8 @@ colorText: Colors.white,);
             ? Padding(
                 padding: EdgeInsets.only(left: 2.w),
                 child: Text('No interests added',
-                    style: TextStyle(color: AppColors.textColorSecondary, fontSize: 12.sp)),
+                    style: TextStyle(
+                        color: AppColors.textColorSecondary, fontSize: 12.sp)),
               )
             : Wrap(
                 alignment: WrapAlignment.start,
@@ -873,21 +881,30 @@ Download EventGo app to connect with them and discover amazing events!
       final res = await ModerationService.reportUser(userId,
           reason: reason.isEmpty ? null : reason);
       if (res['statusCode'] == 201 || res['statusCode'] == 200) {
-        Get.snackbar('Reported', res['message'] ?? 'Report submitted.',
-            snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        Get.snackbar(
+          'Reported',
+          res['message'] ?? 'Report submitted.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
       } else {
-        Get.snackbar('Error', res['message'] ?? 'Could not submit report.',
-            snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        Get.snackbar(
+          'Error',
+          res['message'] ?? 'Could not submit report.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
-          snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -895,7 +912,8 @@ colorText: Colors.white,);
     final confirm = await Get.dialog<bool>(
       AlertDialog(
         backgroundColor: AppColors.textColorPrimary,
-        title: const Text('Block User?', style: TextStyle(color: AppColors.textColorPrimary)),
+        title: const Text('Block User?',
+            style: TextStyle(color: AppColors.textColorPrimary)),
         content: const Text(
             'This user will be removed from your feed. You can unblock them later from settings.',
             style: TextStyle(color: AppColors.textColorSecondary)),
@@ -914,22 +932,31 @@ colorText: Colors.white,);
     try {
       final res = await ModerationService.blockUser(userId);
       if (res['statusCode'] == 200) {
-        Get.snackbar('Blocked', res['message'] ?? 'User blocked.',
-            snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        Get.snackbar(
+          'Blocked',
+          res['message'] ?? 'User blocked.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
         if (mounted) Navigator.of(context).pop();
       } else {
-        Get.snackbar('Error', res['message'] ?? 'Could not block.',
-            snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        Get.snackbar(
+          'Error',
+          res['message'] ?? 'Could not block.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
-          snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     }
   }
 }
@@ -952,20 +979,23 @@ class _ReportReasonDialogState extends State<_ReportReasonDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.textColorPrimary,
-      title: Text('Report User', style: TextStyle(color: AppColors.textColorPrimary)),
+      title: const Text('Report User',
+          style: TextStyle(color: AppColors.textColorPrimary)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text('Optionally describe the issue:',
-              style: TextStyle(color: AppColors.textColorSecondary, fontSize: 12)),
+              style:
+                  TextStyle(color: AppColors.textColorSecondary, fontSize: 12)),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Reason (optional)',
-              hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38)),
+              hintStyle: TextStyle(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.38)),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
@@ -978,8 +1008,8 @@ class _ReportReasonDialogState extends State<_ReportReasonDialog> {
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(context),
-            child:
-                const Text('Cancel', style: TextStyle(color: AppColors.textColorSecondary))),
+            child: const Text('Cancel',
+                style: TextStyle(color: AppColors.textColorSecondary))),
         TextButton(
             onPressed: () => Navigator.pop(context, _controller.text.trim()),
             child: const Text('Submit',

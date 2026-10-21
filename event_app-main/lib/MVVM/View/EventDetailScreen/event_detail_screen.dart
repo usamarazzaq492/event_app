@@ -103,21 +103,30 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       final res = await ModerationService.reportEvent(eventId,
           reason: reason.isEmpty ? null : reason);
       if (res['statusCode'] == 201 || res['statusCode'] == 200) {
-        Get.snackbar('Reported', res['message'] ?? 'Report submitted.',
-            snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        Get.snackbar(
+          'Reported',
+          res['message'] ?? 'Report submitted.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
       } else {
-        Get.snackbar('Error', res['message'] ?? 'Could not submit report.',
-            snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+        Get.snackbar(
+          'Error',
+          res['message'] ?? 'Could not submit report.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: AppColors.textColorPrimary,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''),
-          snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: AppColors.textColorPrimary,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -410,29 +419,30 @@ colorText: Colors.white,);
                             'Share failed',
                             'Could not open share. Please try again.',
                             snackPosition: SnackPosition.BOTTOM,
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                            backgroundColor: AppColors.textColorPrimary,
+                            colorText: Colors.white,
+                          );
                         }
                       }
                     });
                   } else if (value == 'report') {
                     if (!authViewModel.isLoggedIn.value) {
                       Get.snackbar(
-                          'Sign in required', 'Please sign in to report.',
-                          snackPosition: SnackPosition.BOTTOM,
-                          
-                          
-                          mainButton: TextButton(
-                              onPressed: () {
-                                Get.closeCurrentSnackbar();
-                                Get.toNamed(RouteName.loginScreen);
-                              },
-                              child: const Text('Sign in',
-                                  style: TextStyle(
-                                      color: AppColors.textColorPrimary,
-                                      fontWeight: FontWeight.bold))),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                        'Sign in required',
+                        'Please sign in to report.',
+                        snackPosition: SnackPosition.BOTTOM,
+                        mainButton: TextButton(
+                            onPressed: () {
+                              Get.closeCurrentSnackbar();
+                              Get.toNamed(RouteName.loginScreen);
+                            },
+                            child: const Text('Sign in',
+                                style: TextStyle(
+                                    color: AppColors.textColorPrimary,
+                                    fontWeight: FontWeight.bold))),
+                        backgroundColor: AppColors.textColorPrimary,
+                        colorText: Colors.white,
+                      );
                       return;
                     }
                     await _showReportEventSheet(event.eventId!);
@@ -444,10 +454,11 @@ colorText: Colors.white,);
                       child: Row(children: [
                         Icon(Icons.share_rounded,
                             color: AppColors.textColorPrimary, size: 16.sp),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text('Share',
-                            style:
-                                TextStyle(color: AppColors.textColorPrimary, fontSize: 11.sp))
+                            style: TextStyle(
+                                color: AppColors.textColorPrimary,
+                                fontSize: 11.sp))
                       ])),
                   PopupMenuItem(
                       value: 'report',
@@ -456,8 +467,9 @@ colorText: Colors.white,);
                             color: Colors.orange, size: 16.sp),
                         const SizedBox(width: 8),
                         Text('Report',
-                            style:
-                                TextStyle(color: AppColors.textColorPrimary, fontSize: 11.sp))
+                            style: TextStyle(
+                                color: AppColors.textColorPrimary,
+                                fontSize: 11.sp))
                       ])),
                 ],
               ),
@@ -514,7 +526,7 @@ colorText: Colors.white,);
                     end: Alignment.bottomRight,
                   ),
                 ),
-                child: Center(
+                child: const Center(
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor:
@@ -566,7 +578,11 @@ colorText: Colors.white,);
                       color: AppColors.blueColor.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(2.h),
                       boxShadow: [
-                        BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2),),
+                        BoxShadow(
+                          color: AppColors.blueColor.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
                       ],
                     ),
                     child: Text(
@@ -655,8 +671,8 @@ colorText: Colors.white,);
             child: Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.all(2),
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
                       colors: [AppColors.blueColor, Colors.transparent],
@@ -672,14 +688,16 @@ colorText: Colors.white,);
                       height: 55,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
-                        color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                        color:
+                            AppColors.textColorPrimary.withValues(alpha: 0.05),
                         child: Image.asset(
                           AppImages.profilePlaceholder,
                           fit: BoxFit.contain,
                         ),
                       ),
                       errorWidget: (context, url, error) => Container(
-                        color: AppColors.textColorPrimary.withValues(alpha: 0.05),
+                        color:
+                            AppColors.textColorPrimary.withValues(alpha: 0.05),
                         child: Image.asset(
                           AppImages.profilePlaceholder,
                           fit: BoxFit.contain,
@@ -697,7 +715,8 @@ colorText: Colors.white,);
                         'HOSTED BY',
                         style: TextStyle(
                           fontSize: 8.sp,
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.38),
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
                         ),
@@ -815,8 +834,9 @@ colorText: Colors.white,);
                       Get.snackbar(
                         'Location not available',
                         'This event does not have a valid location.',
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                        backgroundColor: AppColors.textColorPrimary,
+                        colorText: Colors.white,
+                      );
                       return;
                     }
 
@@ -832,15 +852,17 @@ colorText: Colors.white,);
                         Get.snackbar(
                           'Maps not available',
                           'Could not open Google Maps on this device.',
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                          backgroundColor: AppColors.textColorPrimary,
+                          colorText: Colors.white,
+                        );
                       }
                     } catch (_) {
                       Get.snackbar(
                         'Maps not available',
                         'Could not open Google Maps on this device.',
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                        backgroundColor: AppColors.textColorPrimary,
+                        colorText: Colors.white,
+                      );
                     }
                   },
                   child: Container(
@@ -1024,7 +1046,8 @@ colorText: Colors.white,);
                       title.toUpperCase(),
                       style: TextStyle(
                         fontSize: 8.sp,
-                        color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                        color:
+                            AppColors.textColorPrimary.withValues(alpha: 0.38),
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.2,
                       ),
@@ -1223,7 +1246,8 @@ colorText: Colors.white,);
                               'EVENT STATUS',
                               style: TextStyle(
                                 fontSize: 8.sp,
-                                color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                                color: AppColors.textColorPrimary
+                                    .withValues(alpha: 0.38),
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: 1.2,
                               ),
@@ -1302,7 +1326,8 @@ colorText: Colors.white,);
                                   ? 'ALREADY BOOKED'
                                   : isCreator
                                       ? 'YOUR EVENT'
-                                      : (event.isOrganizerPayPalConnected == false)
+                                      : (event.isOrganizerPayPalConnected ==
+                                              false)
                                           ? 'UNAVAILABLE'
                                           : 'GET TICKETS',
                       icon: hasEventEnded
@@ -1313,7 +1338,8 @@ colorText: Colors.white,);
                                   ? Icons.check_circle_rounded
                                   : isCreator
                                       ? Icons.person_rounded
-                                      : (event.isOrganizerPayPalConnected == false)
+                                      : (event.isOrganizerPayPalConnected ==
+                                              false)
                                           ? Icons.block_rounded
                                           : Icons.shopping_bag_rounded,
                       color: hasEventEnded
@@ -1324,7 +1350,8 @@ colorText: Colors.white,);
                                   ? Colors.green
                                   : isCreator
                                       ? Colors.purple
-                                      : (event.isOrganizerPayPalConnected == false)
+                                      : (event.isOrganizerPayPalConnected ==
+                                              false)
                                           ? Colors.red
                                           : AppColors.blueColor,
                       isDisabled: hasEventStarted ||
@@ -1339,8 +1366,6 @@ colorText: Colors.white,);
                             'Sign in to get tickets',
                             'Create an account to purchase tickets.',
                             snackPosition: SnackPosition.BOTTOM,
-                            
-                            
                             mainButton: TextButton(
                               onPressed: () =>
                                   Get.toNamed(RouteName.loginScreen),
@@ -1352,8 +1377,9 @@ colorText: Colors.white,);
                                 ),
                               ),
                             ),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                            backgroundColor: AppColors.textColorPrimary,
+                            colorText: Colors.white,
+                          );
                           return;
                         }
                         NavigationUtils.push(
@@ -1648,7 +1674,8 @@ colorText: Colors.white,);
                         'ORGANIZER TOOLS',
                         style: TextStyle(
                           fontSize: 8.sp,
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.38),
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
                         ),
@@ -1668,7 +1695,7 @@ colorText: Colors.white,);
               ),
               SizedBox(height: 3.h),
               if (_isLoadingQrCodes)
-                Center(
+                const Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: CircularProgressIndicator(),
@@ -1677,11 +1704,12 @@ colorText: Colors.white,);
               else if (_qrCodes.isEmpty)
                 Center(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Text(
                       'No payment QR codes generated yet.',
                       style: TextStyle(
-                        color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                        color:
+                            AppColors.textColorPrimary.withValues(alpha: 0.38),
                         fontSize: 10.sp,
                       ),
                     ),
@@ -1779,7 +1807,11 @@ colorText: Colors.white,);
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(1.5.h),
                   boxShadow: [
-                    BoxShadow(color: AppColors.blueColor.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4),),
+                    BoxShadow(
+                      color: AppColors.blueColor.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                   ],
                 ),
                 child: QrImageView(
@@ -1846,7 +1878,8 @@ colorText: Colors.white,);
                         'EVENT CONTENT',
                         style: TextStyle(
                           fontSize: 8.sp,
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.38),
                           fontWeight: FontWeight.w800,
                           letterSpacing: 1.2,
                         ),
@@ -1917,7 +1950,8 @@ colorText: Colors.white,);
                         'This live stream is available for ticket holders only.',
                         style: TextStyle(
                           fontSize: 10.sp,
-                          color: AppColors.textColorPrimary.withValues(alpha: 0.38),
+                          color: AppColors.textColorPrimary
+                              .withValues(alpha: 0.38),
                           height: 1.5,
                         ),
                         textAlign: TextAlign.center,
@@ -1934,8 +1968,6 @@ colorText: Colors.white,);
                               'Sign in to get tickets',
                               'Create an account to purchase tickets.',
                               snackPosition: SnackPosition.BOTTOM,
-                              
-                              
                               mainButton: TextButton(
                                 onPressed: () =>
                                     Get.toNamed(RouteName.loginScreen),
@@ -1947,8 +1979,9 @@ colorText: Colors.white,);
                                   ),
                                 ),
                               ),
-backgroundColor: AppColors.textColorPrimary,
-colorText: Colors.white,);
+                              backgroundColor: AppColors.textColorPrimary,
+                              colorText: Colors.white,
+                            );
                             return;
                           }
                           NavigationUtils.push(
@@ -2001,20 +2034,24 @@ class _ReportEventReasonDialogState extends State<_ReportEventReasonDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Colors.white,
-      title: Text('Report Event', style: TextStyle(color: AppColors.textColorPrimary, fontWeight: FontWeight.bold)),
+      title: const Text('Report Event',
+          style: TextStyle(
+              color: AppColors.textColorPrimary, fontWeight: FontWeight.bold)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text('Optionally describe the issue:',
-              style: TextStyle(color: AppColors.textColorSecondary, fontSize: 12)),
+              style:
+                  TextStyle(color: AppColors.textColorSecondary, fontSize: 12)),
           const SizedBox(height: 8),
           TextField(
             controller: _controller,
             maxLines: 3,
             decoration: InputDecoration(
               hintText: 'Reason (optional)',
-              hintStyle: TextStyle(color: AppColors.textColorPrimary.withValues(alpha: 0.38)),
+              hintStyle: TextStyle(
+                  color: AppColors.textColorPrimary.withValues(alpha: 0.38)),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               filled: true,
@@ -2027,8 +2064,8 @@ class _ReportEventReasonDialogState extends State<_ReportEventReasonDialog> {
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(context),
-            child:
-                const Text('Cancel', style: TextStyle(color: AppColors.textColorSecondary))),
+            child: const Text('Cancel',
+                style: TextStyle(color: AppColors.textColorSecondary))),
         TextButton(
             onPressed: () => Navigator.pop(context, _controller.text.trim()),
             child: const Text('Submit',

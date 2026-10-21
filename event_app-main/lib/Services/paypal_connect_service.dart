@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:event_app/app/config/app_url.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,10 +48,10 @@ class PayPalConnectService {
         final data = jsonDecode(response.body);
         return data['oauth_url'];
       }
-      print('PayPal Connect Error: ${response.statusCode} - ${response.body}');
+      debugPrint('PayPal Connect Error: ${response.statusCode} - ${response.body}');
       return null;
     } catch (e) {
-      print('PayPal Connect Exception: $e');
+      debugPrint('PayPal Connect Exception: $e');
       return null;
     }
   }

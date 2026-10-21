@@ -259,7 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           Container(
             width: 120,
             height: 120,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.textColorSecondary,
               shape: BoxShape.circle,
             ),
@@ -463,7 +463,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               height: 2,
               width: 20.w,
               margin: EdgeInsets.only(top: 0.5.h),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [AppColors.blueColor, Colors.transparent],
                 ),
@@ -930,7 +930,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           height: 15.h,
                           color: AppColors.textColorPrimary
                               .withValues(alpha: 0.05),
-                          child: Center(
+                          child: const Center(
                               child: CircularProgressIndicator(strokeWidth: 2)),
                         ),
                         errorWidget: (context, url, error) => Container(
