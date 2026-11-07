@@ -41,11 +41,21 @@ class _PayPalPaymentPageState extends State<PayPalPaymentPage> {
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setUserAgent(
+        'Mozilla/5.0 (Linux; Android 14; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Mobile Safari/537.36',
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (NavigationRequest request) {
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
       ..addJavaScriptChannel(
         'FlutterWebView',
         onMessageReceived: (message) async {
           final nonce = message.message;
-          debugPrint('🔑 Received Square nonce: $nonce');
+          debugPrint('🔑 Received nonce: $nonce');
           await sendToBackend(nonce);
         },
       )

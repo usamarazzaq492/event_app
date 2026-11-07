@@ -36,7 +36,8 @@ class PayPalConnectController extends Controller
         $state = Crypt::encryptString($organizer->organizerId . '|' . Str::random(20));
 
         $clientId = config('paypal.client_id');
-        $redirectUri = env('APP_URL') . '/paypal/callback';
+        $appUrl = config('app.url') ?: env('APP_URL') ?: 'https://eventgo-live.com';
+        $redirectUri = rtrim($appUrl, '/') . '/paypal/callback';
         $environment = config('paypal.environment', 'sandbox');
 
         if (empty($clientId)) {
